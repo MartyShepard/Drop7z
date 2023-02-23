@@ -1,0 +1,113 @@
+DropSevenZip (Drop.7z)
+
+Todo:
+	..Convert Archive to 7z
+
+v0.99.91 Final Beta Early Access Nicht Bezahlt Edition und so.... (Quick Fix)
+- Fixed 7z Memory Exit Code
+- Added: Drop7z Create now SH1 Files, ON/Off ?, look in the Traymenu.
+- Added: DropSum, a Chesum Verifier for SHA1 Files. DoubleClick on SHA files and
+  Open with DropSum
+	
+v0.99.81 Final Beta Early Access Developer Edition und so.... (Quick Fix)
+- Fixed Autostart loading with Profiles.ini and Histroy.ini. ..... hum....
+
+v0.99.8 Final Beta Early Access Developer Edition und so....
+- Small Design and Bug Fixes in the Combobox lists. Changed to using now orignal WindowsAPI stuff.
+- Changed Drop7z.ini and Profiles.ini handle.
+- Fix a small bug with Password. If there exists a password and is not Check Marked. It  does'nt show in the
+  Profile Editor.
+	
+v0.99.7 Final Beta Early Access Developer Edition und so....
+- Updated Purebasic to 5.30 and use now the New Compiler
+- Fixed a small redirect bug in Autostart
+- Fixed and catch a Destination Path bug with Letter ()
+- Exchanged Normal Destination String with History Combobox
+- Added Autocomplete to the History Combobox
+- History stored in the file named Drop7z_History.ini
+- Added in the Popup and Tray Menu the Option to Clear the History
+
+v0.99.6 Final Beta Early Access	
+- Todo List: ..Create Executable Files
+- Added 7zSFX Support. Create Sevenzip Selfextract Archives
+
+From v0. 99.0 >> v0.99.5 Final Beta Early Access	
+- Fixed Destination Path in Continous Single Mode.
+- Fixed Window 'Stay on top' on Minimized to Tray  
+- Added New Style Requester from LH.Game(Start,i)
+- Localizied in German and English
+- Fixed Continous Single Mode handle run
+- Fixed the Archiv name Suffix in Combination with Split Archive and Blank Name
+- Optimze Memory and Program Size
+- About Window extended. Add Mail Send and Homepage Button
+- Add Sendmail with 7z Archive Attachment (Support Outlook)
+  If not Installed, it try to open your default Mail Client with the Attachement
+- Fixed Delete Directorys in Single Mode
+- Extended Requester Message if an Error occured due Delete Files
+- Fixed: a Marked State in the FileList
+- Fixed: Catched Abort ExitCode by 7z if You Compress or Verfiy an Archive.
+- Optimze Memory
+- Small bug's Fixed in the Profile Editor
+- Added 'Single/Multi Instance' Option (Look at the Tray Icon Menu)
+- Added 'Dont't ask me' for the Delete Files Option
+- State Fix in the Password Checkbox
+- Fixed Bug in Delete Files (Allcoate  Memory was to small. Not all Files was be Delete to Recycle bin)
+- State Fix for Size/Items not Disable. 
+- Command Clear File List does'nt Reset the Password ... hum 
+- Heavy Design Changes
+- Changed FileLister to Select various single Files
+ (If not Checkmkarked Pack all Files, If Checkmarked Pack Only Selected Files)
+- Put Delete Fils Function to the File List PopupMenu.
+- 4 New PopupMenu File List Entries, Select All, Deselct all, Removed Maked and NonMarked Items
+- Added Option to Rename Profiles
+- Added : 'Auto Clear File List' to the Tray Icon and FileLister PopupMenu.
+ (Once Disabled, you can add Files and Folders from various HD locations and Compress it)
+- Change: FileLister, added Size.
+- Change: Calculation Size Function 
+- Change: 'Delete Files' function. If you Compress all Files as seperat Archiv. It Delete
+  No 7z Archives.
+- Added 'Del/Entf' Key to Remove the Selected Item in the File List.
+- Change: Option Splittet, Start With Windows and Minimized  (Tray Icon Menu)
+- Added : Drop.7z Window 'Stay On Top' (Tray Icon Menu)
+- Added : Delete Files after Compressing in 7z archives. (Beta) (Look at The Tray Icon Menu)
+- Filehandling Issue in Combination with Directory's and Suffix
+- Start with Windows State Fix
+- Added a Relead/Refresh Button on the Profiles Window
+- Fixed Missing Refresh State on Program Start 
+- Fixed NoSPlit/SplitMode on Profile Window. Corrected Filename
+  Change on Profile Window (Use and Close)
+- Element 'Open File' and 'Size View'. Corrected State Disable/Enable
+- Few Font Changes
+- Small Bug Fix on Password State if you go back from the Profile 
+  Window to Main Window
+- little Changes
+- Added -ssw Command line as Check-box
+- Profile Window Changes
+- Changes: Detail Fixes, Design changes in the Profile Window 
+- Added: Function to Delete the selected Profile
+- Added: -ssw to the 7z command-line
+- Added: The 7z Default Compressions (Store,Fast,Normal. etc..)
+- Fixed: The Window TopFront handle on Profile Window & About Window
+- ... and a Few Design Changes
+- Added: You can self change Split Size for Multi-Volumes Archives
+- Fixed: Window Handle that hide the 7z string field
+- Added: Profile Settings. Save and Stored your Individual Settings
+- Bug Fix on Path Finding eq: C:\Test\Test\Test
+- Layout Changes
+- Added 'Compress Single' Option (Pack All Files/Folders in a Separate Archive)
+- Added PopUp Menu in the FileList Window (Press Right Mouse)
+  Added To Menu:
+	Compress: Complete List 		(it's the same how 'Go And Pack' Button)
+	Compress: All Separate			(It's the same how ''Compress Single' Button)
+	Compress: Current Item		(Pack the current Selected Item)
+	'Remove: Items' and 'Remove Current Item' from List
+ - Added 150mb Option to the Split Archives
+ - Add a Progress Indicate for ''Compress Single' Option
+ - Handle Changes on Running 7z
+- Few Design Changes
+- Added Option to Split Archives
+- Add Missing ToolType Tip for Destination Directory
+- Show the Size of the Dragged Directory and/or Files
+
+
+v0.95 *First Public Release
