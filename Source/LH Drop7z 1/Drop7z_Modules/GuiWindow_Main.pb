@@ -293,8 +293,8 @@ Module GUI04
 EndModule
 
 ; IDE Options = PureBasic 6.00 LTS (Windows - x64)
-; CursorPosition = 40
-; FirstLine = 123
+; CursorPosition = 104
+; FirstLine = 63
 ; Folding = --
 ; EnableAsm
 ; EnableXP

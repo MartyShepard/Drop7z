@@ -111,7 +111,7 @@ DeclareModule UnRAR
 	Global RARSetPassword.RARSetPassword
 	Global RARGetDllVersion.RARGetDllVersion
 	
-	Declare  RARUnpackArchiv(FileName.s, DestPath.s = "", Password.s = "", *Callback = 0, szGadgetID = 0)
+	Declare  RARUnpackArchiv(FileName.s, DestPath.s = "", Password.s = "", *Callback = 0, szGadgetID = 0, szGadgetID_With = 0)
 EndDeclareModule
 
 Module UnRAR
@@ -169,7 +169,25 @@ Module UnRAR
 		EndSelect
 	EndProcedure
 	
-	Procedure RARUnpackArchiv(FileName.s, DestPath.s = "", Password.s = "", *Callback = 0, szGadgetID = 0)
+	Procedure 	UnCompressSetInfo(szString.s, szGadgetID.i, szGadgetID_With.i)
+		Protected szInfo.s
+		Define rect.RECT
+		
+		;Delay(25)
+				
+		rect\left  = 0
+		rect\right = szGadgetID_With
+		rect\top   = 0
+		rect\bottom= GadgetHeight(szGadgetID)
+				
+		szInfo =  ReplaceString( szString , "/","\") 
+		DrawText_(GetDC_(0),@szInfo,-1,@rect,#DT_PATH_ELLIPSIS|#DT_MODIFYSTRING)	
+		SetGadgetText(DC::#String_005,"Extract: RAR:\" +szInfo)	
+					
+		
+	EndProcedure
+	
+	Procedure RARUnpackArchiv(FileName.s, DestPath.s = "", Password.s = "", *Callback = 0, szGadgetID = 0, szGadgetID_With = 0)
 		Protected i.i
 		Protected  szFilename.s
 		Protected raropen.RAROpenArchiveDataEx
@@ -218,7 +236,7 @@ Module UnRAR
 				EndIf	
 				
 				If ( IsGadget( szGadgetID ) And Len( szFilename ) > 0 )
-					SetGadgetText(szGadgetID,"Extract: [" + UCase( GetExtensionPart( FileName ) ) + "]\" + szFilename )	
+					UnCompressSetInfo(szFilename, szGadgetID, szGadgetID_With)					
 				EndIf	
 					
 				If RARProcessFile(hRAR, #RAR_EXTRACT, DestPath, #Null$) <> #ERAR_SUCCESS					
@@ -240,8 +258,8 @@ CompilerIf #PB_Compiler_IsMainFile
 CompilerEndIf	
 
 ; IDE Options = PureBasic 6.00 LTS (Windows - x64)
-; CursorPosition = 189
-; FirstLine = 171
+; CursorPosition = 171
+; FirstLine = 161
 ; Folding = --
 ; EnableAsm
 ; EnableXP

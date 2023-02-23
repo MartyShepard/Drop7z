@@ -50,6 +50,7 @@ Module DropVert
 		exitCodeLo.i
 		ResultMax.i
 		ContinueOnError.i
+		rect.RECT
 		List Collection.s()
 		List ConvertResult.CONVERT_RESULT()
 		List Mis.s()
@@ -929,11 +930,123 @@ Module DropVert
 	EndProcedure	
 	;
 	;
-	;		
+	;
+	Procedure 	UnCompressSetInfo(*P.PROGRAM_BOOT,szString.s)
+		Protected szInfo.s
+		
+		; The method of formatting the text. This parameter can be one Or more of the following values.
+		; 
+		; Value			Meaning
+		; DT_CENTER			Centers text horizontally IN the rectangle.
+		; DT_TOP			Justifies the text To the top of the rectangle.		
+		; DT_BOTTOM			Justifies the text To the bottom of the rectangle. This value is used only With the DT_SINGLELINE value.
+		; DT_LEFT			Aligns text To the left.
+		; DT_RIGHT			Aligns text To the right.		
+		; DT_VCENTER		Centers text vertically. This value is used only With the DT_SINGLELINE value.		
+		;
+		; DT_NOCLIP			Draws without clipping. DrawText is somewhat faster when DT_NOCLIP is used.		
+		;
+		; DT_INTERNAL		Uses the system font To calculate text metrics.		
+		;
+		; DT_CALCRECT		Determines the width And height of the rectangle. If there are multiple lines of text, DrawText uses
+		;				the width of the rectangle pointed To by the lpRect parameter And extends the base of the rectangle
+		;				To BOUND the last line of text. If the largest word is wider than the rectangle, the width is expanded.
+		;				If the text is less than the width of the rectangle, the width is reduced. If there is only one line of
+		;				text, DrawText modifies the right side of the rectangle so that it bounds the last character IN the line.
+		;				IN either Case, DrawText returns the height of the formatted text but does Not draw the text.
+		;
+		; DT_PATH_ELLIPSIS	For displayed text, replaces characters IN the middle of the string With ellipses so that the result fits
+		;				IN the specified rectangle. If the string contains backslash (\\) characters, DT_PATH_ELLIPSIS preserves
+		;				As much As possible of the text after the last backslash. The string is Not modified unless the DT_MODIFYSTRING 
+		;				flag is specified. Compare With DT_END_ELLIPSIS And DT_WORD_ELLIPSIS.		
+		;
+		; DT_END_ELLIPSIS		For displayed text, If the End of a string does Not fit IN the rectangle, it is truncated And ellipses
+		;				are added. If a word that is Not at the End of the string goes beyond the limits of the rectangle, it
+		;				is truncated without ellipses. The string is Not modified unless the DT_MODIFYSTRING flag is specified.		
+		;
+		; 
+		; DT_WORD_ELLIPSIS	Truncates any word that does Not fit IN the rectangle And adds ellipses.
+		;				Compare With DT_END_ELLIPSIS And DT_PATH_ELLIPSIS.		
+		;
+		
+		;
+		; DT_MODIFYSTRING		Modifies the specified string To match the displayed text. This value has no effect unless DT_END_ELLIPSIS Or
+		;				DT_PATH_ELLIPSIS is specified.
+		;
+		; DT_EDITCONTROL		Duplicates the text-displaying characteristics of a multiline edit control. Specifically, the average
+		;				character width is calculated IN the same manner As For an edit control, And the function does Not display
+		;				a partially visible last line.
+
+		; 
+		; 				Compare With DT_PATH_ELLIPSIS And DT_WORD_ELLIPSIS.
+		; 
+		; DT_EXPANDTABS		Expands tab characters. The Default number of characters per tab is eight.
+		;				The DT_WORD_ELLIPSIS, DT_PATH_ELLIPSIS, And DT_END_ELLIPSIS values cannot be used With the DT_EXPANDTABS value.
+		; DT_EXTERNALLEADING	Includes the font external leading IN line height. Normally, external leading is Not included IN the height of a line of text.
+		; DT_HIDEPREFIX		Ignores the ampersand (&) prefix character IN the text. The letter that follows will Not be underlined, but
+		;				other mnemonic-prefix characters are still processed.
+		; 				Example:
+		; 
+		; 					input string: "A&bc&&d"
+		; 
+		; 					normal: "Abc&d"
+		; 
+		; 					DT_HIDEPREFIX: "Abc&d"
+		; 
+		; 				Compare With DT_NOPREFIX And DT_PREFIXONLY.
+		; DT_NOPREFIX		Turns off processing of prefix characters. Normally, DrawText interprets the mnemonic-prefix character & As
+		;				a directive To underscore the character that follows, And the mnemonic-prefix characters && As a directive
+		;				To print a single &. By specifying DT_NOPREFIX, this processing is turned off. For example,
+		; 				Example:
+		; 
+		; 					input string: "A&bc&&d"
+		; 
+		; 					normal: "Abc&d"
+		; 
+		; 					DT_NOPREFIX: "A&bc&&d"
+		;
+		; DT_PREFIXONLY		Draws only an underline at the position of the character following the ampersand (&) prefix character.
+		;				Does Not draw any other characters IN the string. For example,
+		; 				Example:
+		; 
+		; 					input string: "A&bc&&d"n
+		; 
+		; 					normal: "Abc&d"
+		; 
+		; 					DT_PREFIXONLY: " _ "		
+		; 
+		;
+		; DT_NOFULLWIDTHCHARBREAK	Prevents a line Break at a DBCS (double-wide character string), so that the line breaking rule is 
+		;					equivalent To SBCS strings. For example, this can be used IN Korean windows, For more readability
+		;					of icon labels. This value has no effect unless DT_WORDBREAK is specified.
+		; 
+		; 
+		; DT_RTLREADING		Layout IN right-To-left reading order For bidirectional text when the font selected INTO the hdc is a
+		;				Hebrew Or Arabic font. The Default reading order For all text is left-To-right.
+		; DT_SINGLELINE		Displays text on a single line only. Carriage returns And line feeds do Not Break the line.
+		; DT_TABSTOP		SETS tab stops. Bits 15-8 (high-order byte of the low-order word) of the uFormat parameter specify the
+		;				number of characters For each tab. The Default number of characters per tab is eight. The DT_CALCRECT,
+		;				DT_EXTERNALLEADING, DT_INTERNAL, DT_NOCLIP, And DT_NOPREFIX values cannot be used With the DT_TABSTOP value.
+
+		; DT_WORDBREAK		Breaks words. Lines are automatically broken between words If a word would extend past the edge of the rectangle
+		;				specified by the lpRect parameter. A carriage Return-line feed sequence also breaks the line. If this is Not
+		;				specified, output is on one line.
+
+		*P\rect\left = 0
+		*P\rect\right = 300
+		szInfo =  ReplaceString( szString , "/","\") 
+		DrawText_(GetDC_(GadgetID(DC::#String_005)),@szInfo,-1,@*P\rect,#DT_CALCRECT|#DT_PATH_ELLIPSIS|#DT_MODIFYSTRING|#DT_NOCLIP)	
+		SetGadgetText(DC::#String_005,"Extract: " + UCase( GetExtensionPart( *P\ConvertResult()\File ))+":\" +szInfo)	
+					
+		
+	EndProcedure
+	;
+	;
+	;
 	Procedure 	 UnCompressZIP(*P.PROGRAM_BOOT, pbPackerPlugin.i)
 		Protected.i PackData, Result, SizeLocal, SizePacked, PackType, SizeUnPacked
-		Protected.s szFilePack, szDirectory, szPackedFile, szUnPackedFile, szUnicode
-		
+		Protected.s szFilePack, szDirectory, szPackedFile, szUnPackedFile, szUnicode,Infotext
+			
 		AddElement( *P\ConvertResult() ) 
 
 		*P\ConvertResult()\File 		= *P\Collection() 
@@ -980,6 +1093,8 @@ Module DropVert
 						Continue
 					EndIf	
 					
+	
+						
 					Debug "Pack Name: " + Chr(34) +RSet( szPackedFile , 50, " ") + Chr(34) +#CRLF$ +
 					      " [ Size UnCompress: " + RSet( Str( SizeUnPacked ), 12, " ") +  #TAB$ +
 					      " | Size Compressed: " + RSet( Str( SizePacked   ), 12, " ") + #TAB$ +
@@ -995,9 +1110,8 @@ Module DropVert
 					szUnPackedFile = UnCompressZIP_GenerateDirs(szUnPackedFile)
 					
 					Debug "Extract  : " + Chr(34) + szUnPackedFile + Chr(34) + #CRLF$	
-					
-					SetGadgetText(DC::#String_005,"Extract: "+UCase( GetExtensionPart( *P\ConvertResult()\File ))+":\" + szPackedFile )
-					Delay(5)
+					UnCompressSetInfo(*P,szPackedFile)
+									
 					;
 					; Verzeichnisse werden NICHT "Entpackt". Die müssen angelegt werden
 					Select PackType
@@ -1009,6 +1123,9 @@ Module DropVert
 							EndSelect 
 							
 							Continue
+						Default
+							
+						
 					EndSelect					
 
 					Result = UncompressPackFile( PackData , szUnPackedFile)
@@ -1068,6 +1185,7 @@ Module DropVert
 	Procedure UnCompressRAR(*P.PROGRAM_BOOT)
 		Protected.s szDirectory
 		Protected.i Result
+
 		
 		AddElement( *P\ConvertResult() ) 
 
@@ -1084,7 +1202,7 @@ Module DropVert
 			szDirectory + "\"
 		EndIf	
 		
-		Result = UnRar::RARUnpackArchiv(*P\ConvertResult()\File, szDirectory, "", 0,  DC::#String_005)					
+		Result = UnRar::RARUnpackArchiv(*P\ConvertResult()\File, szDirectory, "", 0,  DC::#String_005, GadgetWidth( DC::#String_005)-58)					
 		
 		Debug "UnRAR Result: " + Str( Result )
 		If Result = 0
@@ -1170,9 +1288,11 @@ Module DropVert
 						; -5 : Extractting by File = File Not in the List
 						; -6 : Extractting by Nr   = Number excced List
 						; -7 : Extractting by Nr   = File Not in the List						
+						
 						Result =  UnLZX::Extract_Archive(*LzxMemory, szDirectory,"", UnLZX::User_LZX_List()\FileNum)
 						
-						SetGadgetText(DC::#String_005,"Extract: "+UCase( GetExtensionPart( *P\ConvertResult()\File ))+":\" + UnLZX::User_LZX_List()\PathFile )
+						UnCompressSetInfo(*P,UnLZX::User_LZX_List()\PathFile)
+						;SetGadgetText(DC::#String_005,"Extract: "+UCase( GetExtensionPart( *P\ConvertResult()\File ))+":\" + UnLZX::User_LZX_List()\PathFile )
 						Delay(5)
 						
 					EndIf
@@ -1214,7 +1334,7 @@ Module DropVert
 		
 		
 		Select UCase( GetExtensionPart( *P\Collection() ) )
-			Case "RAR", "ARJ"	; Not Yet Supportet
+			Case "RAR"; Not Yet Supportet, "ARJ"	
 				UnCompressRAR(*P)				
 			Case "ZIP", "PK4", "PK3","KPF", "TSU"
 				; KPF : QuakeEX
@@ -1232,9 +1352,6 @@ Module DropVert
 		EndSelect		
 		
 	EndProcedure	
-	;
-	;
-	;	
 	;
 	;
 	;
@@ -1468,9 +1585,7 @@ Module DropVert
 	;
 	;	
 	Procedure ConvertArchive()
-		
-		
-		
+
 		Protected bUnRarFound.i = #True, szUnrarDLL.s = ""
 		
 		Protected Lst.s         = ""
@@ -1512,6 +1627,11 @@ Module DropVert
 		*P\szPrgSWord      = ""
 		*P\szTempFile      = ""
 		*P\PrgFlag         = 0
+		
+		*P\rect\left  = 0
+		*P\rect\right = GadgetWidth(DC::#String_001)
+		*P\rect\top   = 0
+		*P\rect\bottom= GadgetHeight(DC::#String_001)
 		
 		; Suche nach 7z Location
 		*P\Program         = DropCode::Locate7z(1)
@@ -1579,7 +1699,7 @@ Module DropVert
 						EndIf						
 					Case "ZIP", "TAR", "PK3", "PK4","KPF", "TSU", "GZ", "LZX"
 						; OK       
-					Case "RAR", "ARJ"	
+					Case "RAR";, "ARJ"
 
 						CompilerIf #PB_Compiler_Processor = #PB_Processor_x64	
 							szUnRarDLL = GetPathPart( ProgramFilename() ) + "UnRAR\unrar64.dll"
@@ -1724,9 +1844,9 @@ Module DropVert
 	EndProcedure	
 EndModule
 ; IDE Options = PureBasic 6.00 LTS (Windows - x64)
-; CursorPosition = 1307
-; FirstLine = 814
-; Folding = jAAcm---
+; CursorPosition = 948
+; FirstLine = 482
+; Folding = jAAcm-A-
 ; EnableAsm
 ; EnableXP
 ; UseMainFile = ..\Drop7z.pb
