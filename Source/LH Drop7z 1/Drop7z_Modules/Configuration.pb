@@ -111,7 +111,7 @@ Module CFG
         Protected Size.i
         
         
-        *Config\Version.s    = "0.99.96 FF"
+        *Config\Version.s    = "1.00b FF"
         *Config\WindowTitle.s= "Drop7z v"+ *Config\Version.s +" By Marty Shepard"
         
         *Config\ConfigPath.s = GetPathPart( ProgramFilename() ) + "Drop7z.ini"
@@ -203,9 +203,9 @@ Module CFG
         
     EndProcedure
 EndModule
-; IDE Options = PureBasic 5.73 LTS (Windows - x64)
+; IDE Options = PureBasic 6.00 LTS (Windows - x64)
 ; CursorPosition = 113
-; FirstLine = 96
+; FirstLine = 84
 ; Folding = --
 ; EnableAsm
 ; EnableXP

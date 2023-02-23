@@ -198,8 +198,8 @@ Module DropVert
 			*P\sz7zArchiv + "." + "001"
 		EndIf    
 		
-		SetGadgetText(DC::#String_001, GetFilePart( *P\sz7zArchiv) ); Aktualisere den Dateinam im Vordergrund
-		SetGadgetText(DC::#String_005, GetFilePart( *P\sz7zArchiv,1) ); Aktualisere den Dateinam im Hintergrund
+		;SetGadgetText(DC::#String_001, GetFilePart( *P\sz7zArchiv) ); Aktualisere den Dateinam im Vordergrund
+		;SetGadgetText(DC::#String_005, GetFilePart( *P\sz7zArchiv,1) ); Aktualisere den Dateinam im Hintergrund
 		
 	EndProcedure    
 	;
@@ -1068,7 +1068,6 @@ Module DropVert
 	Procedure UnCompressRAR(*P.PROGRAM_BOOT)
 		Protected.s szDirectory
 		Protected.i Result
-		Define *Callback
 		
 		AddElement( *P\ConvertResult() ) 
 
@@ -1095,8 +1094,120 @@ Module DropVert
 		*P\DstPath = szDirectory ; Lösche das _xxxx Temp Verzeichnis
 		
 		
-	EndProcedure	
+	EndProcedure		
 	;
+	;
+	;
+	
+	Procedure UnCompressLZX(*P.PROGRAM_BOOT)
+		
+		Define *LzxMemory
+		Protected.s szDirectory
+		Protected.i Result	
+		Protected.i ListCount
+		AddElement( *P\ConvertResult() ) 
+
+		*P\ConvertResult()\File 		= *P\Collection() 
+		*P\ConvertResult()\FileCount 	= 0
+		*P\ConvertResult()\MismtachSize = 0
+		*P\ConvertResult()\MisMatchFile = 0
+		*P\ConvertResult()\MisMatchZero = 0	
+		
+		*P\Archivname  			= GetGadgetText(DC::#String_002)  + GetFilePart( *P\ConvertResult()\File , #PB_FileSystem_NoExtension)
+		szDirectory    			= GetPathPart( *P\ConvertResult()\File  ) + GetFilePart( *P\ConvertResult()\File , #PB_FileSystem_NoExtension) + "_[TEMP" + Str( Random(999999,000001) ) + "]"
+		
+		If ( Right( szDirectory, 1) <> "\" )
+			szDirectory + "\"
+		EndIf	
+		
+		*LzxMemory = UnLZX::Process_Archive(*P\ConvertResult()\File)				
+		If ( *LzxMemory > 0 )	
+			
+			;
+			; Verzeichnis Anlegen
+			Select FileSize( szDirectory )
+				Case -1: CreateDirectory( szDirectory )                    
+			EndSelect 			
+			;
+			; Archive Auflisten
+			Result =  UnLZX::Examine_Archive(*LzxMemory)						
+				;
+				; ReturnCodes
+				;
+				; -1 : No LZX File
+				; -2 : Error Data Listing
+				; -3 : Error User Listing
+				; -4 : File is In use
+				;
+				; Listing Example
+			
+
+			
+			If Result > 0			
+				
+				;ListCount =  UnLZX::ListSize_Archive(*LzxMemory)			
+												
+				While NextElement( UnLZX::User_LZX_List() )
+					
+					If  UnLZX::User_LZX_List()\isMerge
+						
+					Else
+					
+					Debug #TAB$ + UnLZX::User_LZX_List()\PathFile
+					
+					Result = UnLZX::Verify_Archive(*LzxMemory, "", UnLZX::User_LZX_List()\FileNum)
+					If ( Result > 0)
+						Debug "Verify: Bad CRC's = " + Str(Result)
+						*P\ConvertResult()\MisMatchFile + 1
+						MessageRequester( "ERROR", "LZX CRC Error on : "+UnLZX::User_LZX_List()\PathFile ,#PB_MessageRequester_Error)
+						
+					Else
+						Debug "Verify: OK"
+						*P\ConvertResult()\FileCount 	+ 1
+						;
+						; ReturnCodes
+						;
+						; -5 : Extractting by File = File Not in the List
+						; -6 : Extractting by Nr   = Number excced List
+						; -7 : Extractting by Nr   = File Not in the List						
+						Result =  UnLZX::Extract_Archive(*LzxMemory, szDirectory,"", UnLZX::User_LZX_List()\FileNum)
+						
+						SetGadgetText(DC::#String_005,"Extract: "+UCase( GetExtensionPart( *P\ConvertResult()\File ))+":\" + UnLZX::User_LZX_List()\PathFile )
+						Delay(5)
+						
+					EndIf
+				EndIf
+				
+					
+				Wend	
+			Else 
+				Select Result
+					Case -1: 
+						MessageRequester( "ERROR", "LZX Fehler: [" + Str(Result) + " No LZX File]" ,#PB_MessageRequester_Warning)
+						*P\ContinueOnError = 1						
+					Case -2
+						MessageRequester( "ERROR", "LZX Fehler: [" + Str(Result) + " Error Data Listing]" ,#PB_MessageRequester_Warning)
+						*P\ContinueOnError = 1									
+					Case -3
+						MessageRequester( "ERROR", "LZX Fehler: [" + Str(Result) + " Error User Listing]" ,#PB_MessageRequester_Warning)
+						*P\ContinueOnError = 1									
+					Case -4
+						MessageRequester( "ERROR", "LZX Fehler: [" + Str(Result) + " File is In use]" ,#PB_MessageRequester_Warning)						
+						*P\ContinueOnError = 1							
+				EndSelect		
+				
+			EndIf	
+					;
+			;
+			; Free File and Free Memory
+			Debug #LFCR$ + "> ... Closing LZX File " + *P\ConvertResult()\File
+			*LzxMemory = UnLZX::Close_Archive(*LzxMemory)
+			
+			
+			*P\DstPath = szDirectory ; Lösche das _xxxx Temp Verzeichnis
+		EndIf
+		
+	EndProcedure
 	;
 	;	
 	Procedure   UncompressCheck(*P.PROGRAM_BOOT)	
@@ -1115,7 +1226,9 @@ Module DropVert
 			Case "TAR", "GZ"
 				UnCompressZIP(*P, #PB_PackerPlugin_Tar)
 			Case "LZ"
-				UnCompressZIP(*P, #PB_PackerPlugin_BriefLZ)					
+				UnCompressZIP(*P, #PB_PackerPlugin_BriefLZ)
+			Case "LZX"	
+				UnCompressLZX(*P)	
 		EndSelect		
 		
 	EndProcedure	
@@ -1133,7 +1246,7 @@ Module DropVert
 		*P\ResultMax = 0
 		Protected Chk.s         = ""		    ; Für Filesize um zu überprüfen ob die Dateiexitiert
 
-		Protected Bra.s         = *P\sz7zArchiv ; Merke das Letzte Archiv bevor im Text Gadget es überschrieben wird
+
 		
 		Protected ItemWidth1.i = GetGadgetItemAttribute(DC::#ListIcon_001,0, #PB_ListIcon_ColumnWidth, 0) ; Directory
 		
@@ -1188,13 +1301,15 @@ Module DropVert
 				;	;  #PB_FileSystem_NoExtension = 1
 				;	*P\sz7zArchiv      =  *P\DstPath + GetFilePart(*P\Collection(), 1)                              
 				;EndIf    
-				
+					
 				;
+				; Aktualisere den Dateinam im Hintergrund 
+				
+				SetGadgetText(DC::#String_005, "Compress: " + Chr(34) + GetFilePart( *P\sz7zArchiv )  + ".7z" + Chr(34) )
+				;                               
 				;
 				SetGadgetState(DC::#Progress_001, Cnt)  
-				;
-				; Aktualisere den Dateinam im Hintergrund  
-				SetGadgetText(DC::#String_005, "Convert To: " + GetFilePart( *P\sz7zArchiv ) )                 
+                 
 				
 				;
 				; Überprüfe oder der Suffix ok ist und
@@ -1290,18 +1405,13 @@ Module DropVert
 					DeleteDirectory( *P\DstPath, "",  #PB_FileSystem_Recursive|#PB_FileSystem_Force )
 				EndIf	
 				
-				Delay( 5 )
-				
-				SetGadgetText(DC::#String_005,  GetFilePart( *P\sz7zArchiv ) )  
+				Delay( 5 ) 
 			Next
 			
 			; Normalisiere den Drop7z Satus
 			SetGadgetState(DC::#Progress_001, 0)
 			
-			;
-			; Füge den Orignalen Dateinamen wieder in das Textgadget
-			SetGadgetText(DC::#String_001, Bra )	        
-			SetGadgetText(DC::#String_005, Bra )
+
 			
 			If ( Items_Count() =  CountGadgetItems(DC::#ListIcon_001) )
 				;
@@ -1331,7 +1441,7 @@ Module DropVert
 	;
 	Procedure.i ConvertArchive_Thread(*P)
 		
-
+		
 		
 		; Ab hier den Durchlauf starten
 		
@@ -1441,6 +1551,7 @@ Module DropVert
 		; werden. 
 		;
 		*P\sz7zArchiv      =  GetGadgetText(DC::#String_001)
+		Protected Bra.s    = *P\sz7zArchiv ; Merke das Letzte Archiv bevor im Text Gadget es überschrieben wird
 		
 		*P\PrgFlag         = #PB_Program_Hide|
 		                     #PB_Program_Open|
@@ -1466,7 +1577,7 @@ Module DropVert
 							EndIf	
 							DeleteElement( *P\Collection() )
 						EndIf						
-					Case "ZIP", "TAR", "PK3", "PK4","KPF", "TSU", "GZ"
+					Case "ZIP", "TAR", "PK3", "PK4","KPF", "TSU", "GZ", "LZX"
 						; OK       
 					Case "RAR", "ARJ"	
 
@@ -1603,14 +1714,19 @@ Module DropVert
 			ProcedureReturn 1           
 		EndIf
 		
+					;
+			; Füge den Orignalen Dateinamen wieder in das Textgadget
+			SetGadgetText(DC::#String_001, Bra )	        
+			SetGadgetText(DC::#String_005, Bra )
+		
 	Wend
 
 	EndProcedure	
 EndModule
 ; IDE Options = PureBasic 6.00 LTS (Windows - x64)
-; CursorPosition = 1105
-; FirstLine = 800
-; Folding = vyAcm---
+; CursorPosition = 1307
+; FirstLine = 814
+; Folding = jAAcm---
 ; EnableAsm
 ; EnableXP
 ; UseMainFile = ..\Drop7z.pb

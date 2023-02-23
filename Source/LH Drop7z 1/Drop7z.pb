@@ -96,7 +96,9 @@ IncludeFile "_INCLUDES\7z_About_Window.pb"
 IncludeFile "_INCLUDES\7z_Prc_Globals.pb"
 IncludeFile "_INCLUDES\_Tray_PopUpMenu.pb"
 
+XIncludeFile "Modules\Module_LZX.pb"
 XIncludeFile "Modules\Module_UnRar.pb" 
+
 IncludeFile "Modules\Module_Compress_Full.pb"         ; Updated
 IncludeFile "Modules\Module_Compress_Single.pb"		; Updated
 IncludeFile "Modules\Module_Convert.pb"			; Updated
@@ -448,7 +450,7 @@ ForEver
 
 ; IDE Options = PureBasic 6.00 LTS (Windows - x64)
 ; CursorPosition = 98
-; FirstLine = 60
+; FirstLine = 76
 ; EnableThread
 ; EnableXP
 ; EnableOnError
