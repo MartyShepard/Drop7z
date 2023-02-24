@@ -179,11 +179,10 @@ Module UnRAR
 		rect\right = szGadgetID_With
 		rect\top   = 0
 		rect\bottom= GadgetHeight(szGadgetID)
-				
+		Delay( 25 )	
 		szInfo =  ReplaceString( szString , "/","\") 
-		DrawText_(GetDC_(0),@szInfo,-1,@rect,#DT_PATH_ELLIPSIS|#DT_MODIFYSTRING)	
-		SetGadgetText(DC::#String_005,"Extract: RAR:\" +szInfo)	
-					
+		DrawText_(GetDC_(0),@szInfo,-1,@rect,#DT_CALCRECT|#DT_PATH_ELLIPSIS|#DT_MODIFYSTRING)	
+		SetGadgetText(szGadgetID,"Extract: RAR:\" +szInfo)						
 		
 	EndProcedure
 	
@@ -258,8 +257,8 @@ CompilerIf #PB_Compiler_IsMainFile
 CompilerEndIf	
 
 ; IDE Options = PureBasic 6.00 LTS (Windows - x64)
-; CursorPosition = 171
-; FirstLine = 161
+; CursorPosition = 181
+; FirstLine = 146
 ; Folding = --
 ; EnableAsm
 ; EnableXP

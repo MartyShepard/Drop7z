@@ -25,7 +25,21 @@ Global iResult_DeleteFiles  = #False
 Declare Event_GadgetEx_Profile()
 Declare ComboAutoText()
 
+;///////////////////////////////////////////////////////////////////////////////// AutoComplete
+Structure comboboxinfo 
+	cbSize.l
+	rcItem.RECT
+	rcButton.RECT
+	stateButton.l
+	hwndCombo.l
+	hwndEdit.l
+	hwndList.l
+EndStructure
 
+Global cbinfo.comboboxinfo
+Global oldcomboProc    
+
+cbinfo\cbsize   = SizeOf(comboboxinfo)
 
 
 ;/////////////////////////////////////////////////////////////////////////////////////// Includes
@@ -141,21 +155,7 @@ GUI00::MakeWin()
 
 DropCode::SetUIElements_Global(0)
 
-;///////////////////////////////////////////////////////////////////////////////// AutoComplete
-Structure comboboxinfo 
-	cbSize.l
-	rcItem.RECT
-	rcButton.RECT
-	stateButton.l
-	hwndCombo.l
-	hwndEdit.l
-	hwndList.l
-EndStructure
 
-Global cbinfo.comboboxinfo
-Global oldcomboProc    
-
-cbinfo\cbsize   = SizeOf(comboboxinfo)
 GetComboBoxInfo_(GadgetID(DC::#String_002),@cbinfo)
 
 tb              = cbinfo.comboboxinfo\hwndedit
@@ -449,8 +449,8 @@ Repeat
 ForEver
 
 ; IDE Options = PureBasic 6.00 LTS (Windows - x64)
-; CursorPosition = 98
-; FirstLine = 76
+; CursorPosition = 41
+; FirstLine = 102
 ; EnableThread
 ; EnableXP
 ; EnableOnError
