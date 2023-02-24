@@ -92,7 +92,13 @@ Module DropCode
         SetMenuItemState(DC::#PopUpMenu_002, 51, CFG::*Config\CHDbSticky)        
         SetMenuItemState(DC::#PopUpMenu_002, 52, CFG::*Config\CHDbClipBoard)
         
-        SetMenuItemState(DC::#PopUpMenu_002, 60, CFG::*Config\PinDirectory)        
+        SetMenuItemState(DC::#PopUpMenu_002, 60, CFG::*Config\PinDirectory) 
+        
+        SetMenuItemState(DC::#PopUpMenu_002, 70,CFG::*Config\HandleExeAsRAR)
+        SetMenuItemState(DC::#PopUpMenu_002, 71,CFG::*Config\HandleExeAsZIP)
+        SetMenuItemState(DC::#PopUpMenu_002, 72,CFG::*Config\HandleExeAsS7Z)        
+        SetMenuItemState(DC::#PopUpMenu_002, 73,CFG::*Config\ConvertDelTemp)        
+
         
     EndProcedure
     ;
@@ -675,10 +681,10 @@ EndProcedure
 
 EndModule
 
-; IDE Options = PureBasic 5.73 LTS (Windows - x64)
-; CursorPosition = 443
-; FirstLine = 58
-; Folding = DA+
+; IDE Options = PureBasic 6.00 LTS (Windows - x64)
+; CursorPosition = 99
+; FirstLine = 57
+; Folding = -O+
 ; EnableAsm
 ; EnableXP
 ; UseMainFile = ..\Drop7z.pb

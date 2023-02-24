@@ -26,6 +26,11 @@
             CHDbSticky.i
             PinDirectory.i
             szPinCurrent.s
+            HandleExeAsRAR.i
+            HandleExeAsZIP.i
+            HandleExeAsS7Z.i
+            ConvertDelTemp.i
+            MoveZIProblems.i
         EndStructure    
         
         *Config.INI_STRUCTURE       = AllocateMemory(SizeOf(INI_STRUCTURE))
@@ -33,6 +38,12 @@
         Declare ReadConfig(*Config.INI_STRUCTURE)
         Declare WriteConfig(*Config.INI_STRUCTURE)
         Declare Make_Config(*Config.INI_STRUCTURE)
+        
+        *Config\HandleExeAsRAR = #False
+        *Config\HandleExeAsZIP = #True
+        *Config\HandleExeAsS7Z = #False
+        *Config\ConvertDelTemp = #True
+        *Config\MoveZIProblems = #True
         
         Declare.s MakeHistory(szFileHistory.s,Force=0)
 EndDeclareModule 
@@ -169,6 +180,8 @@ Module CFG
         *Config\CHDbClipBoard=INIValue::Get_Value("SETTINGS","ClipBoard"    ,*Config\ConfigPath.s)
         *Config\CHDbSticky  = INIValue::Get_Value("SETTINGS","CHDSticky"    ,*Config\ConfigPath.s) 
         *Config\PinDirectory= INIValue::Get_Value("SETTINGS","PinDirectory" ,*Config\ConfigPath.s)
+        
+         
     EndProcedure
     
     ;
@@ -204,8 +217,8 @@ Module CFG
     EndProcedure
 EndModule
 ; IDE Options = PureBasic 6.00 LTS (Windows - x64)
-; CursorPosition = 113
-; FirstLine = 84
+; CursorPosition = 41
+; FirstLine = 7
 ; Folding = --
 ; EnableAsm
 ; EnableXP

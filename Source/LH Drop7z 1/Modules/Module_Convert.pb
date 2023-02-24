@@ -1422,12 +1422,23 @@ Module DropVert
 	;
 	;	
 	Procedure   UncompressCheck(*P.PROGRAM_BOOT)	
-		
+		Protected CheckArchive.s
 		
 		Select UCase( GetExtensionPart( *P\Collection() ) )
-			Case "EXE"; ..................................... 
-				UnCompressZIP(*P, #PB_PackerPlugin_Zip)
-			Case "RAR"; Not Yet Supportet, "ARJ"	
+			Case "EXE"; Try this with ZIP, RAR or 7z									
+				
+				If ( CFG::*Config\HandleExeAsRAR )
+					UnCompressRAR(*P)	
+					
+				ElseIf ( CFG::*Config\HandleExeAsZIP )
+					UnCompressZIP(*P, #PB_PackerPlugin_Zip)
+					
+				ElseIf (CFG::*Config\HandleExeAsS7Z )	
+					UnCompressZIP(*P, #PB_PackerPlugin_Lzma)	
+					
+				EndIf					
+				
+			Case "RAR", "001"; Not Yet Supportet, "ARJ"	
 				UnCompressRAR(*P)				
 			Case "ZIP", "PK4", "PK3","KPF", "TSU"
 				; KPF : QuakeEX
@@ -1624,7 +1635,8 @@ Module DropVert
 					;Delay( 25 )
 				EndIf
 				
-				If ( FileSize( *P\DstPath ) = -2 )
+				
+				If ( FileSize( *P\DstPath ) = -2 And  CFG::*Config\ConvertDelTemp = #True )
 					DeleteDirectory( *P\DstPath, "",  #PB_FileSystem_Recursive|#PB_FileSystem_Force )
 				EndIf	
 				
@@ -1689,11 +1701,71 @@ Module DropVert
 	EndProcedure    
 	;
 	;
+	;
+	Procedure.i	MessageRequester_Show(*P.PROGRAM_BOOT, Option.i = 0, szString.s = "")
+		
+		Select Option
+			Case 1				
+				Result = Request::MSG(DropLang::GetUIText(20), "ReCompress", "7z Archiv Neu Komprimieren und überschreiben?",11,-1,"",0,0,DC::#_Window_001 )
+				
+			Case 2				
+				Request::MSG(DropLang::GetUIText(20), "Archiv Identifikation", "Archiv "+ Chr(34) +GetFilePart( *P\Collection() ) + Chr(34) + " Identifziert als " + szString,2,-1,"",0,0,DC::#_Window_001 )	
+				
+			Case 3
+				Result = Request::MSG(DropLang::GetUIText(20), "Archiv Existiert", "Archiv "+GetFilePart( *P\Collection() , #PB_FileSystem_NoExtension) + ".7z Überschreiben?",11,-1,"",0,0,DC::#_Window_001 )
+				
+			Case 4
+				Request::*MsgEx\User_BtnTextL = "Weiter"
+				Request::*MsgEx\User_BtnTextR = "Abbruch" 				
+				Result = Request::MSG(DropLang::GetUIText(20), "RAR. DLL Not Found", "Rar benötigt die "+ Chr(34) + GetFilePart( szString ) + Chr(34) + " im DropZ Verzeichnis " + GetPathPart( szString ),10,0,"",0,0,DC::#_Window_001 )
+				
+			Case 5
+				Result = Request::MSG(DropLang::GetUIText(20), "Identifiziert als: "+ szString +" ", "Kann Das Archiv [."+GetExtensionPart( *P\Collection() )+"] nicht in 7z umwandeln" + #CRLF$ +  *P\Collection(),10,2,"",0,0,DC::#_Window_001 )				
+				
+			Case 6
+				Result = Request::MSG(DropLang::GetUIText(20), "Can Not Compress", "Kann das Archiv [."+GetExtensionPart( *P\Collection() )+"] nicht IN 7z umwandeln" + #CRLF$ +  *P\Collection(),10,2,"",0,0,DC::#_Window_001 )
+				
+			Case 7
+				Request::MSG( DropLang::GetUIText(20) , "Keine Dateien !?!", "Keine Dateien zum Archivieren", 2, 0, "",0,0,DC::#_Window_001)
+			Case 8
+				Request::*MsgEx\User_BtnTextL = "RAR"			
+				Request::*MsgEx\User_BtnTextM = "ZIP"
+				Request::*MsgEx\User_BtnTextR = "Abbruch"					
+				Result = Request::MSG(DropLang::GetUIText(20), "Archiv Identifikation", "Archiv "+ Chr(34) +GetFilePart( *P\Collection() ) + Chr(34) + " Identifziert als " + szString + #CRLF$ + "Trotzdem Versuchen zu Entpacken/ Konvertieren als RAR/ZIP oder Überspringen?",16,-1,"",0,0,DC::#_Window_001 )	
+								
+		EndSelect
+		
+		ProcedureReturn Result
+	EndProcedure	
+	;
+	;
+	;
+	Macro MessageRequester_Result				
+		If ( ListSize( *P\Collection() ) = 1 )
+			QuitTask(*P): ProcedureReturn 0
+		EndIf	
+		DeleteElement( *P\Collection() )				
+	EndMacro	
+	;
+	;
+	;		
+	;
+	;
 	;	
 	Procedure ConvertArchive()
 
-		Protected bUnRarFound.i = #True, szUnrarDLL.s = ""
+		Protected.s szUnrarDLL, CheckArchive, CheckArchiveLongName
+		Protected.i bHandleExe2S7Z,  bHandleExe2ZIP, bHandleExe2RAR, bUnRarFound
 		
+		szUnrarDLL	= ""
+		bUnRarFound = #True
+		
+		;
+		; Die Letzte User Einstellung Merken
+		bHandleExe2S7Z = CFG::*Config\HandleExeAsS7Z 
+		bHandleExe2ZIP = CFG::*Config\HandleExeAsZIP
+		bHandleExe2RAR = CFG::*Config\HandleExeAsRAR
+							
 		Protected Lst.s         = ""
 		
 		SetGadgetState(DC::#Progress_001, 0)
@@ -1795,29 +1867,70 @@ Module DropVert
 			ForEach *P\Collection()
 				
 				Select UCase( GetExtensionPart( *P\Collection() ) )
+						; ---------------------------------------------------------------------------------------------------------------  						
 					Case "7Z"	
-						Result = Request::MSG(DropLang::GetUIText(20), "ReCompress", "7z Archiv Neu Komprimieren und überschreiben?",11,-1,"",0,0,DC::#_Window_001 )
-						If Result = 1
-							If ( ListSize( *P\Collection() ) = 1 )
-								QuitTask(*P): ProcedureReturn 0
-							EndIf	
-							DeleteElement( *P\Collection() )
-						EndIf				
+						Result = MessageRequester_Show(*P, 1)
+						If ( Result = 1 )
+							MessageRequester_Result
+						EndIf	
+						
+						; ---------------------------------------------------------------------------------------------------------------  						
 					Case "ZIP", "TAR", "PK3", "PK4","KPF", "TSU", "GZ", "TGZ", "LZX", "EXE"
+						
+						If ( UCase( GetExtensionPart( *P\Collection() ) ) = "EXE" )
+							
+
+							
+							CheckArchive = ArchiveCheck::Test_Archive( *P\Collection() )
+							Select CheckArchive
+								Case "ARJSFX"
+									CheckArchiveLongName = "ARJ (Selbstentpackende Datei)"
+									
+								Case "UPX"
+									CheckArchiveLongName = "UPX (Ausfürhbare Datei)"
+									Result = MessageRequester_Show(*P, 8, CheckArchiveLongName)	
+									Select Result
+										Case 0: 
+											CFG::*Config\HandleExeAsRAR = #True
+											CFG::*Config\HandleExeAsZIP = #False
+											CFG::*Config\HandleExeAsS7Z = #False
+											CheckArchive = ""
+										Case 2:											
+											CFG::*Config\HandleExeAsRAR = #False
+											CFG::*Config\HandleExeAsZIP = #True
+											CFG::*Config\HandleExeAsS7Z = #False
+											CheckArchive = ""											
+										Default
+											MessageRequester_Result										
+									EndSelect		
+									
+								Case "RARSFX"
+									CFG::*Config\HandleExeAsRAR = #True
+									CFG::*Config\HandleExeAsZIP = #False
+									CFG::*Config\HandleExeAsS7Z = #False
+									CheckArchive = ""
+								Default
+									CheckArchiveLongName = ""
+							EndSelect	
+							
+							If (Len( CheckArchive) > 0)																									
+								MessageRequester_Show(*P, 2, CheckArchiveLongName)								
+								MessageRequester_Result
+							EndIf									
+							
+						EndIf
 						
 						If ( FileSize( *P\DstPath + GetFilePart( *P\Collection() , #PB_FileSystem_NoExtension) + ".7z" ) >= 0 )
 							
-							Result = Request::MSG(DropLang::GetUIText(20), "Archiv Existiert", "Archiv "+GetFilePart( *P\Collection() , #PB_FileSystem_NoExtension) + ".7z Überschreiben?",11,-1,"",0,0,DC::#_Window_001 )
+							Result = MessageRequester_Show(*P, 3)	
 							If Result = 1
-								If ( ListSize( *P\Collection() ) = 1 )
-									QuitTask(*P): ProcedureReturn 0
-								EndIf	
-								DeleteElement( *P\Collection() )
+								MessageRequester_Result
 							EndIf	
 						EndIf
+						
 							
-						; OK       
-					Case "RAR";, "ARJ"
+						; ---------------------------------------------------------------------------------------------------------------       
+					Case "RAR", "001";, "ARJ"
 
 						CompilerIf #PB_Compiler_Processor = #PB_Processor_x64	
 							szUnRarDLL = GetPathPart( ProgramFilename() ) + "UnRAR\unrar64.dll"
@@ -1826,55 +1939,57 @@ Module DropVert
 						CompilerEndIf
 						
 						If FileSize( szUnRarDLL ) = -1
-
-							Request::*MsgEx\User_BtnTextL = "Weiter"
-							Request::*MsgEx\User_BtnTextR = "Abbruch" 								
-							Result = Request::MSG(DropLang::GetUIText(20), "RAR. DLL Not Found", "Rar benötigt die "+ Chr(34) + GetFilePart( szUnrarDLL ) + Chr(34) + " im DropZ Verzeichnis " + GetPathPart( szUnrarDLL ),10,0,"",0,0,DC::#_Window_001 )
+							
+							Result = MessageRequester_Show(*P, 4, szUnRarDLL)
 							If Result = 0
-								If ( ListSize( *P\Collection() ) = 1 )
-									QuitTask(*P): ProcedureReturn 0
-								EndIf	
-								DeleteElement( *P\Collection() )
+								MessageRequester_Result
 							Else										
-								QuitTask(*P): ProcedureReturn 0
+								QuitTask(*P)
+								ProcedureReturn 0
 							EndIf							
 						EndIf	
 						
 						If ( FileSize( *P\DstPath + GetFilePart( *P\Collection() , #PB_FileSystem_NoExtension) + ".7z" ) >= 0 )
 							
-							Result = Request::MSG(DropLang::GetUIText(20), "Archiv Existiert", "Archiv "+GetFilePart( *P\Collection() , #PB_FileSystem_NoExtension) + ".7z Überschreiben?",11,-1,"",0,0,DC::#_Window_001 )
+							Result = MessageRequester_Show(*P, 3)	
 							If Result = 1
-								If ( ListSize( *P\Collection() ) = 1 )
-									QuitTask(*P): ProcedureReturn 0
-								EndIf	
-								DeleteElement( *P\Collection() )
+								MessageRequester_Result
 							EndIf	
 						EndIf					
 						
+						; ---------------------------------------------------------------------------------------------------------------  						
 					Default
 						; NOT SUPPORT:
 						; - LHA
 						; - ZOO
 						; - LHZ
 						; - ARJ
+						; - UHA
+						; - ACE
 						Request::*MsgEx\User_BtnTextL = "Weiter"
-						Request::*MsgEx\User_BtnTextR = "Abbruch" 						
-						Result = Request::MSG(DropLang::GetUIText(20), "Can Not Compress", "Kann das Archiv [."+GetExtensionPart( *P\Collection() )+"] nicht IN 7z umwandeln" + #CRLF$ +  *P\Collection(),10,2,"",0,0,DC::#_Window_001 )
+						Request::*MsgEx\User_BtnTextR = "Abbruch" 
+						
+						CheckArchive = ArchiveCheck::Test_Archive( *P\Collection() )
+						If (Val(CheckArchive) = -2 )
+							
+						ElseIf  ( Len( CheckArchive ) > 2 )
+							Result = MessageRequester_Show(*P, 5, CheckArchive)
+						Else							
+							Result = MessageRequester_Show(*P, 6)
+						EndIf							
+						
 						If Result = 0
-							If ( ListSize( *P\Collection() ) = 1 )
-								QuitTask(*P): ProcedureReturn 0
-							EndIf	
-							DeleteElement( *P\Collection() )
+							MessageRequester_Result
 						Else										
-							QuitTask(*P): ProcedureReturn 0
+							QuitTask(*P)
+							ProcedureReturn 0
 						EndIf							
 				EndSelect					
 			Next
 		Else
-			Request::MSG( DropLang::GetUIText(20) , 
-			              "Keine Dateien !?!", 
-			              "Keine Dateien zum Archivieren", 2, 0, "",0,0,DC::#_Window_001)             
-			QuitTask(*P):ProcedureReturn 12		
+           		MessageRequester_Show(*P, 7)
+           		QuitTask(*P)
+           		ProcedureReturn 12		
 		EndIf				
 		
 		;Set_GadgetStatus(1)
@@ -1888,7 +2003,12 @@ Module DropVert
 		
 		While Not IsThread(_Thread)	
 			
+			CFG::*Config\HandleExeAsS7Z  = bHandleExe2S7Z
+			CFG::*Config\HandleExeAsZIP  = bHandleExe2ZIP
+			CFG::*Config\HandleExeAsRAR  = bHandleExe2RAR	
+			
 			Set_GadgetStatus(0)
+				
 			
 			If ( ListSize( *P\Collection() ) > 0 )
 				szErrorList.s = ""
@@ -1979,9 +2099,9 @@ Module DropVert
 	EndProcedure	
 EndModule
 ; IDE Options = PureBasic 6.00 LTS (Windows - x64)
-; CursorPosition = 896
-; FirstLine = 423
-; Folding = jAAc3-f+
+; CursorPosition = 1733
+; FirstLine = 1232
+; Folding = jAAc3--7
 ; EnableAsm
 ; EnableXP
 ; UseMainFile = ..\Drop7z.pb

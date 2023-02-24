@@ -60,6 +60,15 @@ Procedure.l _SetPopUpMenu()
                 MenuItem(52, "Option: Zwischenablage")
             CloseSubMenu()                
             MenuBar()
+            MenuItem(72, "Convert: Handle EXE as 7z")              
+            MenuItem(70, "Convert: Handle EXE as RAR")
+            MenuItem(71, "Convert: Handle EXE as ZIP")              
+            OpenSubMenu("Convert Options")           
+            MenuBar()
+            MenuItem(73, "Delete Temp Directoy")
+            ;MenuItem(75, "Move ZIP Problems")              
+            CloseSubMenu()                          
+            MenuBar()            
             MenuItem(10, "Remove: All Items")            
             MenuItem(11, "Remove: Current Item")
             MenuItem(23, "Remove: Maked Items")            
@@ -417,15 +426,40 @@ Procedure _SeePopUpMenu(iMenuID.l)
                 Case 0: CFG::*Config\PinDirectory = 1                   
                 Case 1: CFG::*Config\PinDirectory = 0                    
             EndSelect            
-            DropCode::Consolidate_Directory(CFG::*Config\PinDirectory)             
-            
+            DropCode::Consolidate_Directory(CFG::*Config\PinDirectory)      
+      Case 70
+      	;
+		; Handle Exe as RARSFX 
+      	CFG::*Config\HandleExeAsRAR = #True
+        	CFG::*Config\HandleExeAsZIP = #False
+        	CFG::*Config\HandleExeAsS7z = #False       	
+      Case 71
+      	;
+      	; Handle Exe as ZIPSFX 
+      	CFG::*Config\HandleExeAsRAR = #False
+        	CFG::*Config\HandleExeAsZIP = #True
+        	CFG::*Config\HandleExeAsS7z = #False 
+      Case 72
+      	;
+      	; Handle Exe as ZIPSFX 
+      	CFG::*Config\HandleExeAsRAR = #False
+        	CFG::*Config\HandleExeAsZIP = #False
+        	CFG::*Config\HandleExeAsS7z = #True  
+        Case 73
+        	;
+		; Lösche [nicht] das Erstellte Tempverzeichnis
+        	If (CFG::*Config\ConvertDelTemp = #False)
+        	    CFG::*Config\ConvertDelTemp = #True
+        	ElseIf (CFG::*Config\ConvertDelTemp = #True)
+        		CFG::*Config\ConvertDelTemp = #False
+        	EndIf	
     EndSelect
     
     CFG::WriteConfig(CFG::*Config): CFG::ReadConfig(CFG::*Config): DropSYSF::Process_FreeRam()
 EndProcedure
-; IDE Options = PureBasic 5.62 (Windows - x64)
-; CursorPosition = 423
-; FirstLine = 360
+; IDE Options = PureBasic 6.00 LTS (Windows - x64)
+; CursorPosition = 62
+; FirstLine = 30
 ; Folding = -
 ; EnableAsm
 ; EnableXP

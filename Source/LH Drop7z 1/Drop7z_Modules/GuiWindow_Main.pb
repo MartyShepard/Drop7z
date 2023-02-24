@@ -207,7 +207,7 @@ Module GUI00
     	
     	GadgetToolTip(DC::#Button_003, "Komprimiere Standard als Archiv: 7Z, ZIP, CHD")
     	GadgetToolTip(DC::#Button_006, "Massenkomprimierung als Einzelne Archive: 7Z, ZIP, CHD")
-    	GadgetToolTip(DC::#Button_002, "Konvertiere zu 7z: KPF, LZX (Amiga), PK3, PK4, RAR, TAR, TGZ, TSU, ZIP")    	
+    	GadgetToolTip(DC::#Button_002, "KPF, LZX (Amiga), PK3, PK4, RAR (VOL,SFX), TAR, TGZ, TSU, ZIP (SFX)")    	
     	
     EndProcedure
 EndModule        
@@ -294,7 +294,7 @@ EndModule
 
 ; IDE Options = PureBasic 6.00 LTS (Windows - x64)
 ; CursorPosition = 209
-; FirstLine = 183
+; FirstLine = 160
 ; Folding = --
 ; EnableAsm
 ; EnableXP
