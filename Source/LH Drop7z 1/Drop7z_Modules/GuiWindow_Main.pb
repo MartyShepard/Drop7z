@@ -175,9 +175,17 @@ Module GUI00
     	              DC::#_BTN_GREY4_0H,
     	              DC::#_BTN_GREY4_0P,
     	              ;DC::#_BTN_GREY4_0D,"Clear", "FileList", "FileList",GetSysColor_(#COLOR_3DFACE),$29D7DA,nCurrentFontID)
-    	    	        DC::#_BTN_GREY4_0D,"Convert", "... to 7z", "... to 7z",GetSysColor_(#COLOR_3DFACE),$29D7DA,nCurrentFontID)
+    	    	        DC::#_BTN_GREY4_0D,"Convert", "Archiv(e)", "Archiv(e)",GetSysColor_(#COLOR_3DFACE),$29D7DA,nCurrentFontID)
     	;ButtonEX::TooltTip(WindowID(DC::#_Window_001), DC::#Button_002, "",":.....Clear the File List", 1,275) 
-    	
+    	    	        
+        ;
+        ; Button Info
+        If ( CFG::*Config\UnPackOnly = #true )
+        	ButtonEX::Settext(DC::#Button_002,0,"Unpack")
+        Else
+        	ButtonEX::Settext(DC::#Button_002,0,"Convert")
+        EndIf
+        
     	;///////////// Compress Profile
     	ButtonEX::Add(DC::#Button_005,309, 442, 83, 20,
     	              DC::#_BTN_GREY4_0N,
@@ -292,9 +300,9 @@ Module GUI04
      EndProcedure  
 EndModule
 
-; IDE Options = PureBasic 6.00 LTS (Windows - x64)
-; CursorPosition = 209
-; FirstLine = 160
+; IDE Options = PureBasic 5.73 LTS (Windows - x64)
+; CursorPosition = 182
+; FirstLine = 151
 ; Folding = --
 ; EnableAsm
 ; EnableXP

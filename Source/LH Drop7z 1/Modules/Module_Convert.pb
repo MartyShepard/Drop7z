@@ -1135,7 +1135,7 @@ Module DropVert
 	;
 	;
 	;
-	Procedure 	 UnCompressZIP(*P.PROGRAM_BOOT, pbPackerPlugin.i)
+	Procedure 	UnCompressZIP(*P.PROGRAM_BOOT, pbPackerPlugin.i)
 		Protected.i PackData, Result, SizeLocal, SizePacked, PackType, SizeUnPacked
 		Protected.s szFilePack, szDirectory, szPackedFile, szUnPackedFile, szUnicode,Infotext
 			
@@ -1438,7 +1438,7 @@ Module DropVert
 					
 				EndIf					
 				
-			Case "RAR", "001"; Not Yet Supportet, "ARJ"	
+			Case "RAR"; Not Yet Supportet, "ARJ"	
 				UnCompressRAR(*P)				
 			Case "ZIP", "PK4", "PK3","KPF", "TSU"
 				; KPF : QuakeEX
@@ -1453,6 +1453,15 @@ Module DropVert
 				UnCompressZIP(*P, #PB_PackerPlugin_BriefLZ)
 			Case "LZX"	
 				UnCompressLZX(*P)	
+			Default
+				CheckArchive = ArchiveCheck::Test_Archive( *P\Collection() )
+				Select CheckArchive
+					Case "RAR", "RARSFX"
+						UnCompressRAR(*P)	
+					Case "ZIP"															
+						UnCompressZIP(*P, #PB_PackerPlugin_Zip)						
+				EndSelect		
+				
 		EndSelect		
 		
 	EndProcedure	
@@ -1503,6 +1512,8 @@ Module DropVert
 				*P\ulMutex          = 0
 				*P\ulThread         = 0
 				
+				SetWindowTitle(DC::#_Window_001," Extrahiere Archiv ... Bitte warten ....")   
+				
 				SetGadgetText(DC::#Frame_006, UCase(GetExtensionPart( *P\Collection() ) ) )
 				
 				UnCompressCheck( *P )	
@@ -1515,28 +1526,20 @@ Module DropVert
 					EndIf						
 					Continue
 				EndIf	
-					
-				;
-				; Das Archiv welches erstellt wird
-				;If ( FileSize( *P\Collection() ) = -2 )
-				;	;
-					*P\sz7zArchiv      =  *P\Archivname
-				;Else     
-				;	;
-				;	;  #PB_FileSystem_NoExtension = 1
-				;	*P\sz7zArchiv      =  *P\DstPath + GetFilePart(*P\Collection(), 1)                              
-				;EndIf    
-					
-				;
-				; Aktualisere den Dateinam im Hintergrund 
-					
-
+							
 				Select CFG::*Config\usFormat
 					Case 0: SetGadgetText(DC::#Frame_006,"7Z")
 					Case 1: SetGadgetText(DC::#Frame_006,"ZIP")           
 					Case 2: SetGadgetText(DC::#Frame_006,"CHD")          
 				EndSelect 
-    
+				
+				
+				If ( CFG::*Config\UnPackOnly )
+					Continue
+				EndIf
+				
+				*P\sz7zArchiv      =  *P\Archivname
+				
 				SetGadgetText(DC::#String_005, "Compress: " + Chr(34) + GetFilePart( *P\sz7zArchiv )  + ".7z" + Chr(34) )
 				
 				;                               
@@ -1869,9 +1872,11 @@ Module DropVert
 				Select UCase( GetExtensionPart( *P\Collection() ) )
 						; ---------------------------------------------------------------------------------------------------------------  						
 					Case "7Z"	
-						Result = MessageRequester_Show(*P, 1)
-						If ( Result = 1 )
-							MessageRequester_Result
+						If ( CFG::*Config\UnPackOnly = #False)
+							Result = MessageRequester_Show(*P, 1)
+							If ( Result = 1 )
+								MessageRequester_Result
+							EndIf	
 						EndIf	
 						
 						; ---------------------------------------------------------------------------------------------------------------  						
@@ -1920,7 +1925,7 @@ Module DropVert
 							
 						EndIf
 						
-						If ( FileSize( *P\DstPath + GetFilePart( *P\Collection() , #PB_FileSystem_NoExtension) + ".7z" ) >= 0 )
+						If ( FileSize( *P\DstPath + GetFilePart( *P\Collection() , #PB_FileSystem_NoExtension) + ".7z" ) >= 0 ) And ( CFG::*Config\UnPackOnly = #False)
 							
 							Result = MessageRequester_Show(*P, 3)	
 							If Result = 1
@@ -1930,7 +1935,7 @@ Module DropVert
 						
 							
 						; ---------------------------------------------------------------------------------------------------------------       
-					Case "RAR", "001";, "ARJ"
+					Case "RAR";, "ARJ"
 
 						CompilerIf #PB_Compiler_Processor = #PB_Processor_x64	
 							szUnRarDLL = GetPathPart( ProgramFilename() ) + "UnRAR\unrar64.dll"
@@ -1949,7 +1954,7 @@ Module DropVert
 							EndIf							
 						EndIf	
 						
-						If ( FileSize( *P\DstPath + GetFilePart( *P\Collection() , #PB_FileSystem_NoExtension) + ".7z" ) >= 0 )
+						If ( FileSize( *P\DstPath + GetFilePart( *P\Collection() , #PB_FileSystem_NoExtension) + ".7z" ) >= 0 ) And ( CFG::*Config\UnPackOnly = #False)
 							
 							Result = MessageRequester_Show(*P, 3)	
 							If Result = 1
@@ -1973,7 +1978,54 @@ Module DropVert
 						If (Val(CheckArchive) = -2 )
 							
 						ElseIf  ( Len( CheckArchive ) > 2 )
-							Result = MessageRequester_Show(*P, 5, CheckArchive)
+							
+							;
+							;
+							; Multi Volume z.b 000 etc ...
+							If ( CheckArchive = "RAR" Or CheckArchive = "RARSFX" )
+																
+								CompilerIf #PB_Compiler_Processor = #PB_Processor_x64	
+									szUnRarDLL = GetPathPart( ProgramFilename() ) + "UnRAR\unrar64.dll"
+								CompilerElse
+									szUnRarDLL = GetPathPart( ProgramFilename() ) + "UnRAR\unrar.dll"								
+								CompilerEndIf
+								
+								If FileSize( szUnRarDLL ) = -1
+									
+									Result = MessageRequester_Show(*P, 4, szUnRarDLL)
+									If Result = 0
+										MessageRequester_Result
+									Else										
+										QuitTask(*P)
+										ProcedureReturn 0
+									EndIf							
+								EndIf	
+								
+								If ( FileSize( *P\DstPath + GetFilePart( *P\Collection() , #PB_FileSystem_NoExtension) + ".7z" ) >= 0 ) And ( CFG::*Config\UnPackOnly = #False)
+									
+									Result = MessageRequester_Show(*P, 3)	
+									If Result = 1
+										MessageRequester_Result
+									EndIf	
+								EndIf								
+								Continue
+								;
+								; ----------------------------------------------------------------------
+							ElseIf  ( CheckArchive = "ZIP" )
+								
+								If ( FileSize( *P\DstPath + GetFilePart( *P\Collection() , #PB_FileSystem_NoExtension) + ".7z" ) >= 0 ) And ( CFG::*Config\UnPackOnly = #False)
+									
+									Result = MessageRequester_Show(*P, 3)	
+									If Result = 1
+										MessageRequester_Result
+									EndIf	
+								EndIf																
+								Continue
+							Else	
+							
+								Result = MessageRequester_Show(*P, 5, CheckArchive)
+							EndIf	
+							
 						Else							
 							Result = MessageRequester_Show(*P, 6)
 						EndIf							
@@ -2062,9 +2114,15 @@ Module DropVert
 				EndIf	
 				
 				If ( ListSize( *P\Collection() ) = *P\ResultMax ) And ( Len( szErrorList ) = 0 )
-					Request::MSG( DropLang::GetUIText(20) , 
-					              "Konvertierungs Status Erfogreich" , 
-					              "Alle 7z Archiv(e) Komprimiert", 2, 0, "",0,0,DC::#_Window_001)   
+					;
+					;
+					; Entpacken/ Konvertieren Fehlerbericht					
+					If ( CFG::*Config\UnPackOnly )
+						Request::MSG( DropLang::GetUIText(20) , "Status" , "Alle Archiv(e) Entpackt", 2, 0, "",0,0,DC::#_Window_001)  
+					Else						
+						Request::MSG( DropLang::GetUIText(20) , "Status" , "Alle 7z Archiv(e) Komprimiert", 2, 0, "",0,0,DC::#_Window_001)   
+					EndIf	
+					
 					ProcedureReturn 0
 					
 				ElseIf  ( ListSize( *P\Collection() ) > *P\ResultMax )
@@ -2075,9 +2133,15 @@ Module DropVert
 						Lst + #CR$ + *P\Mis()
 					Next    
 					
-					Request::MSG( DropLang::GetUIText(20) , 
-					              "Konvertierungs Status" , 
-					              "7z Archiv(e) Komprimiert " + Str(*P\ResultMax) + " von " + ListSize( *P\Collection() ) + Lst + #CRLF$ + szErrorList, 2, 0,"",0,0,DC::#_Window_001)  
+					;
+					; Entpacken/ Konvertieren Fehlerbericht
+					;
+					If ( CFG::*Config\UnPackOnly )
+						Request::MSG( DropLang::GetUIText(20) , "Status" , Str( ListSize( *P\Collection()) ) + " Archiv(e) Entpackt " + Lst + #CRLF$ + szErrorList, 2, 0,"",0,0,DC::#_Window_001) 
+					Else						
+						Request::MSG( DropLang::GetUIText(20) , "Status" , "7z Archiv(e) Komprimiert " + Str(*P\ResultMax) + " von " + ListSize( *P\Collection() ) + Lst + #CRLF$ + szErrorList, 2, 0,"",0,0,DC::#_Window_001)  
+					EndIf
+					;
 					ProcedureReturn 1
 				EndIf
 				
@@ -2098,13 +2162,13 @@ Module DropVert
 
 	EndProcedure	
 EndModule
-; IDE Options = PureBasic 6.00 LTS (Windows - x64)
-; CursorPosition = 1733
-; FirstLine = 1232
-; Folding = jAAc3--7
+; IDE Options = PureBasic 5.73 LTS (Windows - x64)
+; CursorPosition = 2013
+; FirstLine = 939
+; Folding = jAA93-Y5-
 ; EnableAsm
 ; EnableXP
 ; UseMainFile = ..\Drop7z.pb
-; CurrentDirectory = ..\Drop7z\
+; CurrentDirectory = ..\..\LH Drop7z 1 (Beta Versions)\
 ; CompileSourceDirectory
 ; EnableUnicode

@@ -62,11 +62,12 @@ Procedure.l _SetPopUpMenu()
             MenuBar()
             MenuItem(72, "Convert: Handle EXE as 7z")              
             MenuItem(70, "Convert: Handle EXE as RAR")
-            MenuItem(71, "Convert: Handle EXE as ZIP")              
-            OpenSubMenu("Convert Options")           
+            MenuItem(71, "Convert: Handle EXE as ZIP")
             MenuBar()
+            MenuItem(75, "Convert: Unpack Only")             
+            OpenSubMenu("Convert Options")           
             MenuItem(73, "Delete Temp Directoy")
-            ;MenuItem(75, "Move ZIP Problems")              
+            ;MenuItem(74, "Move ZIP Problems")                  
             CloseSubMenu()                          
             MenuBar()            
             MenuItem(10, "Remove: All Items")            
@@ -448,18 +449,25 @@ Procedure _SeePopUpMenu(iMenuID.l)
         Case 73
         	;
 		; Lösche [nicht] das Erstellte Tempverzeichnis
-        	If (CFG::*Config\ConvertDelTemp = #False)
-        	    CFG::*Config\ConvertDelTemp = #True
-        	ElseIf (CFG::*Config\ConvertDelTemp = #True)
-        		CFG::*Config\ConvertDelTemp = #False
-        	EndIf	
+            Select CFG::*Config\ConvertDelTemp
+                Case 0: CFG::*Config\ConvertDelTemp = 1                   
+                Case 1: CFG::*Config\ConvertDelTemp = 0                    
+            EndSelect        	
+        Case 75
+        	;
+		; Konvertiere nicht, nur Extrahieren           	
+            Select CFG::*Config\UnpackOnly
+                Case 0: CFG::*Config\UnpackOnly = 1                   
+                Case 1: CFG::*Config\UnpackOnly = 0                    
+            EndSelect         	
+     	
     EndSelect
     
     CFG::WriteConfig(CFG::*Config): CFG::ReadConfig(CFG::*Config): DropSYSF::Process_FreeRam()
 EndProcedure
-; IDE Options = PureBasic 6.00 LTS (Windows - x64)
-; CursorPosition = 62
-; FirstLine = 30
+; IDE Options = PureBasic 5.73 LTS (Windows - x64)
+; CursorPosition = 65
+; FirstLine = 32
 ; Folding = -
 ; EnableAsm
 ; EnableXP

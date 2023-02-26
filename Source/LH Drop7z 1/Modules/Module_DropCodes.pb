@@ -98,7 +98,7 @@ Module DropCode
         SetMenuItemState(DC::#PopUpMenu_002, 71,CFG::*Config\HandleExeAsZIP)
         SetMenuItemState(DC::#PopUpMenu_002, 72,CFG::*Config\HandleExeAsS7Z)        
         SetMenuItemState(DC::#PopUpMenu_002, 73,CFG::*Config\ConvertDelTemp)        
-
+        SetMenuItemState(DC::#PopUpMenu_002, 75,CFG::*Config\UnpackOnly)  
         
     EndProcedure
     ;
@@ -681,9 +681,9 @@ EndProcedure
 
 EndModule
 
-; IDE Options = PureBasic 6.00 LTS (Windows - x64)
-; CursorPosition = 99
-; FirstLine = 57
+; IDE Options = PureBasic 5.73 LTS (Windows - x64)
+; CursorPosition = 100
+; FirstLine = 54
 ; Folding = -O+
 ; EnableAsm
 ; EnableXP

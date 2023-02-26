@@ -25,7 +25,7 @@ Module ArchiveCheck
 		If ( *ARCHEAD > 0 )           
 			
 			If ( *ARCHEAD\pbData > 0 )  
-				Debug "Close LZX File"
+				Debug "Close Unknown File"
 				CloseFile( *ARCHEAD\pbData )
 			EndIf			
 			ClearStructure(*ARCHEAD, ARC_HEADER)
@@ -61,7 +61,12 @@ Module ArchiveCheck
 		If Bytes = 1025
 
 			Debug_Header(*ARCHEAD)
-
+			
+			If (*ARCHEAD\header[0] = 'R') And (*ARCHEAD\header[1] = 'a') And (*ARCHEAD\header[2] = 'r')  And (*ARCHEAD\header[3] = '!')
+				Debug "RAR Datei"
+				ProcedureReturn "RAR"
+			EndIf	
+			
 			If (*ARCHEAD\header[28] = 'R') And (*ARCHEAD\header[29] = 'J') And (*ARCHEAD\header[30] = 'S')  And (*ARCHEAD\header[31] = 'X')
 				Debug "ARJ Self Extract found"
 				ProcedureReturn "ARJSFX"
@@ -80,7 +85,12 @@ Module ArchiveCheck
 			If (*ARCHEAD\header[760] = 'U') And (*ARCHEAD\header[761] = 'P') And (*ARCHEAD\header[762] = 'X')  And (*ARCHEAD\header[763] = '0')
 				Debug "UPX Ausführbare Datei"
 				ProcedureReturn "UPX"
-			EndIf				
+			EndIf
+			
+			If (*ARCHEAD\header[0] = 'P') And (*ARCHEAD\header[1] = 'K'); And (*ARCHEAD\header[2] = 3)  And (*ARCHEAD\header[4] = 4)
+				Debug "ZIP Registriert"
+				ProcedureReturn "ZIP"
+			EndIf			
 		EndIf
 		
 		ProcedureReturn ""
@@ -123,9 +133,9 @@ Module ArchiveCheck
 		ProcedureReturn Headed
 	EndProcedure	
 EndModule
-; IDE Options = PureBasic 6.00 LTS (Windows - x64)
-; CursorPosition = 79
-; FirstLine = 27
+; IDE Options = PureBasic 5.73 LTS (Windows - x64)
+; CursorPosition = 89
+; FirstLine = 69
 ; Folding = --
 ; EnableAsm
 ; EnableXP

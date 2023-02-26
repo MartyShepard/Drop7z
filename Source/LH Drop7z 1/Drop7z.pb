@@ -1,132 +1,148 @@
 ﻿
+	;
+	; Der ganze Code, Routinen aufbau bis auf die sachne vom Letzten und vorletzten Jahr
+	; stammen noch aus der Anfangszeit. ><. Ja vieles ist Müll .....
+	;
+	
 	InitKeyboard()
 	UseSHA1Fingerprint()
 	UseZipPacker()
 	UseLZMAPacker()
 	UseTARPacker()
 	UseBriefLZPacker()
-Structure FULLPATHLIST
-	xPath.s ; 
-	xFile.s ; 
-	xNumB.l
-EndStructure
+	
+	Structure FULLPATHLIST
+		xPath.s ; 
+		xFile.s ; 
+		xNumB.l
+	EndStructure
 
-Define tb
-;///////////////////////// AutoComplete
+	Define tb
+	
+	;	/ AutoComplete
+	;
+	;
+	
+	TB_Created.l = RegisterWindowMessage_("TaskbarCreated")
 
-TB_Created.l = RegisterWindowMessage_("TaskbarCreated")
+	
+	Global _Action1.i           = 0
+	Global DirectoryOnly        = 0
+	Global Profile_Current.s        = ""
 
-Global _Action1.i           = 0
-Global DirectoryOnly        = 0
-Global Profile_Current.s        = ""
+	Global iResult_DeleteFiles  = #False
 
-Global iResult_DeleteFiles  = #False
+	Declare Event_GadgetEx_Profile()
+	Declare ComboAutoText()
 
-Declare Event_GadgetEx_Profile()
-Declare ComboAutoText()
+	;
+	;
+	; AutoComplete
+	Structure comboboxinfo 
+		cbSize.l
+		rcItem.RECT
+		rcButton.RECT
+		stateButton.l
+		hwndCombo.l
+		hwndEdit.l
+		hwndList.l
+	EndStructure
+	
+	;
+	;
 
-;///////////////////////////////////////////////////////////////////////////////// AutoComplete
-Structure comboboxinfo 
-	cbSize.l
-	rcItem.RECT
-	rcButton.RECT
-	stateButton.l
-	hwndCombo.l
-	hwndEdit.l
-	hwndList.l
-EndStructure
+	Global cbinfo.comboboxinfo
+	Global oldcomboProc    
 
-Global cbinfo.comboboxinfo
-Global oldcomboProc    
-
-cbinfo\cbsize   = SizeOf(comboboxinfo)
-
-
-;/////////////////////////////////////////////////////////////////////////////////////// Includes
-
-;
-; Include Modules
-;
-XIncludeFile "Drop7z_Modules\Constants.pb"
-XIncludeFile ".\_INCLUDES\Class_Fonts_Drop7Z.pb" 
-;
-; Include Modules, Global Code Modules
-;   
-XIncludeFile "..\INCLUDES\Class_Process.pb"          
-
-XIncludeFile "..\INCLUDES\Class_Win_Form.pb"
-XIncludeFile "..\INCLUDES\Class_Win_Style.pb"         
-XIncludeFile "..\INCLUDES\Class_Win_Desk.pb"
-
-XIncludeFile "..\INCLUDES\Class_ListIcon_Sort.pb"          
-XIncludeFile "..\INCLUDES\Class_Tooltip.pb"
-
-XIncludeFile "..\Includes\CLASSES_GUI\SplitterGadgetEx.pb"
-XIncludeFile "..\INCLUDES\CLASSES_GUI\ButtonGadgetEX.pb"
-XIncludeFile "..\INCLUDES\CLASSES_GUI\DialogRequestEX.pb" 
-
-XIncludeFile "..\INCLUDES\Class_Windows.pb"
-
-XIncludeFile "..\INCLUDES\Class_FastFilePeInfo.pb"
-XIncludeFile "..\INCLUDES\Class_FastFileHandle.pb"       
-XIncludeFile "..\INCLUDES\CLASSES_FFS\FastFileSearch.pb"
-
-XIncludeFile "..\INCLUDES\Class_IniCommand.pb"
-
-XIncludeFile "..\INCLUDES\Class_Tooltip.pb"
-
-XIncludeFile "..\INCLUDES\CLASSES_SUB\Math_Bytes.pb"
+	cbinfo\cbsize   = SizeOf(comboboxinfo)
 
 
-;
-; Include Modules Drop7z   
-;    
+	;
+	; 
+	; Include Modules
+	XIncludeFile "Drop7z_Modules\Constants.pb"
+	XIncludeFile ".\_INCLUDES\Class_Fonts_Drop7Z.pb" 
+	
+	;
+	; Include Modules, Global Code Modules
+	;   
+	XIncludeFile "..\INCLUDES\Class_Process.pb"          
 
-XIncludeFile "Drop7z_Modules\Configuration.pb"
+	XIncludeFile "..\INCLUDES\Class_Win_Form.pb"
+	XIncludeFile "..\INCLUDES\Class_Win_Style.pb"         
+	XIncludeFile "..\INCLUDES\Class_Win_Desk.pb"
+	
+	XIncludeFile "..\INCLUDES\Class_ListIcon_Sort.pb"          
+	XIncludeFile "..\INCLUDES\Class_Tooltip.pb"
+	
+	XIncludeFile "..\Includes\CLASSES_GUI\SplitterGadgetEx.pb"
+	XIncludeFile "..\INCLUDES\CLASSES_GUI\ButtonGadgetEX.pb"
+	XIncludeFile "..\INCLUDES\CLASSES_GUI\DialogRequestEX.pb" 
+	
+	XIncludeFile "..\INCLUDES\Class_Windows.pb"
+	
+	XIncludeFile "..\INCLUDES\Class_FastFilePeInfo.pb"
+	XIncludeFile "..\INCLUDES\Class_FastFileHandle.pb"       
+	XIncludeFile "..\INCLUDES\CLASSES_FFS\FastFileSearch.pb"
+	
+	XIncludeFile "..\INCLUDES\Class_IniCommand.pb"
+	
+	XIncludeFile "..\INCLUDES\Class_Tooltip.pb"
+	
+	XIncludeFile "..\INCLUDES\CLASSES_SUB\Math_Bytes.pb"
 
-IncludeFile "Modules\Module_DropLists.pb"
-DropLS::CreateStructs()
 
-IncludeFile "Modules\Module_DropLanguage.pb"
-IncludeFile "Modules\Module_DropSysFunctions.pb"         
-IncludeFile "Modules\Module_DropCodes.pb"   
+	;
+	; Include Modules Drop7z   
+	;    
+	
+	XIncludeFile "Drop7z_Modules\Configuration.pb"
+	
+	IncludeFile "Modules\Module_DropLists.pb"
+	
+	DropLS::CreateStructs()
+	
+	IncludeFile "Modules\Module_DropLanguage.pb"
+	IncludeFile "Modules\Module_DropSysFunctions.pb"         
+	IncludeFile "Modules\Module_DropCodes.pb"   
+	
+	
+	
+	XIncludeFile "..\INCLUDES\CLASSES_EMU\Mame_CHD_External_Support.pb"
+	
+	XIncludeFile "Drop7z_Modules\GuiWindow_Main.pb"
+	XIncludeFile "Drop7z_Modules\Quersumme.pb"
+	
+	IncludeFile "_INCLUDES\7z_About_Window.pbf"         ; Mit PB Editor, veraltete Variante
+	
+	
+	IncludeFile "_INCLUDES\_Datas_Sections.pb"
+	IncludeFile "_INCLUDES\7z_Struct_Lists.pb"
+	
+	IncludeFile "_INCLUDES\_WinFunc_Delete.pb"                        
+	IncludeFile "_INCLUDES\7z_About_Window.pb"
+	
+	IncludeFile "_INCLUDES\7z_Prc_Globals.pb"
+	IncludeFile "_INCLUDES\_Tray_PopUpMenu.pb"
+	
+	XIncludeFile "Modules\Module_ArchiveCheck.pb"
+	XIncludeFile "Modules\Module_LZX.pb"
+	XIncludeFile "Modules\Module_UnRar.pb" 
+	
+	IncludeFile "Modules\Module_Compress_Full.pb"         ; Updated
+	IncludeFile "Modules\Module_Compress_Single.pb"		; Updated
+	IncludeFile "Modules\Module_Convert.pb"			; Updated
+	
+	IncludeFile "_INCLUDES\7z_Profile_Function.pb"
+	
+	IncludeFile "Modules\Module_DropThread.pb"        
+	IncludeFile "_INCLUDES\_GagdetEX_Events.pb"
 
-
-
-XIncludeFile "..\INCLUDES\CLASSES_EMU\Mame_CHD_External_Support.pb"
-
-XIncludeFile "Drop7z_Modules\GuiWindow_Main.pb"
-XIncludeFile "Drop7z_Modules\Quersumme.pb"
-
-IncludeFile "_INCLUDES\7z_About_Window.pbf"         ; Mit PB Editor, veraltete Variante
-
-
-IncludeFile "_INCLUDES\_Datas_Sections.pb"
-IncludeFile "_INCLUDES\7z_Struct_Lists.pb"
-
-IncludeFile "_INCLUDES\_WinFunc_Delete.pb"                        
-IncludeFile "_INCLUDES\7z_About_Window.pb"
-
-IncludeFile "_INCLUDES\7z_Prc_Globals.pb"
-IncludeFile "_INCLUDES\_Tray_PopUpMenu.pb"
-
-XIncludeFile "Modules\Module_LZX.pb"
-XIncludeFile "Modules\Module_UnRar.pb" 
-
-IncludeFile "Modules\Module_Compress_Full.pb"         ; Updated
-IncludeFile "Modules\Module_Compress_Single.pb"		; Updated
-IncludeFile "Modules\Module_Convert.pb"			; Updated
-
-IncludeFile "_INCLUDES\7z_Profile_Function.pb"
-
-IncludeFile "Modules\Module_DropThread.pb"        
-IncludeFile "_INCLUDES\_GagdetEX_Events.pb"
-
-;
-; Intialisiere Language System
-
-DropLang::GetLngSysUI()
-Global LHGAME_LANGUAGE = DropLang::GetLngSysUI(-1)     
+	;
+	; Intialisiere Language System
+	
+	DropLang::GetLngSysUI()
+	Global LHGAME_LANGUAGE = DropLang::GetLngSysUI(-1)     
 
 ;/////////////////////////////////////////////////////////////////////////////////////// Pre
 
@@ -432,7 +448,13 @@ Repeat
 				Case 50 : _SeePopUpMenu(50)		; CHD
 				Case 51 : _SeePopUpMenu(51)		; CHD  Sticky Window                   
 				Case 52 : _SeePopUpMenu(52)		; CHD Force Overwrite
-				Case 60 : _SeePopUpMenu(60)		; CHD Force Overwrite                      
+				Case 60 : _SeePopUpMenu(60)		; CHD Force Overwrite 
+				Case 70 : _SeePopUpMenu(70)	
+				Case 71 : _SeePopUpMenu(71)						
+				Case 72 : _SeePopUpMenu(72)						
+				Case 73 : _SeePopUpMenu(73)					
+				Case 74 : _SeePopUpMenu(74)
+				Case 75 : _SeePopUpMenu(75)						
 					
 			EndSelect
 			
@@ -448,14 +470,14 @@ Repeat
 	
 ForEver
 
-; IDE Options = PureBasic 6.00 LTS (Windows - x64)
-; CursorPosition = 41
-; FirstLine = 102
+; IDE Options = PureBasic 5.73 LTS (Windows - x64)
+; CursorPosition = 98
+; FirstLine = 72
 ; EnableThread
 ; EnableXP
 ; EnableOnError
 ; UseIcon = _GUI_IMAGES\ICONS\drop7ztray.ico
 ; Executable = ..\LH Drop7z 1 (Beta Versions)\Drop7z x64.exe
 ; CurrentDirectory = Drop7z\
-; Compiler = PureBasic 6.00 LTS (Windows - x64)
+; Compiler = PureBasic 5.73 LTS (Windows - x64)
 ; EnableUnicode

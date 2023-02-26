@@ -152,7 +152,7 @@ Module UnRAR
 		Select msg
 			Case #UCM_NEEDPASSWORD
 				If PWD = ""
-					PWD = InputRequester("Password", "Password required:", "", #PB_InputRequester_Password)
+					PWD = InputRequester("Archive Benötigt Password", "Password required:", "");, #PB_InputRequester_Password)
 				EndIf
 				If PWD
 					PokeS(P1, PWD, P2, #PB_Ascii)
@@ -160,29 +160,90 @@ Module UnRAR
 				EndIf
 			Case #UCM_NEEDPASSWORDW
 				If PWD = ""
-					PWD = InputRequester("Password", "Password required:", "", #PB_InputRequester_Password)
+					PWD = InputRequester("Archive Benötigt Password", "Password required:", "");, #PB_InputRequester_Password)
 				EndIf
 				If PWD
 					PokeS(P1, PWD, P2, #PB_Unicode)
 					ProcedureReturn #True
 				EndIf
+			Case #UCM_CHANGEVOLUME	
+				MessageRequester("Nächstes Volume Benötigt ... ", "Benötige das nächste Volume")
+			Case #UCM_CHANGEVOLUMEW
+				MessageRequester("Nächstes Volume Benötigt ... ", "Benötige das nächste Volume")		
 		EndSelect
 	EndProcedure
 	
-	Procedure 	UnCompressSetInfo(szString.s, szGadgetID.i, szGadgetID_With.i)
-		Protected szInfo.s
-		Define rect.RECT
+	Procedure 	UnCompressSetInfo(szString.s, szGadgetID.i, szTextWidth.i)
 		
-		;Delay(25)
+		Protected.s szInfo, szNew, szPts, szDir
+		Protected.i StringMaxLen, DefaulLenght, FreeLenght, InputLenght, SubDirCount, i, u
+		
+		If ( Right( szString, 1) = "/" )
+			ProcedureReturn 
+		EndIf
+		Delay( 5 )
+			
+			szInfo		= szString
+			
+			StringMaxLen 	= 50; Len("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABBBBBBNNNNN"); Maximale Gadgte Länge
+			DefaulLenght 	= 14; Len("Extract: ZIP:\")					    ; Text Länge die Berücksichtig werden muss
+			
+			FreeLenght	= StringMaxLen - DefaulLenght
+			
+			InputLenght  	= Len( szInfo ) +4
+
+			If ( InputLenght > FreeLenght )
 				
-		rect\left  = 0
-		rect\right = szGadgetID_With
-		rect\top   = 0
-		rect\bottom= GadgetHeight(szGadgetID)
-		Delay( 25 )	
-		szInfo =  ReplaceString( szString , "/","\") 
-		DrawText_(GetDC_(0),@szInfo,-1,@rect,#DT_CALCRECT|#DT_PATH_ELLIPSIS|#DT_MODIFYSTRING)	
-		SetGadgetText(szGadgetID,"Extract: RAR:\" +szInfo)						
+				
+				SubDirCount = CountString(szString, "/")
+				
+				
+				For i = SubDirCount To 1 Step -1
+
+					szDir = StringField( szInfo, i, "/") + "/"
+					SzNew = szDir + SzNew 
+					
+					InputLenght = Len( SzNew )
+					
+					If ( InputLenght < FreeLenght )									
+						Break
+					EndIf	
+				Next
+												
+				If ( SubDirCount > 1 ) And ( SubDirCount <= 4 )
+					For u = 0 To SubDirCount-1
+						SzNew = "./" + SzNew
+					Next				
+				Else
+					If ( SubDirCount > 2 ) 
+						SzNew = "./../" + SzNew
+					EndIf
+				EndIf	
+				
+				SzNew + GetFilePart( szString )
+				
+				InputLenght  	= Len( SzNew )
+								
+				If ( InputLenght > FreeLenght )
+					Repeat
+						InputLenght - 1
+						SzNew      = Right( SzNew, InputLenght )							
+						InputLenght = Len( SzNew )
+						
+					Until ( InputLenght  < FreeLenght )
+					szInfo = ".." + SzNew
+						
+				Else					
+					szInfo = SzNew
+				EndIf	
+				
+			EndIf
+			Debug "Verkürzte Version: " + szInfo
+			
+			
+		SetGadgetText(szGadgetID,"Extract: RAR:\" + szInfo)	
+					
+		ProcedureReturn					
 		
 	EndProcedure
 	
@@ -215,9 +276,7 @@ Module UnRAR
 		hRAR = RAROpenArchive(raropen)
 		
 		If hRAR
-			
-			
-			
+
 			
 			While RARReadHeader(hRAR, rarheader) = #ERAR_SUCCESS				
 				
@@ -252,13 +311,13 @@ EndModule
 
 CompilerIf #PB_Compiler_IsMainFile
 	
-	Debug UnRar::RARUnpackArchiv("B:\TestPack\Columns.rar", "B:\TestPack\" )
+	Debug UnRar::RARUnpackArchiv("B:\Sortet\ANVIL.rar", "B:\TestPack\" )
 	
 CompilerEndIf	
 
-; IDE Options = PureBasic 6.00 LTS (Windows - x64)
-; CursorPosition = 181
-; FirstLine = 146
+; IDE Options = PureBasic 5.73 LTS (Windows - x64)
+; CursorPosition = 178
+; FirstLine = 164
 ; Folding = --
 ; EnableAsm
 ; EnableXP
