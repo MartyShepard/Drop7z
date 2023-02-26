@@ -1459,7 +1459,9 @@ Module DropVert
 					Case "RAR", "RARSFX"
 						UnCompressRAR(*P)	
 					Case "ZIP"															
-						UnCompressZIP(*P, #PB_PackerPlugin_Zip)						
+						UnCompressZIP(*P, #PB_PackerPlugin_Zip)	
+					Case "S7ZSFX"
+						UnCompressZIP(*P, #PB_PackerPlugin_Lzma)
 				EndSelect		
 				
 		EndSelect		
@@ -1495,7 +1497,7 @@ Module DropVert
 			
 			ForEach *P\Collection()
 				
-				SetWindowTitle(DC::#_Window_001, "Bitte Warten. 7z Konvertiert die Archiv Daten um..")
+				
 				
 				Auto_Select( *P\Collection() )                
 				
@@ -1539,6 +1541,8 @@ Module DropVert
 				EndIf
 				
 				*P\sz7zArchiv      =  *P\Archivname
+				
+				SetWindowTitle(DC::#_Window_001, "7z Komprimiert die Daten ...")
 				
 				SetGadgetText(DC::#String_005, "Compress: " + Chr(34) + GetFilePart( *P\sz7zArchiv )  + ".7z" + Chr(34) )
 				
@@ -1914,6 +1918,11 @@ Module DropVert
 									CFG::*Config\HandleExeAsZIP = #False
 									CFG::*Config\HandleExeAsS7Z = #False
 									CheckArchive = ""
+								Case "S7ZSFX"
+									CFG::*Config\HandleExeAsRAR = #False
+									CFG::*Config\HandleExeAsZIP = #False
+									CFG::*Config\HandleExeAsS7Z = #True
+									CheckArchive = ""									
 								Default
 									CheckArchiveLongName = ""
 							EndSelect	
@@ -2163,9 +2172,9 @@ Module DropVert
 	EndProcedure	
 EndModule
 ; IDE Options = PureBasic 5.73 LTS (Windows - x64)
-; CursorPosition = 2013
-; FirstLine = 939
-; Folding = jAA93-Y5-
+; CursorPosition = 1431
+; FirstLine = 513
+; Folding = jAA93-w5-
 ; EnableAsm
 ; EnableXP
 ; UseMainFile = ..\Drop7z.pb

@@ -82,6 +82,7 @@ DeclareModule UnRAR
 		CmtState.l
 		Flags.l
 		*Callback
+		*ChangeVolProc
 		UserData.i
 		Reserved.l[28]
 	EndStructure
@@ -118,6 +119,7 @@ Module UnRAR
 	EnableExplicit
 	
 	Define DLL
+	;Global VolClose.i
 	
 	CompilerIf #PB_Compiler_Processor = #PB_Processor_x64
 		DLL = OpenLibrary(#PB_Any, GetPathPart( ProgramFilename() ) +"UnRAR\unrar64.dll")
@@ -141,13 +143,16 @@ Module UnRAR
 		RARSetPassword        = GetFunction(DLL, "RARSetPassword")
 		RARGetDllVersion      = GetFunction(DLL, "RARGetDllVersion")
 	EndIf
-	
+		
 	
 	Procedure Callback(msg, UserData, P1, P2)
+		Protected Result.i
+
 		Protected PWD.s
 		
 		If UserData
 			PWD = PeekS(UserData)
+			
 		EndIf
 		Select msg
 			Case #UCM_NEEDPASSWORD
@@ -167,13 +172,35 @@ Module UnRAR
 					ProcedureReturn #True
 				EndIf
 			Case #UCM_CHANGEVOLUME	
-				MessageRequester("Nächstes Volume Benötigt ... ", "Benötige das nächste Volume")
+				Select P2
+					Case 0						
+						Result = MessageRequester("RAR Volume Benötigt ... ", "Benötige das nächste Volume: " + Chr(34) + PeekS(P1, -1, #PB_Ascii) + Chr(34), #PB_MessageRequester_Info | #MB_RETRYCANCEL )	
+						If Result = 2						
+							ProcedureReturn -1
+						EndIf
+					Case 1
+						;
+						; OK Found
+				EndSelect
 			Case #UCM_CHANGEVOLUMEW
-				MessageRequester("Nächstes Volume Benötigt ... ", "Benötige das nächste Volume")		
+				Select P2
+					Case 0						
+						Result = MessageRequester("RAR Volume Benötigt ... ", "Benötige das nächste Volume: "  + Chr(34) + PeekS(P1) + Chr(34), #PB_MessageRequester_Info |#MB_RETRYCANCEL )
+						If Result = 2							
+							;ProcedureReturn -1
+						EndIf						
+					Case 1
+						;
+						; OK Found	
+				EndSelect
+				
+		
 		EndSelect
 	EndProcedure
 	
-	Procedure 	UnCompressSetInfo(szString.s, szGadgetID.i, szTextWidth.i)
+		
+	
+	Procedure UnCompressSetInfo(szString.s, szGadgetID.i, szTextWidth.i)
 		
 		Protected.s szInfo, szNew, szPts, szDir
 		Protected.i StringMaxLen, DefaulLenght, FreeLenght, InputLenght, SubDirCount, i, u
@@ -254,6 +281,8 @@ Module UnRAR
 		Protected rarheader.RARHeaderDataEx
 		Protected hRAR, NoError = #True
 		
+		;VolClose = 0
+		
 		CompilerIf #PB_Compiler_Unicode
 			raropen\ArcNameW = @Filename
 		CompilerElse
@@ -262,6 +291,7 @@ Module UnRAR
 				CharToOem_(DestPath, DestPath)
 			EndIf
 		CompilerEndIf
+		
 		raropen\OpenMode = #RAR_OM_EXTRACT
 		If Password
 			raropen\UserData = @Password
@@ -272,13 +302,19 @@ Module UnRAR
 			raropen\Callback = @Callback()
 		EndIf
 		
-		
 		hRAR = RAROpenArchive(raropen)
 		
 		If hRAR
-
-			
+				
 			While RARReadHeader(hRAR, rarheader) = #ERAR_SUCCESS				
+				
+; 				If IsThread(raropen\Callback )
+; 					Debug "HALLO"
+; 				EndIf	
+; 				If VolClose = -1
+; 					KillThread( @Callback() )
+; 					Break
+; 				EndIf
 				
 				szFilename = ""				
 				For i = 0 To 1023
@@ -311,13 +347,13 @@ EndModule
 
 CompilerIf #PB_Compiler_IsMainFile
 	
-	Debug UnRar::RARUnpackArchiv("B:\Sortet\ANVIL.rar", "B:\TestPack\" )
+	Debug UnRar::RARUnpackArchiv("B:\Sortet\AVSRUTH.001", "B:\TestPack\" )
 	
 CompilerEndIf	
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x64)
-; CursorPosition = 178
-; FirstLine = 164
-; Folding = --
+; CursorPosition = 187
+; FirstLine = 142
+; Folding = f-
 ; EnableAsm
 ; EnableXP
