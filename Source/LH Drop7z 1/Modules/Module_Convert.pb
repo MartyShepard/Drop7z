@@ -1136,7 +1136,7 @@ Module DropVert
 	;
 	;
 	Procedure 	UnCompressZIP(*P.PROGRAM_BOOT, pbPackerPlugin.i)
-		Protected.i PackData, Result, SizeLocal, SizePacked, PackType, SizeUnPacked
+		Protected.i PackData, Result, SizeLocal, SizePacked, PackType, SizeUnPacked, u, FileAttribute.i
 		Protected.s szFilePack, szDirectory, szPackedFile, szUnPackedFile, szUnicode,Infotext
 			
 		AddElement( *P\ConvertResult() ) 
@@ -1149,7 +1149,25 @@ Module DropVert
 		*P\ContinueOnError		  = 0
 		*P\Archivname  			= GetGadgetText(DC::#String_002)  + GetFilePart( *P\ConvertResult()\File , #PB_FileSystem_NoExtension)
 		
-		szDirectory    			= GetPathPart( *P\ConvertResult()\File  ) + GetFilePart( *P\ConvertResult()\File , #PB_FileSystem_NoExtension) + "_[TEMP" + Str( Random(999999,000001) ) + "]\"
+		szDirectory    			= GetPathPart( *P\ConvertResult()\File  ) + GetFilePart( *P\ConvertResult()\File , #PB_FileSystem_NoExtension)
+		
+		
+		If ( CFG::*Config\UnPackOnly = #False)
+			szDirectory	+ "_[TEMP" + Str( Random(999999,000001) ) + "]\"
+		Else
+			If ( FileSize( szDirectory ) = -2 )				
+				For u = 0 To 999
+					
+					szDirectory = szDirectory + "_["+RSet( Str(u), 3, "0") +"]"
+					
+					If ( FileSize( szDirectory ) ! -2 )	
+						Break;
+					EndIf
+				Next
+			EndIf
+		EndIf
+			
+		
 		*P\DstPath = szDirectory ; Lösche das _xxxx Temp Verzeichnis
 		
 		If ( Right( szDirectory, 1) <> "\" )
@@ -1218,6 +1236,17 @@ Module DropVert
 					EndSelect					
 					
 					UnCompressSetInfo(*P,szPackedFile)
+					
+					
+					FileAttribute = GetFileAttributes(szUnPackedFile)
+					Select FileAttribute
+						Case #PB_FileSystem_Hidden     : Debug "Attribute: Datei ist versteckt"
+						Case #PB_FileSystem_Archive    : Debug "Attribute: Datei wurde geändert und nicht archiviert seit dem letzten Mal"
+						Case #PB_FileSystem_Compressed : Debug "Attribute: Datei ist komprimiert"
+						Case #PB_FileSystem_Normal     : Debug "Attribute: Normale Attribute"
+						Case #PB_FileSystem_ReadOnly   : Debug "Attribute: Datei ist im ReadOnly Modus (schreibgeschützt)"
+						Case #PB_FileSystem_System     : Debug "Attribute: Datei ist eine Systemdatei"
+					EndSelect
 
 					Result = UncompressPackFile( PackData , szUnPackedFile)
 					If ( Result >= 0)
@@ -1240,6 +1269,14 @@ Module DropVert
 							                           Chr(34) +szPackedFile 		     + Chr(34) + ": " +Str(SizeUnPacked)  + #CRLF$ +
 							                           Chr(34) +GetFilePart( szUnPackedFile) + Chr(34) + ": " +Str(SizeLocal) ,#PB_MessageRequester_Warning)
 							
+						Else
+							FileAttribute = SetFileAttributes(szUnPackedFile, #PB_FileSystem_Normal ) 
+							If FileAttribute > 0
+								;
+								; ok
+							Else
+								Debug "Attribute problem"
+							EndIf								
 						EndIf						
 					Else
 						*P\ConvertResult()\MisMatchFile + 1
@@ -1288,7 +1325,22 @@ Module DropVert
 		*P\ConvertResult()\MisMatchZero = 0	
 		
 		*P\Archivname  			= GetGadgetText(DC::#String_002)  + GetFilePart( *P\ConvertResult()\File , #PB_FileSystem_NoExtension)
-		szDirectory    			= GetPathPart( *P\ConvertResult()\File  ) + GetFilePart( *P\ConvertResult()\File , #PB_FileSystem_NoExtension) + "_[TEMP" + Str( Random(999999,000001) ) + "]"
+		szDirectory    			= GetPathPart( *P\ConvertResult()\File  ) + GetFilePart( *P\ConvertResult()\File , #PB_FileSystem_NoExtension)
+		
+		If ( CFG::*Config\UnPackOnly = #False)
+			szDirectory	+ "_[TEMP" + Str( Random(999999,000001) ) + "]\"
+		Else
+			If ( FileSize( szDirectory ) = -2 )				
+				For u = 0 To 999
+					
+					szDirectory = szDirectory + "_["+RSet( Str(u), 3, "0") +"]"
+					
+					If ( FileSize( szDirectory ) ! -2 )	
+						Break;
+					EndIf
+				Next
+			EndIf
+		EndIf
 		
 		If ( Right( szDirectory, 1) <> "\" )
 			szDirectory + "\"
@@ -1326,7 +1378,22 @@ Module DropVert
 		*P\Archivname  			= GetGadgetText(DC::#String_002)  + GetFilePart( *P\ConvertResult()\File , #PB_FileSystem_NoExtension)	
 			
 		
-		szDirectory    			= GetPathPart( *P\ConvertResult()\File  ) + GetFilePart( *P\ConvertResult()\File , #PB_FileSystem_NoExtension) + "_[TEMP" + Str( Random(999999,000001) ) + "]"
+		szDirectory    			= GetPathPart( *P\ConvertResult()\File  ) + GetFilePart( *P\ConvertResult()\File , #PB_FileSystem_NoExtension)
+		
+		If ( CFG::*Config\UnPackOnly = #False)
+			szDirectory	+ "_[TEMP" + Str( Random(999999,000001) ) + "]\"
+		Else
+			If ( FileSize( szDirectory ) = -2 )				
+				For u = 0 To 999
+					
+					szDirectory = szDirectory + "_["+RSet( Str(u), 3, "0") +"]"
+					
+					If ( FileSize( szDirectory ) ! -2 )	
+						Break;
+					EndIf
+				Next
+			EndIf
+		EndIf
 		
 		If ( Right( szDirectory, 1) <> "\" )
 			szDirectory + "\"
@@ -1895,6 +1962,9 @@ Module DropVert
 								Case "ARJSFX"
 									CheckArchiveLongName = "ARJ (Selbstentpackende Datei)"
 									
+								Case "LHASFX"
+									CheckArchiveLongName = "LHA (Selbstentpackende Datei)"
+									
 								Case "UPX"
 									CheckArchiveLongName = "UPX (Ausfürhbare Datei)"
 									Result = MessageRequester_Show(*P, 8, CheckArchiveLongName)	
@@ -1922,7 +1992,12 @@ Module DropVert
 									CFG::*Config\HandleExeAsRAR = #False
 									CFG::*Config\HandleExeAsZIP = #False
 									CFG::*Config\HandleExeAsS7Z = #True
-									CheckArchive = ""									
+									CheckArchive = ""	
+								Case "ZIPSFX"
+									CFG::*Config\HandleExeAsRAR = #False
+									CFG::*Config\HandleExeAsZIP = #True
+									CFG::*Config\HandleExeAsS7Z = #False
+									CheckArchive = ""										
 								Default
 									CheckArchiveLongName = ""
 							EndSelect	
@@ -2171,10 +2246,10 @@ Module DropVert
 
 	EndProcedure	
 EndModule
-; IDE Options = PureBasic 5.73 LTS (Windows - x64)
-; CursorPosition = 1431
-; FirstLine = 513
-; Folding = jAA93-w5-
+; IDE Options = PureBasic 6.00 LTS (Windows - x64)
+; CursorPosition = 1966
+; FirstLine = 1272
+; Folding = jAA93-+9-
 ; EnableAsm
 ; EnableXP
 ; UseMainFile = ..\Drop7z.pb

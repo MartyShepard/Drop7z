@@ -470,7 +470,7 @@ Repeat
 	
 ForEver
 
-; IDE Options = PureBasic 5.73 LTS (Windows - x64)
+; IDE Options = PureBasic 6.00 LTS (Windows - x64)
 ; CursorPosition = 98
 ; FirstLine = 72
 ; EnableThread
@@ -479,5 +479,5 @@ ForEver
 ; UseIcon = _GUI_IMAGES\ICONS\drop7ztray.ico
 ; Executable = ..\LH Drop7z 1 (Beta Versions)\Drop7z x64.exe
 ; CurrentDirectory = Drop7z\
-; Compiler = PureBasic 5.73 LTS (Windows - x64)
+; Compiler = PureBasic 6.00 LTS (Windows - x64)
 ; EnableUnicode
