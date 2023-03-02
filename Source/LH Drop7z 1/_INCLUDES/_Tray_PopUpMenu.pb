@@ -79,7 +79,7 @@
 		;MenuItem(21, "Einträge: Alle Selektieren")
 		;MenuItem(22, "Einträge: Selektion umkehren")              
 		;MenuBar()            
-		MenuItem(19, "Entferne Alle Drag'n'Drop")
+		MenuItem(19, "Drag'n'Drop: Auto. Entfernen")
 		MenuBar()   
 		MenuItem(28, "Säubere History")
 		MenuBar()   
@@ -470,7 +470,8 @@
 		CFG::WriteConfig(CFG::*Config): CFG::ReadConfig(CFG::*Config): DropSYSF::Process_FreeRam()
 	EndProcedure
 ; IDE Options = PureBasic 5.73 LTS (Windows - x64)
-; CursorPosition = 29
+; CursorPosition = 81
+; FirstLine = 51
 ; Folding = -
 ; EnableAsm
 ; EnableXP
