@@ -132,7 +132,13 @@ Module DropVert
 			Case 0: DropCode::SetUIElements7ZP(n)
 			Case 1: DropCode::SetUIElementsZIP(1)
 			Case 2: DropCode::SetUIElementsCHD(1)
-		EndSelect    
+		EndSelect  
+		
+		If ( CFG::*Config\PinDirectory = #True )		
+			DisableGadget(DC::#String_002,1)
+			ButtonEX::Disable(DC::#Button_004,1)   
+		EndIf	
+	
 	EndProcedure
 	;
 	;
@@ -1147,7 +1153,7 @@ Module DropVert
 	;
 	Procedure 	UnCompressZIP(*P.PROGRAM_BOOT, pbPackerPlugin.i)
 		Protected.i PackData, Result, SizeLocal, SizePacked, PackType, SizeUnPacked, u, FileAttribute.i
-		Protected.s szFilePack, szDirectory, szPackedFile, szUnPackedFile, szUnicode,Infotext
+		Protected.s szFilePack, szDirectory, szPackedFile, szUnPackedFile, szUnicode, Infotext, szNumbering
 			
 		AddElement( *P\ConvertResult() ) 
 
@@ -1159,21 +1165,26 @@ Module DropVert
 		*P\ContinueOnError		  = 0
 		*P\Archivname  			= GetGadgetText(DC::#String_002)  + GetFilePart( *P\ConvertResult()\File , #PB_FileSystem_NoExtension)
 		
-		szDirectory    			= GetPathPart( *P\ConvertResult()\File  ) + GetFilePart( *P\ConvertResult()\File , #PB_FileSystem_NoExtension)
-		
-		
+		szDirectory    			= GetPathPart( *P\ConvertResult()\File  )
+				
 		If ( CFG::*Config\UnPackOnly = #False)
 			szDirectory	+ "_[TEMP" + Str( Random(999999,000001) ) + "]\"
-		Else
-			If ( FileSize( szDirectory ) = -2 )				
-				For u = 0 To 999
-					
-					szDirectory = szDirectory + "_["+RSet( Str(u), 3, "0") +"]"
-					
-					If ( FileSize( szDirectory ) ! -2 )	
-						Break;
-					EndIf
-				Next
+		Else			
+			
+			If ( CFG::*Config\UnpackInSubDirectory = #True )
+				szDirectory + GetFilePart( *P\ConvertResult()\File , #PB_FileSystem_NoExtension)
+								
+				If ( FileSize( szDirectory ) = -2 )				
+					For u = 0 To 999
+						szNumbering = ""
+						szNumbering = szDirectory + "_["+RSet( Str(u), 3, "0") +"]"
+						
+						If ( FileSize( szNumbering ) ! -2 )
+							szDirectory = szNumbering
+							Break;
+						EndIf
+					Next
+				EndIf
 			EndIf
 		EndIf
 			
@@ -1322,7 +1333,7 @@ Module DropVert
 	;
 	;
 	Procedure 	UnCompressRAR(*P.PROGRAM_BOOT)
-		Protected.s szDirectory
+		Protected.s szDirectory, szNumbering
 		Protected.i Result
 
 		
@@ -1335,20 +1346,27 @@ Module DropVert
 		*P\ConvertResult()\MisMatchZero = 0	
 		
 		*P\Archivname  			= GetGadgetText(DC::#String_002)  + GetFilePart( *P\ConvertResult()\File , #PB_FileSystem_NoExtension)
-		szDirectory    			= GetPathPart( *P\ConvertResult()\File  ) + GetFilePart( *P\ConvertResult()\File , #PB_FileSystem_NoExtension)
+		szDirectory    			= GetPathPart( *P\ConvertResult()\File  ) 
+
 		
 		If ( CFG::*Config\UnPackOnly = #False)
 			szDirectory	+ "_[TEMP" + Str( Random(999999,000001) ) + "]\"
-		Else
-			If ( FileSize( szDirectory ) = -2 )				
-				For u = 0 To 999
-					
-					szDirectory = szDirectory + "_["+RSet( Str(u), 3, "0") +"]"
-					
-					If ( FileSize( szDirectory ) ! -2 )	
-						Break;
-					EndIf
-				Next
+		Else			
+			
+			If ( CFG::*Config\UnpackInSubDirectory = #True )
+				szDirectory + GetFilePart( *P\ConvertResult()\File , #PB_FileSystem_NoExtension)
+								
+				If ( FileSize( szDirectory ) = -2 )				
+					For u = 0 To 999
+						szNumbering = ""
+						szNumbering = szDirectory + "_["+RSet( Str(u), 3, "0") +"]"
+						
+						If ( FileSize( szNumbering ) ! -2 )
+							szDirectory = szNumbering
+							Break;
+						EndIf
+					Next
+				EndIf
 			EndIf
 		EndIf
 		
@@ -1374,9 +1392,8 @@ Module DropVert
 	Procedure 	UnCompressLZX(*P.PROGRAM_BOOT)
 		
 		Define *LzxMemory
-		Protected.s szDirectory
-		Protected.i Result	
-		Protected.i ListCount
+		Protected.s szDirectory, szNumbering
+		Protected.i Result, ListCount
 		AddElement( *P\ConvertResult() ) 
 		
 		*P\ConvertResult()\File 		= *P\Collection() 
@@ -1385,23 +1402,28 @@ Module DropVert
 		*P\ConvertResult()\MisMatchFile = 0
 		*P\ConvertResult()\MisMatchZero = 0	
 		
-		*P\Archivname  			= GetGadgetText(DC::#String_002)  + GetFilePart( *P\ConvertResult()\File , #PB_FileSystem_NoExtension)	
-			
+		*P\Archivname  			= GetGadgetText(DC::#String_002)  + GetFilePart( *P\ConvertResult()\File , #PB_FileSystem_NoExtension)						
+		szDirectory    			= GetPathPart( *P\ConvertResult()\File  )
 		
-		szDirectory    			= GetPathPart( *P\ConvertResult()\File  ) + GetFilePart( *P\ConvertResult()\File , #PB_FileSystem_NoExtension)
 		
 		If ( CFG::*Config\UnPackOnly = #False)
 			szDirectory	+ "_[TEMP" + Str( Random(999999,000001) ) + "]\"
-		Else
-			If ( FileSize( szDirectory ) = -2 )				
-				For u = 0 To 999
-					
-					szDirectory = szDirectory + "_["+RSet( Str(u), 3, "0") +"]"
-					
-					If ( FileSize( szDirectory ) ! -2 )	
-						Break;
-					EndIf
-				Next
+		Else			
+			
+			If ( CFG::*Config\UnpackInSubDirectory = #True )
+				szDirectory + GetFilePart( *P\ConvertResult()\File , #PB_FileSystem_NoExtension)
+								
+				If ( FileSize( szDirectory ) = -2 )				
+					For u = 0 To 999
+						szNumbering = ""
+						szNumbering = szDirectory + "_["+RSet( Str(u), 3, "0") +"]"
+						
+						If ( FileSize( szNumbering ) ! -2 )
+							szDirectory = szNumbering
+							Break;
+						EndIf
+					Next
+				EndIf
 			EndIf
 		EndIf
 		
@@ -2306,7 +2328,7 @@ Module DropVert
 	EndProcedure	
 EndModule
 ; IDE Options = PureBasic 5.73 LTS (Windows - x64)
-; CursorPosition = 131
+; CursorPosition = 136
 ; FirstLine = 81
 ; Folding = HAA94----
 ; EnableAsm

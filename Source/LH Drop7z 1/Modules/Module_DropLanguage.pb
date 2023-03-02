@@ -61,9 +61,9 @@ Module DropLang
         AddElement(TableDE()): TableDE() = "<- ERR0R ->"
         AddElement(TableDE()): TableDE() = "Listindex is NULL. Data Mismatch"   
         ; 31 - 35
-        AddElement(TableDE()): TableDE() = "Kann das Multivolume Archiv nbicht Erstellen!"
+        AddElement(TableDE()): TableDE() = "Kann das Multivolume Archiv nicht Erstellen!"
         AddElement(TableDE()): TableDE() = "Datei Existiert"
-        AddElement(TableDE()): TableDE() = "Überschreiben oder Aktulasieren?"
+        AddElement(TableDE()): TableDE() = "Überschreiben oder Aktualisieren?"
         AddElement(TableDE()): TableDE() = "Überschreiben"
         AddElement(TableDE()): TableDE() = "Aktualisieren"          
         ; 36 - 40        
@@ -201,8 +201,8 @@ Module DropLang
     EndProcedure              
 EndModule
 ; IDE Options = PureBasic 5.73 LTS (Windows - x64)
-; CursorPosition = 48
-; FirstLine = 25
+; CursorPosition = 63
+; FirstLine = 21
 ; Folding = --
 ; EnableAsm
 ; EnableXP

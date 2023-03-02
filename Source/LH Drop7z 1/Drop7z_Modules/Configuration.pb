@@ -1,6 +1,14 @@
-﻿DeclareModule CFG
+﻿
+ 
+
+DeclareModule CFG
     
-    Structure INI_STRUCTURE
+	Structure INI_STRUCTURE
+            ConfigPath.s{#MAX_PATH}
+            ProfilePath.s{#MAX_PATH}
+            HistoryPath.s{#MAX_PATH}
+            CRCLastPath.s{#MAX_PATH}
+		Version.s{128}             
             WindowTitle.s{384}
             Autostart.i
             MiniMized.i
@@ -8,22 +16,12 @@
             DesktopY.l
             DesktopW.l
             DesktopH.l
-            Sticky.i        
+            Sticky.i     			; Window Top Most   
             Instanz.i
             DeleteFiles.i
             AutoClearLt.i
             DontAskMe.i
-            CreateSHA1.i
-            Version.s{128}            
-            ConfigPath.s{#MAX_PATH}
-            ProfilePath.s{#MAX_PATH}
-            HistoryPath.s{#MAX_PATH}
-            CRCLastPath.s{#MAX_PATH}
-            usFormat.i                  ; Aktuelles Pack Format
-            ZipMethodID.i
-            CHDszPath.s{#MAX_PATH}      ; Mame's CHDMan Tool
-            CHDbClipBoard.i
-            CHDbSticky.i
+            CreateSHA1.i            
             PinDirectory.i
             szPinCurrent.s
             HandleExeAsRAR.i
@@ -32,6 +30,13 @@
             ConvertDelTemp.i
             MoveZIProblems.i
             UnPackOnly.i
+            UnpackInSubDirectory.i            
+            usFormat.i                  ; Aktuelles Pack Format
+            ZipMethodID.i
+            CHDszPath.s{#MAX_PATH}      ; Mame's CHDMan Tool
+            CHDbClipBoard.i
+            CHDbSticky.i
+
         EndStructure    
         
         *Config.INI_STRUCTURE       = AllocateMemory(SizeOf(INI_STRUCTURE))
@@ -44,6 +49,11 @@
         
         Declare.s MakeHistory(szFileHistory.s,Force=0)
 EndDeclareModule 
+
+DeclareModule DropPack   
+	Declare.i   Compress()
+EndDeclareModule  
+
 
 Module CFG
     
@@ -85,7 +95,8 @@ Module CFG
                 WriteStringN(DC::#_FileConfig, "ForceEXEAsS7Z=false"	)  
                 WriteStringN(DC::#_FileConfig, "DeleteTempDir=true"	)  
                 WriteStringN(DC::#_FileConfig, "MoveArchive=false"	)                 
-                WriteStringN(DC::#_FileConfig, "UnpackOnly=false"		)                  
+                WriteStringN(DC::#_FileConfig, "UnpackOnly=false"		)
+                WriteStringN(DC::#_FileConfig, "UnpackInSubDirectory=true"		)                   
                 WriteStringN(DC::#_FileConfig, "# CHD Options.......................")                 
                 WriteStringN(DC::#_FileConfig, "CHDManTool=") 
                 WriteStringN(DC::#_FileConfig, "ClipBoard=")
@@ -126,7 +137,7 @@ Module CFG
         Protected Size.i
         
         
-        *Config\Version.s    = "1.01b FF"
+        *Config\Version.s    = "1.02 Beta Fast Fertig"
         *Config\WindowTitle.s= "Drop7z v"+ *Config\Version +" By Marty Shepard"
         
         *Config\ConfigPath.s = GetPathPart( ProgramFilename() ) + "Drop7z.ini"
@@ -200,6 +211,7 @@ Module CFG
         *Config\MoveZIProblems = INIValue::Get_Value("SETTINGS","MoveArchive"    ,*Config\ConfigPath)
         *Config\UnPackOnly	 = INIValue::Get_Value("SETTINGS","UnpackOnly"     ,*Config\ConfigPath)
         
+        *Config\UnpackInSubDirectory = INIValue::Get_Value("SETTINGS","UnpackInSubDirectory" ,*Config\ConfigPath)
          
     EndProcedure
     
@@ -240,6 +252,7 @@ Module CFG
         INIValue::Set_Value("SETTINGS","MoveArchive"    ,*Config\MoveZIProblems ,*Config\ConfigPath)          
         INIValue::Set_Value("SETTINGS","UnpackOnly"     ,*Config\UnPackOnly	  ,*Config\ConfigPath)  
         
+        INIValue::Set_Value("SETTINGS","UnpackInSubDirectory" , *Config\UnpackInSubDirectory , *Config\ConfigPath)
         ;
         ; Button Info
        If ( CFG::*Config\UnPackOnly = #True )
@@ -251,8 +264,8 @@ Module CFG
     EndProcedure
 EndModule
 ; IDE Options = PureBasic 5.73 LTS (Windows - x64)
-; CursorPosition = 128
-; FirstLine = 111
+; CursorPosition = 139
+; FirstLine = 120
 ; Folding = --
 ; EnableAsm
 ; EnableXP

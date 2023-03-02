@@ -10,6 +10,7 @@
 	UseLZMAPacker()
 	UseTARPacker()
 	UseBriefLZPacker()
+	UsePNGImageDecoder()
 	
 	Structure FULLPATHLIST
 		xPath.s ; 
@@ -75,6 +76,7 @@
 	XIncludeFile "..\INCLUDES\Class_ListIcon_Sort.pb"          
 	XIncludeFile "..\INCLUDES\Class_Tooltip.pb"
 	
+	XIncludeFile "..\Includes\Class_MessageBoxEx.pb"
 	XIncludeFile "..\Includes\CLASSES_GUI\SplitterGadgetEx.pb"
 	XIncludeFile "..\INCLUDES\CLASSES_GUI\ButtonGadgetEX.pb"
 	XIncludeFile "..\INCLUDES\CLASSES_GUI\DialogRequestEX.pb" 
@@ -477,8 +479,8 @@ Repeat
 ForEver
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x64)
-; CursorPosition = 242
-; FirstLine = 206
+; CursorPosition = 78
+; FirstLine = 42
 ; EnableThread
 ; EnableXP
 ; EnableOnError

@@ -84,7 +84,7 @@ Procedure.i ComboAutoText()
 	If      (iCBMax = 0)
 		
 		ComboAutoText_Additems(iCBText$)
-		ProcedureReturn
+
 		
 	ElseIf  (iCBMax >= 1)
 		
@@ -99,9 +99,12 @@ Procedure.i ComboAutoText()
 		If (iNotFound = 0)
 			ComboAutoText_Additems(iCBText$)
 		EndIf
-		
-		ProcedureReturn        
+      
 	EndIf
+	
+	If ( CFG::*Config\PinDirectory = #True )		
+		SetGadgetText( DC::#String_002, CFG::*Config\szPinCurrent)
+	EndIf		
 EndProcedure  
 
 ;///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// 
@@ -458,6 +461,7 @@ Procedure _Clear_FileList()
 	GadgetToolTip(DC::#String_002,"")
 	GadgetToolTip(DC::#String_001,"")
 	
+	
 EndProcedure  
 
 ;/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -808,10 +812,7 @@ Procedure _Disable_Enable_Gadets(n)
 		Case 0 ;Offen 
 			
 			HideGadget(DC::#String_001,0) :Debug "HideGadget(DC::#String_001,0)"  
-			;Delay(25)
-			HideGadget(DC::#String_005,1) :Debug "HideGadget(DC::#String_001,0)"                                                           
-			;Delay(25)
-			
+			HideGadget(DC::#String_005,1) :Debug "HideGadget(DC::#String_001,0)"                                                           						
 			SetGadgetText(DC::#String_005,"") :Debug "HideGadget(DC::#String_001,0)"  
 			
 		Case 1  
@@ -822,6 +823,11 @@ Procedure _Disable_Enable_Gadets(n)
 		Case 1: DropCode::SetUIElementsZIP(1)
 		Case 2: DropCode::SetUIElementsCHD(1)
 	EndSelect    
+	
+	If ( CFG::*Config\PinDirectory = #True )		
+		DisableGadget(DC::#String_002,1)
+		ButtonEX::Disable(DC::#Button_004,1)   
+	EndIf	
 EndProcedure
 
 ;/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1738,8 +1744,8 @@ EndProcedure
 
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x64)
-; CursorPosition = 820
-; FirstLine = 762
+; CursorPosition = 825
+; FirstLine = 771
 ; Folding = ------
 ; EnableAsm
 ; EnableXP

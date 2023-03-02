@@ -49,7 +49,9 @@ Module DropCode
     ;
     ; Setze den Status der Checkmarks im Popup Menu
     Procedure   SetMenuCheckMarksPopp()
-        
+    	
+    	  SetMenuItemState(DC::#PopUpMenu_002, 16, CFG::*Config\Sticky)
+    	
         SetMenuItemState(DC::#PopUpMenu_002, 19, CFG::*Config\AutoClearLt)
         SetMenuItemState(DC::#PopUpMenu_002, 27, CFG::*Config\DontAskMe) 
         SetMenuItemState(DC::#PopUpMenu_002, 35, CFG::*Config\CreateSHA1)
@@ -98,7 +100,8 @@ Module DropCode
         SetMenuItemState(DC::#PopUpMenu_002, 71,CFG::*Config\HandleExeAsZIP)
         SetMenuItemState(DC::#PopUpMenu_002, 72,CFG::*Config\HandleExeAsS7Z)        
         SetMenuItemState(DC::#PopUpMenu_002, 73,CFG::*Config\ConvertDelTemp)        
-        SetMenuItemState(DC::#PopUpMenu_002, 75,CFG::*Config\UnpackOnly)  
+        SetMenuItemState(DC::#PopUpMenu_002, 75,CFG::*Config\UnpackOnly) 
+        SetMenuItemState(DC::#PopUpMenu_002, 74,CFG::*Config\UnpackInSubDirectory)
         
     EndProcedure
     ;
@@ -297,7 +300,7 @@ Module DropCode
                     EndIf
                     
                     ;
-                    ; Nehmen wir immer das 1ste Verzeichnis was in der Liste sich befindet
+                    ; Nehmen wir immer das 1etze Verzeichnis was in der Liste sich befindet
                     szString$ = GetGadgetItemText(DC::#String_002,1)
                     
                 EndIf     
@@ -682,9 +685,9 @@ EndProcedure
 EndModule
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x64)
-; CursorPosition = 100
-; FirstLine = 54
-; Folding = -O+
+; CursorPosition = 308
+; FirstLine = 256
+; Folding = -e+
 ; EnableAsm
 ; EnableXP
 ; UseMainFile = ..\Drop7z.pb
