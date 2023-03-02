@@ -39,7 +39,7 @@ Procedure Event_GadgetEx_Events()
 								;
 								; Compress Full Action
 							;Case "7z", "zip"
-								_Disable_Enable_Gadets(1)
+								;_Disable_Enable_Gadets(1)
 								nError = DropVert::ConvertArchive()
 								If ( nError >= 10 )
 									;
@@ -198,9 +198,9 @@ Procedure Event_GadgetEx_Events()
 EndProcedure
 
 
-; IDE Options = PureBasic 6.00 LTS (Windows - x64)
-; CursorPosition = 47
-; FirstLine = 14
+; IDE Options = PureBasic 5.73 LTS (Windows - x64)
+; CursorPosition = 41
+; FirstLine = 9
 ; Folding = -
 ; EnableAsm
 ; EnableXP

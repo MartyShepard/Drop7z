@@ -160,8 +160,6 @@ Procedure.i ComboAutoComplete(hWnd, uMsg, wParam, lParam)
 	EndSelect
 	ProcedureReturn result
 EndProcedure
-;///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// 
-
 
 
 
@@ -175,20 +173,39 @@ BackBrush = CreateSolidBrush_(RGB(200,200,200))
 
 Procedure ComboCallBackColor( hWnd.l, Message.l, wParam.l, lParam.l )
 	
-	If (Message = #WM_CTLCOLOREDIT) Or (Message = #WM_CTLCOLORLISTBOX)
+	
+
+	
+	If  (Message = 512)
+		
+		;SendMessage_(hWnd,#BS_VCENTER, 5,#Null)
+	
+		
+	EndIf	
+	
+	
+	If  (Message = #WM_CTLCOLOREDIT) Or (Message = #WM_CTLCOLORLISTBOX)
+	
 		
 		SetBkMode_(wParam,#TRANSPARENT)
 		; SetTextColor_(wParam,#Yellow)
-		SetBkColor_(wParam,RGB(200,200,200))
+		SetBkColor_(wParam,RGB(128,128,128))
 		Result = BackBrush
+		
 	Else
+		
 		Result = CallWindowProc_(oldcombproc, hWnd, Message, wParam, lParam )
 	EndIf
 	
 	ProcedureReturn Result
 	
 EndProcedure     
-
+    	;	    
+    	;    		    style = GetWindowLong_(GadgetID(DC::#String_002), #GWL_EXSTYLE) 
+    	;newstyle = style &(~#WS_EX_CLIENTEDGE) 
+    	;SetWindowLong_(GadgetID(DC::#String_002), #GWL_EXSTYLE, newstyle) 
+    	;
+    	;
 
 Procedure _ReadConfig_History()
 	
@@ -476,8 +493,8 @@ Procedure Calculate_Size()
 		Next
 		
 		szMessage = DropLang::GetUIText(12)
-		szMessage + RSet( FormatFileSize(iFullSize), 11, Chr(32) )
-		szMessage + Chr(9) + Chr(9) + DropLang::GetUIText(19)
+		szMessage + RSet( FormatFileSize(iFullSize), 10, Chr(32) )
+		szMessage + "    " +DropLang::GetUIText(19)
 		szMessage + RSet( Str(iMax), 8, "0" )
 		
 		;SetGadgetText(DC::#Text_002, WhatEver$ + szMessage)
@@ -801,7 +818,7 @@ Procedure _Disable_Enable_Gadets(n)
 	EndSelect
 	
 	Select CFG::*Config\usFormat
-		Case 0: DropCode::SetUIElements7ZP()
+		Case 0: DropCode::SetUIElements7ZP(n)
 		Case 1: DropCode::SetUIElementsZIP(1)
 		Case 2: DropCode::SetUIElementsCHD(1)
 	EndSelect    
@@ -1720,9 +1737,9 @@ EndProcedure
 
 
 
-; IDE Options = PureBasic 6.00 LTS (Windows - x64)
-; CursorPosition = 752
-; FirstLine = 735
+; IDE Options = PureBasic 5.73 LTS (Windows - x64)
+; CursorPosition = 820
+; FirstLine = 762
 ; Folding = ------
 ; EnableAsm
 ; EnableXP

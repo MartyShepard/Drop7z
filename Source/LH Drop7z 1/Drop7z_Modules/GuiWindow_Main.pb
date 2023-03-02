@@ -21,7 +21,7 @@ Module GUI00
               OpenWindow(DC::#_Window_001, x, y, width, height, CFG::*Config\WindowTitle.s, #PB_Window_SystemMenu | #PB_Window_Invisible | #PB_Window_ScreenCentered)
     EndProcedure
           
-          
+       
     ;
     ;
     ;
@@ -31,17 +31,17 @@ Module GUI00
     	
     	PackFormat$ = DropCode::GetArchivFormat()
     	
-    	TextGadget(DC::#Frame_006, 340, 10, 146, 16, ReplaceString(PackFormat$, Left(PackFormat$, 3) ,UCase( Left(PackFormat$, 3) ) ,0,1,1), #PB_Text_Right); Alt
+    	TextGadget(DC::#Frame_006, 336, 13, 146, 12, ReplaceString(PackFormat$, Left(PackFormat$, 3) ,UCase( Left(PackFormat$, 3) ) ,0,1,1), #PB_Text_Right); Alt
     	
     	    SetGadgetColor(DC::#Frame_006, #PB_Gadget_FrontColor,RGB(0 , 175, 255))
     	    SetGadgetColor(DC::#Frame_006, #PB_Gadget_BackColor, RGB(82,  82,  82))
-    	    SetGadgetFont(DC::#Frame_006, FontID(Fonts::#_SEGOEUI09N))
+    	    SetGadgetFont(DC::#Frame_006, FontID(Fonts::#_FIXPLAIN7_12))
     	
     	
-   	        TextGadget(DC::#Frame_007, 336, 79, 150, 14,  DropLang::GetUIText(5), #PB_Text_Right)    	    
+   	    TextGadget(DC::#Frame_007, 373, 83, 110, 12,  DropLang::GetUIText(5), #PB_Text_Right)    	    
     	    SetGadgetColor(DC::#Frame_007, #PB_Gadget_FrontColor,RGB(0, 175, 255))
     	    SetGadgetColor(DC::#Frame_007, #PB_Gadget_BackColor,RGB(82,82,82))
-    	    SetGadgetFont(DC::#Frame_007, FontID(Fonts::#_SEGOEUI10N))
+    	    SetGadgetFont(DC::#Frame_007, FontID(Fonts::#_FIXPLAIN7_12))
     	
     	TextGadget(DC::#Text_008, 18, 180, 108, 18, "Compression")
     	    SetGadgetFont(DC::#Text_008, FontID(Fonts::#_SEGOEUI10N))
@@ -51,51 +51,47 @@ Module GUI00
     	    SetGadgetFont(DC::#Text_004, FontID(Fonts::#_SEGOEUI10N))
     	TextGadget(DC::#Text_005, 18, 261, 108, 18, "Solid Block Size")
     	    SetGadgetFont(DC::#Text_005, FontID(Fonts::#_SEGOEUI10N))
-    	TextGadget(DC::#Text_007, 34, 344, 162, 18, "Encryption Password")
-    	    SetGadgetFont(DC::#Text_007, FontID(Fonts::#_DROIDMONO_08))
+    	TextGadget(DC::#Text_007, 34, 340, 162, 18, "Encryption Password")
+    	    SetGadgetFont(DC::#Text_007, FontID(Fonts::#_SEGOEUI10N))
     	TextGadget(DC::#Text_009, 18, 290, 108, 18, "Split Archives")
     	    SetGadgetFont(DC::#Text_009, FontID(Fonts::#_SEGOEUI10N))  
     	
     	;
     	; Grösse
-    	TextGadget(DC::#Text_002, 210, 136, 266, 16, DropLang::GetUIText(12) )
-        	SetGadgetFont(DC::#Text_002, FontID(Fonts::#_SEGOEUI09N))
+    	TextGadget(DC::#Text_002, 208, 140, 280, 14, DropLang::GetUIText(12) )
+        	SetGadgetFont(DC::#Text_002, FontID(Fonts::#_FIXPLAIN7_12))
         	SetGadgetColor(DC::#Text_002, #PB_Gadget_BackColor,RGB(82,82,82))
         	SetGadgetColor(DC::#Text_002, #PB_Gadget_FrontColor,RGB(225,225,226)) 
     	
     	;
     	; Profile Namen
-    	TextGadget(DC::#Text_003, 15, 136, 195, 16, DropLang::GetUIText(13) )
+    	TextGadget(DC::#Text_003, 15, 140, 193, 14, DropLang::GetUIText(13) )
         	GadgetToolTip(DC::#Text_003, DropLang::GetUIText(14) )
-        	SetGadgetFont(DC::#Text_003, FontID(Fonts::#_SEGOEUI09N))
+        	SetGadgetFont(DC::#Text_003, FontID(Fonts::#_FIXPLAIN7_12))
         	SetGadgetColor(DC::#Text_003, #PB_Gadget_BackColor,RGB(82,82,82))
         	SetGadgetColor(DC::#Text_003, #PB_Gadget_FrontColor,RGB(225,225,226))
     	
     	;
     	; Dateiname Im Hintegrund wenn Drop7z am Packen ist
-    	TextGadget(DC::#String_005,100, 26, 380, 20, "")
+    	TextGadget(DC::#String_005,94, 28, 394, 16, "")
         	SetGadgetColor(DC::#String_005, #PB_Gadget_FrontColor,RGB(0, 175, 255))
         	SetGadgetColor(DC::#String_005, #PB_Gadget_BackColor,RGB(82,82,82))
-        	SetGadgetFont(DC::#String_005, FontID(Fonts::#_SEGOEUI10N))
+        	SetGadgetFont(DC::#String_005, FontID(Fonts::#_SEGOEUI10N))     	
         	HideGadget(DC::#String_005,1)
+
     	
     	;
     	; String für die Dateinamen
-    	StringGadget(DC::#String_001, 100, 26, 380, 20, "", #PB_String_BorderLess)
+    	StringGadget(DC::#String_001, 90, 28, 398, 16, "", #PB_String_BorderLess)
         	SetGadgetColor(DC::#String_001, #PB_Gadget_BackColor,RGB(82,82,82))
         	SetGadgetColor(DC::#String_001, #PB_Gadget_FrontColor,RGB(225,225,226))
         	SetGadgetFont(DC::#String_001, FontID(Fonts::#_SEGOEUI10N))   
-    	
-    	
-    	
+
     	;////////////// Combox Box Neu ////////////////////////////////////////////////////////
-    	ComboBoxGadget(DC::#String_002, 100, 100, 382, 23, #CBS_SORT|#PB_ComboBox_Editable)
-    	SetGadgetFont(DC::#String_002, FontID(Fonts::#_SEGOEUI10N))        
+    	ComboBoxGadget(DC::#String_002, 67, 100, 415, 24, #CBS_SORT|#PB_ComboBox_Editable)
+    	SetGadgetFont(DC::#String_002, FontID(Fonts::#_SEGOEUI10N))  
     	
-    	If OpenLibrary(DC::#_LinkLibrary, "UxTheme.dll")
-    		swt.NoBorder = GetFunction(DC::#_LinkLibrary, "SetWindowTheme")          		
-    	EndIf      	
-    	
+	
     	
     	;////////////// Combox Box Neu ////////////////////////////////////////////////////////   
     	
@@ -120,9 +116,9 @@ Module GUI00
     	
     	
     	
-    	CheckBoxGadget(DC::#CheckBox_001, 17, 322, 129, 18, "Encrypt Filenames")
+    	CheckBoxGadget(DC::#CheckBox_001, 17, 321, 129, 18, "Encrypt Filenames")
     	GadgetToolTip(DC::#CheckBox_001, DropLang::GetUIText(7) )   
-    	SetGadgetFont(DC::#CheckBox_001, FontID(Fonts::#_SEGOEUI09N))
+    	SetGadgetFont(DC::#CheckBox_001, FontID(Fonts::#_SEGOEUI10N))
     	
     	
     	CheckBoxGadget(DC::#CheckBox_002, 17, 386, 79, 18, "Verify")    
@@ -153,7 +149,7 @@ Module GUI00
     	
     	;///////////// Compress Single
     	
-    	Protected  nCurrentFontID.l = Fonts::#_DROIDSANS_10
+    	Protected  nCurrentFontID.l = Fonts::#_FIXPLAIN7_12
     	ButtonEX::Add(DC::#Button_006,105, 442, 83, 20, 
     	              DC::#_BTN_GREY4_0N, 
     	              DC::#_BTN_GREY4_0H, 
@@ -166,7 +162,7 @@ Module GUI00
     	              DC::#_BTN_GREY4_0N, 
     	              DC::#_BTN_GREY4_0H, 
     	              DC::#_BTN_GREY4_0P,
-    	              DC::#_BTN_GREY4_0D,"Full  ", "Compress", "Compress",GetSysColor_(#COLOR_3DFACE),$29D7DA,nCurrentFontID)
+    	              DC::#_BTN_GREY4_0D,"Standard", "Compress", "Compress",GetSysColor_(#COLOR_3DFACE),$29D7DA,nCurrentFontID)
     	;ButtonEX::TooltTip(WindowID(DC::#_Window_001), DC::#Button_003, "",":.....Compress each Files & Folders in a seperate Archiv", 1,275)  
     	
     	;///////////// Clear List
@@ -180,7 +176,7 @@ Module GUI00
     	    	        
         ;
         ; Button Info
-        If ( CFG::*Config\UnPackOnly = #true )
+        If ( CFG::*Config\UnPackOnly = #True )
         	ButtonEX::Settext(DC::#Button_002,0,"Unpack")
         Else
         	ButtonEX::Settext(DC::#Button_002,0,"Convert")
@@ -191,7 +187,7 @@ Module GUI00
     	              DC::#_BTN_GREY4_0N,
     	              DC::#_BTN_GREY4_0H,
     	              DC::#_BTN_GREY4_0P,
-    	              DC::#_BTN_GREY4_0D,"Profiles", "Edit", "Edit",GetSysColor_(#COLOR_3DFACE),$29D7DA,nCurrentFontID)
+    	              DC::#_BTN_GREY4_0D,"Profile", "Edit", "Edit",GetSysColor_(#COLOR_3DFACE),$29D7DA,nCurrentFontID)
     	;ButtonEX::TooltTip(WindowID(DC::#_Window_001), DC::#Button_005, "","Open the Profile Window for Add or Edit Custom Settings", 1,275) 
     	
     	
@@ -206,17 +202,18 @@ Module GUI00
     	
     	;
     	; Verzeichnis Requester
-    	ButtonEX::Add(DC::#Button_004,16, 102, 83, 20,
-    	              DC::#_BTN_GREY4_0N, 
-    	              DC::#_BTN_GREY4_0H,
-    	              DC::#_BTN_GREY4_0P,
-    	              DC::#_BTN_GREY4_0D,"..\", "..\", "..\",GetSysColor_(#COLOR_3DFACE))
+    	ButtonEX::Add(DC::#Button_004,13, 101, 54, 22,
+    	              DC::#_BTN_GREY5_0N, 
+    	              DC::#_BTN_GREY5_0H,
+    	              DC::#_BTN_GREY5_0P,
+    	              DC::#_BTN_GREY5_0D,"", "", "",GetSysColor_(#COLOR_3DFACE))
    
     	
     	GadgetToolTip(DC::#Button_003, "Komprimiere Standard als Archiv: 7Z, ZIP, CHD")
     	GadgetToolTip(DC::#Button_006, "Massenkomprimierung als Einzelne Archive: 7Z, ZIP, CHD")
     	GadgetToolTip(DC::#Button_002, "KPF, LZX (Amiga), PK3, PK4, RAR (VOL,SFX), TAR, TGZ, TSU, ZIP (SFX)")    	
     	
+
     EndProcedure
 EndModule        
 
@@ -301,8 +298,8 @@ Module GUI04
 EndModule
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x64)
-; CursorPosition = 182
-; FirstLine = 151
+; CursorPosition = 75
+; FirstLine = 43
 ; Folding = --
 ; EnableAsm
 ; EnableXP

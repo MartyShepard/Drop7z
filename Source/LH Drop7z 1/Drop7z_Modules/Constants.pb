@@ -82,7 +82,7 @@
      ;   Constants: Strings
         
          Enumeration 141 Step 1
-            #String_001: #String_002: #String_003: #String_004: #String_005
+            #String_001: #String_002: #String_003: #String_004: #String_005: #String_006
         
         EndEnumeration
     
@@ -224,9 +224,9 @@
     EndDeclareModule
     Module DC
     EndModule
-; IDE Options = PureBasic 5.62 (Windows - x64)
-; CursorPosition = 23
-; FirstLine = 16
+; IDE Options = PureBasic 5.73 LTS (Windows - x64)
+; CursorPosition = 84
+; FirstLine = 64
 ; Folding = -
 ; EnableAsm
 ; EnableXP

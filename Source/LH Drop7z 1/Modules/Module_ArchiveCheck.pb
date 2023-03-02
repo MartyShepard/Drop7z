@@ -39,7 +39,7 @@ Module ArchiveCheck
 	;
 	;
 	Procedure.i	  Debug_Header(*ARCHEAD.ARC_HEADER)
-			For c = 0 To 1024
+			For c = 0 To 1023
 				Debug "Index: ["+RSet (Str( c ), 6," ") +"] Ascii " + RSet (Str( *ARCHEAD\header[c] ), 4," ") + " - Char: " + Chr(*ARCHEAD\header[c])				
 			Next	
 			
@@ -52,7 +52,7 @@ Module ArchiveCheck
 		
 		Protected.i actual, result, MaxReadBytes, MinReadBytes
 		
-		MaxReadBytes = 132102
+		MaxReadBytes = 21137
 		MinReadBytes = *ARCHEAD\Size
 		
 		
@@ -82,90 +82,124 @@ Module ArchiveCheck
 				ProcedureReturn "RAR"
 			EndIf	
 			
-			If (*ARCHEAD\header[28] = 'R') And
-			   (*ARCHEAD\header[29] = 'J') And
-			   (*ARCHEAD\header[30] = 'S') And
-			   (*ARCHEAD\header[31] = 'X')
-				Debug "ARJ Self Extract found"
-				ProcedureReturn "ARJSFX"
+			If ( *ARCHEAD\Size >= 31 )
+				If (*ARCHEAD\header[28] = 'R') And
+				   (*ARCHEAD\header[29] = 'J') And
+				   (*ARCHEAD\header[30] = 'S') And
+				   (*ARCHEAD\header[31] = 'X')
+					Debug "ARJ Self Extract found"
+					ProcedureReturn "ARJSFX"
+				EndIf
 			EndIf
 			
-			If (*ARCHEAD\header[28] = 'R') And
-			   (*ARCHEAD\header[29] = 'S') And
-			   (*ARCHEAD\header[30] = 'F') And
-			   (*ARCHEAD\header[31] = 'X')
-				Debug "RAR Self Extract found"
-				ProcedureReturn "RARSFX"
-			EndIf		
-			
-			If (*ARCHEAD\header[38] = 'L') And
-			   (*ARCHEAD\header[39] = 'H') And
-			   (*ARCHEAD\header[40] = 'a') And
-			   (*ARCHEAD\header[41] = 'r') And
-			   (*ARCHEAD\header[42] = 'c') And
-			   (*ARCHEAD\header[46] = 'S') And
-			   (*ARCHEAD\header[47] = 'F') And
-			   (*ARCHEAD\header[48] = 'X')   
-				Debug "LHA Self Extract found"
-				ProcedureReturn "LHASFX"
-			EndIf	
-			
-			If (*ARCHEAD\header[504] = 'U') And
-			   (*ARCHEAD\header[505] = 'P') And
-			   (*ARCHEAD\header[506] = 'X') And
-			   (*ARCHEAD\header[507] = '0')
-				Debug "UPX Ausführbare Datei"
-				ProcedureReturn "UPX"
-			EndIf				
-			
-			If (*ARCHEAD\header[760] = 'U') And
-			   (*ARCHEAD\header[761] = 'P') And
-			   (*ARCHEAD\header[762] = 'X') And
-			   (*ARCHEAD\header[763] = '0')
-				Debug "UPX Ausführbare Datei"
-				ProcedureReturn "UPX"
+			If ( *ARCHEAD\Size >= 31 )			
+				If (*ARCHEAD\header[28] = 'R') And
+				   (*ARCHEAD\header[29] = 'S') And
+				   (*ARCHEAD\header[30] = 'F') And
+				   (*ARCHEAD\header[31] = 'X')
+					Debug "RAR Self Extract found"
+					ProcedureReturn "RARSFX"
+				EndIf		
 			EndIf
 			
-			If (*ARCHEAD\header[132096] = '7') And
-			   (*ARCHEAD\header[132097] = 'z') And
-			   (*ARCHEAD\header[132098] = 188) And
-			   (*ARCHEAD\header[132099] = 175)
-				Debug "7z Self Extract found"
-				ProcedureReturn "S7ZSFX"
+			If ( *ARCHEAD\Size >= 35 )
+				If (*ARCHEAD\header[30] = 'P') And 
+				   (*ARCHEAD\header[31] = 'K') And
+				   (*ARCHEAD\header[32] = 'L') And
+				   (*ARCHEAD\header[33] = 'I') And
+				   (*ARCHEAD\header[34] = 'T') And
+				   (*ARCHEAD\header[35] = 'E' )
+					Debug "PKLITE Self Extract found"
+					ProcedureReturn "ZIPSFX"
+				EndIf	
+			EndIf
+			
+			If ( *ARCHEAD\Size >= 48 )			
+				If (*ARCHEAD\header[38] = 'L') And
+				   (*ARCHEAD\header[39] = 'H') And
+				   (*ARCHEAD\header[40] = 'a') And
+				   (*ARCHEAD\header[41] = 'r') And
+				   (*ARCHEAD\header[42] = 'c') And
+				   (*ARCHEAD\header[46] = 'S') And
+				   (*ARCHEAD\header[47] = 'F') And
+				   (*ARCHEAD\header[48] = 'X')   
+					Debug "LHA Self Extract found"
+					ProcedureReturn "LHASFX"
+				EndIf	
+			EndIf
+			If ( *ARCHEAD\Size >= 55 )
+				If (*ARCHEAD\header[50] = 'P') And 
+				   (*ARCHEAD\header[51] = 'K') And
+				   (*ARCHEAD\header[52] = 'W') And
+				   (*ARCHEAD\header[53] = 'A') And
+				   (*ARCHEAD\header[54] = 'R') And
+				   (*ARCHEAD\header[55] = 'E' )
+					Debug "PKWARE Self Extract found"
+					ProcedureReturn "ZIPSFX"
+				EndIf	
+			EndIf
+			If ( *ARCHEAD\Size >= 507 )
+				If (*ARCHEAD\header[504] = 'U') And
+				   (*ARCHEAD\header[505] = 'P') And
+				   (*ARCHEAD\header[506] = 'X') And
+				   (*ARCHEAD\header[507] = '0')
+					Debug "UPX Ausführbare Datei"
+					ProcedureReturn "UPX"
+				EndIf				
+			EndIf
+			If ( *ARCHEAD\Size >= 763 )
+				If (*ARCHEAD\header[760] = 'U') And
+				   (*ARCHEAD\header[761] = 'P') And
+				   (*ARCHEAD\header[762] = 'X') And
+				   (*ARCHEAD\header[763] = '0')
+					Debug "UPX Ausführbare Datei"
+					ProcedureReturn "UPX"
+				EndIf							
+			EndIf
+			If ( *ARCHEAD\Size >= 422 )
+				If (*ARCHEAD\header[417] = 'W') And
+				   (*ARCHEAD\header[418] = 'I') And
+				   (*ARCHEAD\header[419] = 'N') And
+				   (*ARCHEAD\header[420] = 'S') And
+				   (*ARCHEAD\header[421] = 'F') And
+				   (*ARCHEAD\header[422] = 'X' )
+					Debug "WinZIP Self Extract found"
+					ProcedureReturn "ZIPSFX"
+				EndIf	
+			EndIf
+			If ( *ARCHEAD\Size >= 422 )						
+				If (*ARCHEAD\header[417] = 'W') And
+				   (*ARCHEAD\header[418] = 'I') And
+				   (*ARCHEAD\header[419] = 'N') And
+				   (*ARCHEAD\header[420] = 'S') And
+				   (*ARCHEAD\header[421] = 'F') And
+				   (*ARCHEAD\header[422] = 'X' )
+					Debug "WinZIP Self Extract found"
+					ProcedureReturn "ZIPSFX"
+				EndIf	
+			EndIf
+			
+			If ( *ARCHEAD\Size >= 132099 )
+				If (*ARCHEAD\header[132096] = '7') And
+				   (*ARCHEAD\header[132097] = 'z') And
+				   (*ARCHEAD\header[132098] = 188) And
+				   (*ARCHEAD\header[132099] = 175)
+					Debug "7z Self Extract found"
+					ProcedureReturn "S7ZSFX"
+				EndIf	
+			EndIf
+			
+			If ( *ARCHEAD\Size >= 21013 )						
+				If (*ARCHEAD\header[21008] = 'W') And
+				   (*ARCHEAD\header[21009] = 'i') And
+				   (*ARCHEAD\header[21010] = 'n') And
+				   (*ARCHEAD\header[21011] = 'Z') And
+				   (*ARCHEAD\header[21012] = 'i') And
+				   (*ARCHEAD\header[21013] = 'p' )
+					Debug "WinZIP Self Extract found"
+					ProcedureReturn "ZIPSFX"
+				EndIf	
 			EndIf			
-			
-		
-			If (*ARCHEAD\header[50] = 'P') And 
-			   (*ARCHEAD\header[51] = 'K') And
-			   (*ARCHEAD\header[52] = 'W') And
-			   (*ARCHEAD\header[53] = 'A') And
-			   (*ARCHEAD\header[54] = 'R') And
-			   (*ARCHEAD\header[55] = 'E' )
-				Debug "PKWARE Self Extract found"
-				ProcedureReturn "ZIPSFX"
-			EndIf	
-
-			If (*ARCHEAD\header[30] = 'P') And 
-			   (*ARCHEAD\header[31] = 'K') And
-			   (*ARCHEAD\header[32] = 'L') And
-			   (*ARCHEAD\header[33] = 'I') And
-			   (*ARCHEAD\header[34] = 'T') And
-			   (*ARCHEAD\header[35] = 'E' )
-				Debug "PKLITE Self Extract found"
-				ProcedureReturn "ZIPSFX"
-			EndIf	
-			
-			If (*ARCHEAD\header[417] = 'W') And
-			   (*ARCHEAD\header[418] = 'I') And
-			   (*ARCHEAD\header[419] = 'N') And
-			   (*ARCHEAD\header[420] = 'S') And
-			   (*ARCHEAD\header[421] = 'F') And
-			   (*ARCHEAD\header[422] = 'X' )
-				Debug "WinZIP Self Extract found"
-				ProcedureReturn "ZIPSFX"
-			EndIf	
-			
-
 			
 			If (*ARCHEAD\header[0] = 'P') And
 			   (*ARCHEAD\header[1] = 'K'); And (*ARCHEAD\header[2] = 3)  And (*ARCHEAD\header[4] = 4)
@@ -174,7 +208,7 @@ Module ArchiveCheck
 			EndIf			
 		EndIf
 		
-		ProcedureReturn ""
+		ProcedureReturn "UNKNOWN"
 		
 	EndProcedure 
 	;
@@ -214,9 +248,9 @@ Module ArchiveCheck
 		ProcedureReturn Headed
 	EndProcedure	
 EndModule
-; IDE Options = PureBasic 6.00 LTS (Windows - x64)
-; CursorPosition = 107
-; FirstLine = 80
+; IDE Options = PureBasic 5.73 LTS (Windows - x64)
+; CursorPosition = 210
+; FirstLine = 184
 ; Folding = --
 ; EnableAsm
 ; EnableXP

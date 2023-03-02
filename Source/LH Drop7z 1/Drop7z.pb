@@ -47,7 +47,7 @@
 		hwndEdit.l
 		hwndList.l
 	EndStructure
-	
+
 	;
 	;
 
@@ -143,7 +143,8 @@
 	
 	DropLang::GetLngSysUI()
 	Global LHGAME_LANGUAGE = DropLang::GetLngSysUI(-1)     
-
+	
+   	
 ;/////////////////////////////////////////////////////////////////////////////////////// Pre
 
 CFG::ReadConfig(CFG::*Config) 
@@ -177,6 +178,9 @@ GetComboBoxInfo_(GadgetID(DC::#String_002),@cbinfo)
 tb              = cbinfo.comboboxinfo\hwndedit
 oldcomboproc    = SetWindowLongPtr_(tb, #GWL_WNDPROC, @ComboAutoComplete())    
 oldcombproc     = SetWindowLongPtr_(GadgetID(DC::#String_002), #GWL_WNDPROC, @ComboCallBackColor())
+
+
+
 ;///////////////////////////////////////////////////////////////////////////////// AutoComplete
 
 ;
@@ -236,9 +240,11 @@ If  ( CFG::*Config\PinDirectory = 1 )
 	DropCode::Consolidate_Directory(2)
 EndIf     
 
+
 ;/////////////////////////////////////////////////////////////////////////////////////// Code: Window
 Repeat
-	
+ 
+    
 	MainEvent       = WaitWindowEvent()
 	MainEventWindow = EventWindow()
 	MainEventGadget = EventGadget() ;// GadgetID
@@ -281,7 +287,7 @@ Repeat
 					Select MainEventGadget                      
 						Case DC::#ComboBox_004  :   _SetButtonState()
 						Case DC::#ComboBox_005  :   _SetCompression_Mode(DC::#ComboBox_005,DC::#ComboBox_001,DC::#ComboBox_002,DC::#ComboBox_003)                        
-						Case DC::#String_002    :   Debug GetGadgetText(DC::#String_002)
+						Case DC::#String_002    :   Debug GetGadgetText(DC::#String_002): 
 							
 					EndSelect                    
 			EndSelect
@@ -470,14 +476,14 @@ Repeat
 	
 ForEver
 
-; IDE Options = PureBasic 6.00 LTS (Windows - x64)
-; CursorPosition = 98
-; FirstLine = 72
+; IDE Options = PureBasic 5.73 LTS (Windows - x64)
+; CursorPosition = 242
+; FirstLine = 206
 ; EnableThread
 ; EnableXP
 ; EnableOnError
 ; UseIcon = _GUI_IMAGES\ICONS\drop7ztray.ico
 ; Executable = ..\LH Drop7z 1 (Beta Versions)\Drop7z x64.exe
 ; CurrentDirectory = Drop7z\
-; Compiler = PureBasic 6.00 LTS (Windows - x64)
+; Compiler = PureBasic 5.73 LTS (Windows - x64)
 ; EnableUnicode

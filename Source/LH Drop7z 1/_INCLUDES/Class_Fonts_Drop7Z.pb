@@ -142,7 +142,7 @@ Global FontID_DEJAVU_08         =LoadFont(#_DEJAVU_08,"DejaVu Sans",08)
 Global FontID_SEGOEUI08N        =LoadFont(#_SEGOEUI08N,"Segoe UI", 08)        
 Global FontID_SEGOEUI09N        =LoadFont(#_SEGOEUI09N,"Segoe UI", 09)     
 Global FontID_SEGOEUI10N        =LoadFont(#_SEGOEUI10N,"Segoe UI", 10)
-;     Global FontID_SEGOEUI11N        =LoadFont(#_SEGOEUI11N,"Segoe UI", 11)
+Global FontID_SEGOEUI11N        =LoadFont(#_SEGOEUI11N,"Segoe UI", 11)
 
 ;     Global FontID_SEGOEUI08B        =LoadFont(#_SEGOEUI08B,"Segoe UI", 08,#PB_Font_Bold|#PB_Font_HighQuality)    
 ;     Global FontID_SEGOEUI09B        =LoadFont(#_SEGOEUI09B,"Segoe UI", 09,#PB_Font_Bold|#PB_Font_HighQuality)
@@ -157,8 +157,8 @@ Module Fonts
 EndModule
 
    
-; IDE Options = PureBasic 5.62 (Windows - x64)
-; CursorPosition = 113
+; IDE Options = PureBasic 5.73 LTS (Windows - x64)
+; CursorPosition = 144
 ; FirstLine = 93
 ; Folding = -
 ; EnableXP

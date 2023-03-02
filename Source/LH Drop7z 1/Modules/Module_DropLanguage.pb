@@ -46,7 +46,7 @@ Module DropLang
         AddElement(TableDE()): TableDE() = "Datei"
         AddElement(TableDE()): TableDE() = "Ziehe Datei(en) oder Verzeichnis(se) in dieses Fenster"
         AddElement(TableDE()): TableDE() = "Größe: ...Berechne"
-        AddElement(TableDE()): TableDE() = "      Item(s): "
+        AddElement(TableDE()): TableDE() = " Item(s): "
         AddElement(TableDE()): TableDE() = "Now Look What You've Done"
         ; 21 - 25        
         AddElement(TableDE()): TableDE() = "No Files, No Work, No Compress!"
@@ -109,7 +109,7 @@ Module DropLang
         AddElement(TableEN()): TableEN() = "Files"
         AddElement(TableEN()): TableEN() = "Drag'n'Drop File(s) or Folder(s) in this Window"
         AddElement(TableEN()): TableEN() = "Size: ...Calculate"
-        AddElement(TableEN()): TableEN() = "      Item(s): "
+        AddElement(TableEN()): TableEN() = " Item(s): "
         AddElement(TableEN()): TableEN() = "Now Look What You've Done"
         ; 21 - 25        
         AddElement(TableEN()): TableEN() = "No Files, No Work, No Compress!"
@@ -202,7 +202,7 @@ Module DropLang
 EndModule
 ; IDE Options = PureBasic 5.73 LTS (Windows - x64)
 ; CursorPosition = 48
-; FirstLine = 22
+; FirstLine = 25
 ; Folding = --
 ; EnableAsm
 ; EnableXP

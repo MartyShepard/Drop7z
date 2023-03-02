@@ -59,18 +59,20 @@ Module DropVert
 	;
 	;
 	;    
-	;
-	;
-	; Überprpfe ob die Datei existiert und Optionl Lösche diese
-	
+
 	Procedure Set_GadgetStatus(n)
 		
 		Select n
 			Case 1 ;Offen 
 				
-				SetGadgetText(DC::#String_005,GetGadgetText(DC::#String_001)):Debug "HideGadget(DC::#String_001,1)"                                
-				HideGadget(DC::#String_005,0):Debug "HideGadget(DC::#String_001,1)"            
-				HideGadget(DC::#String_001,1):Debug "HideGadget(DC::#String_001,1)"            
+				SendMessage_(GadgetID(DC::#String_005), #EM_SETSEL, -1, -1)
+				SetGadgetText(DC::#String_005,"")
+				SetGadgetText(DC::#String_005,GetGadgetText(DC::#String_001))			
+				HideGadget(DC::#String_001,1)				
+				HideGadget(DC::#String_005,0)
+				SetGadgetText(DC::#String_001,"")
+				SetGadgetText(DC::#String_001,GetGadgetText(DC::#String_005))
+           
 		EndSelect        
 		
 		DisableGadget(DC::#String_002,n)
@@ -90,18 +92,26 @@ Module DropVert
 		
 		DisableGadget(DC::#CheckBox_005,n)     
 		DisableGadget(DC::#CheckBox_004,n)    
-		DisableGadget(DC::#CheckBox_001,n)   
+		DisableGadget(DC::#CheckBox_001,n) 
+		
 		ButtonEX::Disable(DC::#Button_001,n)
+		
 		DisableGadget(DC::#ComboBox_003,n)    
 		ButtonEX::Disable(DC::#Button_006,n)  
+		
 		DisableGadget(DC::#CheckBox_002,n)    
 		ButtonEX::Disable(DC::#Button_004,n)   
+		
 		DisableGadget(DC::#ComboBox_002,n)
 		ButtonEX::Disable(DC::#Button_003,n)    
+		
 		DisableGadget(DC::#ComboBox_001,n)
+		
 		ButtonEX::Disable(DC::#Button_005,n) 
+		
 		DisableGadget(DC::#ComboBox_005,n)
 		ButtonEX::Disable(DC::#Button_002,n)   
+		
 		DisableGadget(DC::#CheckBox_003,n)      
 		DisableGadget(DC::#String_001,n) 
 		
@@ -119,7 +129,7 @@ Module DropVert
 		EndSelect
 		
 		Select CFG::*Config\usFormat
-			Case 0: DropCode::SetUIElements7ZP()
+			Case 0: DropCode::SetUIElements7ZP(n)
 			Case 1: DropCode::SetUIElementsZIP(1)
 			Case 2: DropCode::SetUIElementsCHD(1)
 		EndSelect    
@@ -674,7 +684,7 @@ Module DropVert
 		While IsThread(*P\ulThread)        	    
 			;While WindowEvent()
 			;Wend            	
-			Delay(25)
+			Delay(5)
 			
 			If IsThread( *P\ulThread )
 				;
@@ -1055,7 +1065,7 @@ Module DropVert
 		If ( Right( szString, 1) = "/" )
 			ProcedureReturn 
 		EndIf
-		Delay( 5 )
+		;Delay( 5 )
 		
 			*P\rect\right = 280
 			
@@ -1293,7 +1303,7 @@ Module DropVert
 							Break;
 						EndIf	
 					EndIf
-					Delay( 10 )
+					;Delay( 10 )
 					;DropSYSF::Process_FreeRam()
 				Wend
 			Else
@@ -1455,7 +1465,7 @@ Module DropVert
 							UnCompressSetInfo(*P,UnLZX::User_LZX_List()\PathFile)							
 						EndIf
 					EndIf
-					Delay( 10 )
+					;Delay( 10 )
 					
 				Wend	
 			Else 
@@ -1587,7 +1597,7 @@ Module DropVert
 				
 				UnCompressCheck( *P )	
 				
-				Delay( 5 )
+				;Delay( 5 )
 				
 				If ( *P\ContinueOnError = 1 )
 					If ( FileSize( *P\DstPath ) = -2 )
@@ -1595,17 +1605,18 @@ Module DropVert
 					EndIf						
 					Continue
 				EndIf	
-							
+				
+				SetGadgetText(DC::#Frame_006,"---")
+								
+				If ( CFG::*Config\UnPackOnly )
+					Continue
+				EndIf
+				
 				Select CFG::*Config\usFormat
 					Case 0: SetGadgetText(DC::#Frame_006,"7Z")
 					Case 1: SetGadgetText(DC::#Frame_006,"ZIP")           
 					Case 2: SetGadgetText(DC::#Frame_006,"CHD")          
-				EndSelect 
-				
-				
-				If ( CFG::*Config\UnPackOnly )
-					Continue
-				EndIf
+				EndSelect 				
 				
 				*P\sz7zArchiv      =  *P\Archivname
 				
@@ -1742,6 +1753,11 @@ Module DropVert
 			;
 			; Übrpüfe auf Ob alle Dateien geschrieben wordenind
 			
+			Select CFG::*Config\usFormat
+				Case 0: SetGadgetText(DC::#Frame_006,"7Z")
+				Case 1: SetGadgetText(DC::#Frame_006,"ZIP")           
+				Case 2: SetGadgetText(DC::#Frame_006,"CHD")          
+			EndSelect 			
 		EndIf	
 
 	EndProcedure    
@@ -1806,6 +1822,12 @@ Module DropVert
 				Request::*MsgEx\User_BtnTextM = "ZIP"
 				Request::*MsgEx\User_BtnTextR = "Abbruch"					
 				Result = Request::MSG(DropLang::GetUIText(20), "Archiv Identifikation", "Archiv "+ Chr(34) +GetFilePart( *P\Collection() ) + Chr(34) + " Identifziert als " + szString + #CRLF$ + "Trotzdem Versuchen zu Entpacken/ Konvertieren als RAR/ZIP oder Überspringen?",16,-1,"",0,0,DC::#_Window_001 )	
+				
+			Case 9
+				Request::MSG( DropLang::GetUIText(20) , "Kann nicht Öffnen", "Die Datei ist von einem anderen Programm geöffnent" + #CRLF$ + "( " + Chr(34) + GetFilePart(  *P\Collection() ) + Chr(34) + " ) ", 2, 0, "",0,0,DC::#_Window_001)				
+				
+			Case 10
+				Result = Request::MSG(DropLang::GetUIText(20), "Unbekanntes Archiv", "Archiv ["+GetFilePart( *P\Collection() )+" ] kann nicht geöffnet werden.", 2, 0, "",0,0,DC::#_Window_001)			
 								
 		EndSelect
 		
@@ -1822,7 +1844,10 @@ Module DropVert
 	EndMacro	
 	;
 	;
-	;		
+	;
+	Procedure Thread_SetStatus(z)
+		Set_GadgetStatus(z)
+	EndProcedure
 	;
 	;
 	;	
@@ -1844,6 +1869,8 @@ Module DropVert
 		
 		SetGadgetState(DC::#Progress_001, 0)
 		SetWindowTitle(DC::#_Window_001, DropLang::GetUIText(1) )
+		
+		
 		
 		*P.PROGRAM_BOOT = AllocateMemory( SizeOf( PROGRAM_BOOT ) *2)
 		InitializeStructure(*P, PROGRAM_BOOT)     
@@ -1936,7 +1963,17 @@ Module DropVert
 		
 		ResetList( *P\Collection() )
 		
+		_Thread.i = CreateThread( @Thread_SetStatus(),1)
+		While IsThread(_Thread)	
+			Delay(5)
+			While WindowEvent()
+			Wend 
+		Wend
+		_Thread = 0
+		
 		If ( ListSize( *P\Collection() ) >= 1 )
+			
+			SetWindowTitle(DC::#_Window_001," Analysiare ... Bitte warten ....")  
 			
 			ForEach *P\Collection()
 				
@@ -1958,6 +1995,17 @@ Module DropVert
 
 							
 							CheckArchive = ArchiveCheck::Test_Archive( *P\Collection() )
+							
+							If ( CheckArchive = "-2" )
+								MessageRequester_Show(*P, 9)
+								MessageRequester_Result
+							EndIf	
+							
+							If ( CheckArchive = "UNKNOWN" )And ( CFG::*Config\UnPackOnly )
+								MessageRequester_Show(*P, 10)
+								MessageRequester_Result
+							EndIf	
+							
 							Select CheckArchive
 								Case "ARJSFX"
 									CheckArchiveLongName = "ARJ (Selbstentpackende Datei)"
@@ -2002,10 +2050,10 @@ Module DropVert
 									CheckArchiveLongName = ""
 							EndSelect	
 							
-							If (Len( CheckArchive) > 0)																									
-								MessageRequester_Show(*P, 2, CheckArchiveLongName)								
-								MessageRequester_Result
-							EndIf									
+; 							If (Len( CheckArchive) > 0)																									
+; 								MessageRequester_Show(*P, 2, CheckArchiveLongName)								
+; 								MessageRequester_Result
+; 							EndIf									
 							
 						EndIf
 						
@@ -2060,6 +2108,7 @@ Module DropVert
 						
 						CheckArchive = ArchiveCheck::Test_Archive( *P\Collection() )
 						If (Val(CheckArchive) = -2 )
+							MessageRequester_Result														
 							
 						ElseIf  ( Len( CheckArchive ) > 2 )
 							
@@ -2130,20 +2179,30 @@ Module DropVert
 		
 		;Set_GadgetStatus(1)
 		
-		_Thread.i = CreateThread( @ConvertArchive_Thread(),*P.PROGRAM_BOOT)
+		_Thread.i = CreateThread( @ConvertArchive_Thread(),*P)
 		While IsThread(_Thread)	
-			Delay(25)
+			Delay(5)
 			While WindowEvent()
 			Wend 
 		Wend
 		
+		_Thread = 0
 		While Not IsThread(_Thread)	
+			
 			
 			CFG::*Config\HandleExeAsS7Z  = bHandleExe2S7Z
 			CFG::*Config\HandleExeAsZIP  = bHandleExe2ZIP
 			CFG::*Config\HandleExeAsRAR  = bHandleExe2RAR	
 			
-			Set_GadgetStatus(0)
+				_Thread.i = CreateThread( @Thread_SetStatus(),0)
+				While IsThread(_Thread)	
+					Delay(5)
+					While WindowEvent()
+					Wend 
+				Wend
+				_Thread = 0
+		
+			
 				
 			
 			If ( ListSize( *P\Collection() ) > 0 )
@@ -2246,10 +2305,10 @@ Module DropVert
 
 	EndProcedure	
 EndModule
-; IDE Options = PureBasic 6.00 LTS (Windows - x64)
-; CursorPosition = 1966
-; FirstLine = 1272
-; Folding = jAA93-+9-
+; IDE Options = PureBasic 5.73 LTS (Windows - x64)
+; CursorPosition = 131
+; FirstLine = 81
+; Folding = HAA94----
 ; EnableAsm
 ; EnableXP
 ; UseMainFile = ..\Drop7z.pb
