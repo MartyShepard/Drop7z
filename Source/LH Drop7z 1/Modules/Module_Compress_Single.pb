@@ -28,7 +28,8 @@ Module DropSPak
         szPrgSWord.s    ; Word Size
         szPrgSBlok.s    ; Block Size
         szPrgModus.s    ; Compression Mode
-        szPrgSfSFX.s    ; Selbst Enpackende Archive
+        szPrgSfSFX.s	; Selbst Enpackende Archive
+        ListErrors.s
         ulMutex.l
         ulThread.l
         LoProcess.l
@@ -294,17 +295,18 @@ Module DropSPak
     ;
     ;
     Procedure   zProgram_DoWortPass(*P.PROGRAM_BOOT)        
-        If ( GetGadgetState(DC::#CheckBox_001) = 1 )
-            
-            If (Len( GetGadgetText(DC::#String_003) ) >= 1)                            
-                *P\szPrgPWord = GetGadgetText(DC::#String_003)
-                
-                Select CFG::*Config\usFormat
-                    Case 0: *P\szPrgEncrp = "-p" + *P\szPrgPWord + " -mhc=on -mhe=on"      ; Für 7z
-                    Case 1: *P\szPrgEncrp = "-p" + *P\szPrgPWord + " -mem=AES256"          ; Für Zip
-                EndSelect                 
-            EndIf    
-        EndIf                   
+		If ( GetGadgetState(DC::#CheckBox_001) = 1 )
+			
+			If (Len( GetGadgetText(DC::#String_003) ) >= 1)                            
+				*P\szPrgPWord = GetGadgetText(DC::#String_003)
+				
+				Select CFG::*Config\usFormat
+					Case 0: *P\szPrgEncrp = " -p" + *P\szPrgPWord + " -mhc=on -mhe=on"      ; Für 7z                        
+																	;Case 0: *P\szPrgEncrp = " -p" + *P\szPrgPWord + " -mhe"      ; Für 7z
+					Case 1: *P\szPrgEncrp = " -p" + *P\szPrgPWord + " -mem=AES256"		; Für Zip
+				EndSelect                 
+			EndIf    
+		EndIf                    
     EndProcedure
     ;
     ;
@@ -836,7 +838,7 @@ Module DropSPak
                 *P\Command         + *P\szPrgSfSFX +
                                      *P\sz7zArchiv +
                                      *P\szPrgModus +
-                                     *P\szPrgPWord +
+                                     ;*P\szPrgPWord +
                                      *P\szPrgPOFls +
                                      " " + Chr(34) + *P\Collection() + Chr(34)
                 
@@ -927,10 +929,7 @@ Module DropSPak
             ;
             ; Generell Führe ein vergleich aus ob auch alle Dateien Geschrieben wurden
             If ( ListSize( *P\Collection() ) = Max )
-                Request::MSG( DropLang::GetUIText(20) , 
-                              DropLang::GetUIText(37) , 
-                              DropLang::GetUIText(38) + #CR$ + "In: " + ListSize( *P\Collection() ) + "/ Out: " + Str(Max) , 2, 0, ProgramFilename(),0,0,DC::#_Window_001)   
-                ProcedureReturn 0
+            	ProcedureReturn 0
             EndIf
             
             If ( ListSize( *P\Collection() ) >= Max )
@@ -938,28 +937,23 @@ Module DropSPak
                 ResetList( Mis() )
                 
                 ForEach Mis()
-                    Lst + Mis() +#CR$
+                     *p\ListErrors + Mis() +#CR$
                 Next    
-                
-                Request::MSG( DropLang::GetUIText(20) , 
-                              DropLang::GetUIText(29) , 
-                              DropLang::GetUIText(39) + #CR$ + "In: " + ListSize( *P\Collection() ) + "/ Out: " + Str(Max) + #CR$ + Lst, 2, 0, ProgramFilename(),0,0,DC::#_Window_001)  
+
                 ProcedureReturn 1
             EndIf
             
         Else
             
-            Debug ""
-            Debug "7z Archiv. ERROR: Die Liste hat keine Einträge"
-            Request::MSG( DropLang::GetUIText(20) , DropLang::GetUIText(29) , DropLang::GetUIText(30), 2, 0, ProgramFilename(),0,0,DC::#_Window_001)  
-            ProcedureReturn 1           
+
+            ProcedureReturn -1    
         EndIf
     EndProcedure    
     ;
     ;
     ;
     Procedure.i Compress()
-        
+        Protected.i Result
         SetGadgetState(DC::#Progress_001, 0)
         SetWindowTitle(DC::#_Window_001, DropLang::GetUIText(1) )
         
@@ -992,6 +986,7 @@ Module DropSPak
         *P\szPrgSfSFX      = ""
         *P\szPrgSWord      = ""
         *P\szTempFile      = ""
+        *p\ListErrors	   = ""
         *P\PrgFlag         = 0
                         
         ; Suche nach 7z Location
@@ -1044,9 +1039,29 @@ Module DropSPak
             
         ; Ab hier den Durchlauf starten
             
-            If  ( Compress_Looping(*P) = 1 )
-                QuitTask(*P): ProcedureReturn 13
-            EndIf    
+            Result = Compress_Looping(*P)  
+            Select Result
+            	Case 0
+            		Request::MSG( DropLang::GetUIText(20) , 
+            		              DropLang::GetUIText(37) , 
+            		              DropLang::GetUIText(38) + #CR$ + "In: " + ListSize( *P\Collection() ) + "/ Out: " + Str(Max) , 2, 0, ProgramFilename(),0,0,DC::#_Window_001)             		
+            		
+            		
+            		
+            	Case 1            		            	
+            		Request::MSG( DropLang::GetUIText(20) , 
+            		              DropLang::GetUIText(29) , 
+            		              DropLang::GetUIText(39) + #CR$ + "In: " + ListSize( *P\Collection() ) + "/ Out: " + Str(Max) + #CR$ + Lst, 2, 0, ProgramFilename(),0,0,DC::#_Window_001)  
+            		
+            		QuitTask(*P)
+            		ProcedureReturn 13
+            	Case -1
+            		Debug ""
+            		Debug "7z Archiv. ERROR: Die Liste hat keine Einträge"
+            		Request::MSG( DropLang::GetUIText(20) , DropLang::GetUIText(29) , DropLang::GetUIText(30), 2, 0, ProgramFilename(),0,0,DC::#_Window_001)  
+            EndSelect
+            
+          	QuitTask(*P) 
         ; =============================       
       
         ;
@@ -1060,15 +1075,15 @@ Module DropSPak
         ;
         ; _SendMailArchive(*P\sz7zArchiv), in Single Variante ... nö
             
-        QuitTask(*P)                              
+                                     
 
     EndProcedure        
     
 EndModule
 ; IDE Options = PureBasic 5.73 LTS (Windows - x64)
-; CursorPosition = 488
-; FirstLine = 293
-; Folding = 4XACu-
+; CursorPosition = 840
+; FirstLine = 706
+; Folding = 44-Lu-
 ; EnableAsm
 ; EnableXP
 ; UseMainFile = ..\Drop7z.pb

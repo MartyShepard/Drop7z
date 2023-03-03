@@ -1,53 +1,53 @@
 ﻿
- 
+
 
 DeclareModule CFG
-    
+	
 	Structure INI_STRUCTURE
-            ConfigPath.s{#MAX_PATH}
-            ProfilePath.s{#MAX_PATH}
-            HistoryPath.s{#MAX_PATH}
-            CRCLastPath.s{#MAX_PATH}
+		ConfigPath.s{#MAX_PATH}
+		ProfilePath.s{#MAX_PATH}
+		HistoryPath.s{#MAX_PATH}
+		CRCLastPath.s{#MAX_PATH}
 		Version.s{128}             
-            WindowTitle.s{384}
-            Autostart.i
-            MiniMized.i
-            DesktopX.l
-            DesktopY.l
-            DesktopW.l
-            DesktopH.l
-            Sticky.i     			; Window Top Most   
-            Instanz.i
-            DeleteFiles.i
-            AutoClearLt.i
-            DontAskMe.i
-            CreateSHA1.i            
-            PinDirectory.i
-            szPinCurrent.s
-            HandleExeAsRAR.i
-            HandleExeAsZIP.i
-            HandleExeAsS7Z.i
-            ConvertDelTemp.i
-            MoveZIProblems.i
-            UnPackOnly.i
-            UnpackInSubDirectory.i            
-            usFormat.i                  ; Aktuelles Pack Format
-            ZipMethodID.i
-            CHDszPath.s{#MAX_PATH}      ; Mame's CHDMan Tool
-            CHDbClipBoard.i
-            CHDbSticky.i
-
-        EndStructure    
-        
-        *Config.INI_STRUCTURE       = AllocateMemory(SizeOf(INI_STRUCTURE))
-        
-        Declare ReadConfig(*Config.INI_STRUCTURE)
-        Declare WriteConfig(*Config.INI_STRUCTURE)
-        Declare Make_Config(*Config.INI_STRUCTURE)
-        
-
-        
-        Declare.s MakeHistory(szFileHistory.s,Force=0)
+		WindowTitle.s{384}
+		Autostart.i
+		MiniMized.i
+		DesktopX.l
+		DesktopY.l
+		DesktopW.l
+		DesktopH.l
+		Sticky.i     			; Window Top Most   
+		Instanz.i
+		DeleteFiles.i
+		AutoClearLt.i
+		DontAskMe.i
+		CreateSHA1.i            
+		PinDirectory.i
+		szPinCurrent.s
+		HandleExeAsRAR.i
+		HandleExeAsZIP.i
+		HandleExeAsS7Z.i
+		ConvertDelTemp.i
+		MoveZIProblems.i
+		UnPackOnly.i
+		UnpackInSubDirectory.i            
+		usFormat.i                  ; Aktuelles Pack Format
+		ZipMethodID.i
+		CHDszPath.s{#MAX_PATH}      ; Mame's CHDMan Tool
+		CHDbClipBoard.i
+		CHDbSticky.i
+		
+	EndStructure    
+	
+	*Config.INI_STRUCTURE       = AllocateMemory(SizeOf(INI_STRUCTURE))
+	
+	Declare ReadConfig(*Config.INI_STRUCTURE)
+	Declare WriteConfig(*Config.INI_STRUCTURE)
+	Declare Make_Config(*Config.INI_STRUCTURE)
+	
+	
+	
+	Declare.s MakeHistory(szFileHistory.s,Force=0)
 EndDeclareModule 
 
 DeclareModule DropPack   
@@ -56,216 +56,262 @@ EndDeclareModule
 
 
 Module CFG
-    
-    ;
-    ; Akuell Configuration die geschrieben wird
-    ;    
-    Procedure Make_Config(*Config.INI_STRUCTURE)
-        
-            CreateFile(DC::#_FileConfig,*Config\ConfigPath)
-            
-                WriteStringN(DC::#_FileConfig, "[DROP.7Z]")
-                WriteStringN(DC::#_FileConfig, "# Product Name:=: Drop.7z")        
-                WriteStringN(DC::#_FileConfig, "# Version     :=: " + *Config\Version.s)
-                WriteStringN(DC::#_FileConfig, "# Copyright   :=: [= Marty =]")        
-                WriteStringN(DC::#_FileConfig, "")         
-                WriteStringN(DC::#_FileConfig, "[SETTINGS]")
-                WriteStringN(DC::#_FileConfig, "Sticky=false")           
-                WriteStringN(DC::#_FileConfig, "Desktop.Y=0")
-                WriteStringN(DC::#_FileConfig, "Desktop.X=0")               
-                WriteStringN(DC::#_FileConfig, "AutoClearLt=false")
-                WriteStringN(DC::#_FileConfig, "DeleteFiles=false")
-                WriteStringN(DC::#_FileConfig, "DontAskMe=false")                      
-                WriteStringN(DC::#_FileConfig, "AutoStart=false")        
-                WriteStringN(DC::#_FileConfig, "MiniMized=false") 
-                WriteStringN(DC::#_FileConfig, "CreateSHA1=true")                  
-                WriteStringN(DC::#_FileConfig, "SingleInstanz=true")
-                WriteStringN(DC::#_FileConfig, "PinDirectory=false")
-                WriteStringN(DC::#_FileConfig, "PinCurrentVZ=")                
-                WriteStringN(DC::#_FileConfig, "")                
-                WriteStringN(DC::#_FileConfig, "# Current Pack Format...............")                 
-                WriteStringN(DC::#_FileConfig, "usFormat=7z")
-                WriteStringN(DC::#_FileConfig, "")
-                WriteStringN(DC::#_FileConfig, "# ZIP Options.......................")                 
-                WriteStringN(DC::#_FileConfig, "ZipMethodID=0")
-                WriteStringN(DC::#_FileConfig, "")
-                WriteStringN(DC::#_FileConfig, "# Convert/ Unpack ..................")                 
-                WriteStringN(DC::#_FileConfig, "ForceEXEAsRAR=true"	)
-                WriteStringN(DC::#_FileConfig, "ForceEXEAsZIP=false"	)
-                WriteStringN(DC::#_FileConfig, "ForceEXEAsS7Z=false"	)  
-                WriteStringN(DC::#_FileConfig, "DeleteTempDir=true"	)  
-                WriteStringN(DC::#_FileConfig, "MoveArchive=false"	)                 
-                WriteStringN(DC::#_FileConfig, "UnpackOnly=false"		)
-                WriteStringN(DC::#_FileConfig, "UnpackInSubDirectory=true"		)                   
-                WriteStringN(DC::#_FileConfig, "# CHD Options.......................")                 
-                WriteStringN(DC::#_FileConfig, "CHDManTool=") 
-                WriteStringN(DC::#_FileConfig, "ClipBoard=")
-                WriteStringN(DC::#_FileConfig, "CHDSticky=")                
-                WriteStringN(DC::#_FileConfig, "")         
-                WriteStringN(DC::#_FileConfig, "Portable =")      
-                WriteStringN(DC::#_FileConfig, "# Add Optional a Path to 7zg.exe")
-                WriteStringN(DC::#_FileConfig, "# A:\MyApps\YourApps\OurApps\7zG.exe")
-                WriteStringN(DC::#_FileConfig, "# Wthout Double Quotes..............")        
+	;
+	;
+	; 	
+	Procedure.s  Update_OldConfigLocation()
+		Protected.s szConfig, szHistory, szProfiles, szCurrent, szSuffix, suSubData
+		
+		szConfig   = "Drop7z"
+		szProfiles = "Profiles"
+		szHistory  = "History"
+		szSuffix   = ".ini"
+		suSubData  = "DropData\"
+		
+		szCurrent = GetPathPart( ProgramFilename() )
+				
+		;
+		;
+		; Check For Old Locations. Move all to Subs Directory
+		
+		If ( FileSize( szCurrent + suSubData) ! -2 )
+			CreateDirectory( szCurrent + suSubData )
+		EndIf	
+		
+		;
+		; Check Drop7z.Ini
+		If ( FileSize( szCurrent + szConfig + szSuffix) > 0 )
+			MoveFile_(  szCurrent + szConfig + szSuffix,  szCurrent + suSubData + szConfig + szSuffix)
+		EndIf	
+		
+		;
+		; Check Profiles.Ini		
+		If ( FileSize( szCurrent + "Drop7z_Profiles" + szSuffix) > 0 )
+			MoveFile_( szCurrent + szConfig + "_" + szProfiles + szSuffix,  szCurrent + suSubData + szProfiles + szSuffix)
+		EndIf			
+		
+		;
+		; Check History.Ini		
+		If ( FileSize( szCurrent + "Drop7z_History" + szSuffix) > 0 )
+			MoveFile_( szCurrent + szConfig + "_" + szHistory + szSuffix,  szCurrent + suSubData + szHistory + szSuffix)
+		EndIf
+		
+	EndProcedure	
+	;
+	; Akuell Configuration die geschrieben wird
+	;    
+	Procedure Make_Config(*Config.INI_STRUCTURE)
+				
+		CreateFile(DC::#_FileConfig,*Config\ConfigPath)
+		
+		WriteStringN(DC::#_FileConfig, "[DROP.7Z]")
+		WriteStringN(DC::#_FileConfig, "# Product Name:=: Drop.7z")        
+		WriteStringN(DC::#_FileConfig, "# Version     :=: " + *Config\Version.s)
+		WriteStringN(DC::#_FileConfig, "# Copyright   :=: [= Marty =]")        
+		WriteStringN(DC::#_FileConfig, "")         
+		WriteStringN(DC::#_FileConfig, "[SETTINGS]")
+		WriteStringN(DC::#_FileConfig, "Sticky=false")           
+		WriteStringN(DC::#_FileConfig, "Desktop.Y=0")
+		WriteStringN(DC::#_FileConfig, "Desktop.X=0")               
+		WriteStringN(DC::#_FileConfig, "AutoClearLt=false")
+		WriteStringN(DC::#_FileConfig, "DeleteFiles=false")
+		WriteStringN(DC::#_FileConfig, "DontAskMe=false")                      
+		WriteStringN(DC::#_FileConfig, "AutoStart=false")        
+		WriteStringN(DC::#_FileConfig, "MiniMized=false") 
+		WriteStringN(DC::#_FileConfig, "CreateSHA1=true")                  
+		WriteStringN(DC::#_FileConfig, "SingleInstanz=true")
+		WriteStringN(DC::#_FileConfig, "PinDirectory=false")
+		WriteStringN(DC::#_FileConfig, "PinCurrentVZ=")
+		WriteStringN(DC::#_FileConfig, "Profile=")     		
+		WriteStringN(DC::#_FileConfig, "")                
+		WriteStringN(DC::#_FileConfig, "# Current Pack Format...............")                 
+		WriteStringN(DC::#_FileConfig, "usFormat=7z")
+		WriteStringN(DC::#_FileConfig, "")
+		WriteStringN(DC::#_FileConfig, "# ZIP Options.......................")                 
+		WriteStringN(DC::#_FileConfig, "ZipMethodID=0")
+		WriteStringN(DC::#_FileConfig, "")
+		WriteStringN(DC::#_FileConfig, "# Convert/ Unpack ..................")                 
+		WriteStringN(DC::#_FileConfig, "ForceEXEAsRAR=true"	)
+		WriteStringN(DC::#_FileConfig, "ForceEXEAsZIP=false"	)
+		WriteStringN(DC::#_FileConfig, "ForceEXEAsS7Z=false"	)  
+		WriteStringN(DC::#_FileConfig, "DeleteTempDir=true"	)  
+		WriteStringN(DC::#_FileConfig, "MoveArchive=false"	)                 
+		WriteStringN(DC::#_FileConfig, "UnpackOnly=false"		)
+		WriteStringN(DC::#_FileConfig, "UnpackInSubDirectory=true"		)                   
+		WriteStringN(DC::#_FileConfig, "# CHD Options.......................")                 
+		WriteStringN(DC::#_FileConfig, "CHDManTool=") 
+		WriteStringN(DC::#_FileConfig, "ClipBoard=")
+		WriteStringN(DC::#_FileConfig, "CHDSticky=")                
+		WriteStringN(DC::#_FileConfig, "")         
+		WriteStringN(DC::#_FileConfig, "Portable =")      
+		WriteStringN(DC::#_FileConfig, "# Add Optional a Path to 7zg.exe")
+		WriteStringN(DC::#_FileConfig, "# A:\MyApps\YourApps\OurApps\7zG.exe")
+		WriteStringN(DC::#_FileConfig, "# Wthout Double Quotes..............")        
+		
+		CloseFile(DC::#_FileConfig)
+	EndProcedure  
+	
+	;
+	; Resete History und Combobox
+	;    
+	Procedure.s MakeHistory(szFileHistory.s, Force = 0)
+		
+		Protected size.i
+		
+		Select Force
+			Case 0                
+			Case 1
+				DeleteFile(szFileHistory.s,#PB_FileSystem_Force)        
+		EndSelect
+		
+		size.i = FileSize(szFileHistory.s)
+		Select size.i
+			Case 0,-1
+				CreateFile(DC::#_FileHistory,szFileHistory.s)
+				CloseFile (DC::#_FileHistory)
+		EndSelect
+	EndProcedure
 
-             CloseFile(DC::#_FileConfig)
-    EndProcedure  
-
-    ;
-    ; Resete History und Combobox
-    ;    
-    Procedure.s MakeHistory(szFileHistory.s,Force=0)
-
-        Protected size.i
-        Select Force
-            Case 0                
-            Case 1
-                DeleteFile(szFileHistory.s,#PB_FileSystem_Force)        
-        EndSelect
-        
-        size.i = FileSize(szFileHistory.s)
-        Select size.i
-            Case 0,-1
-                CreateFile(DC::#_FileHistory,szFileHistory.s)
-                CloseFile (DC::#_FileHistory)
-        EndSelect
-    EndProcedure
-     
-    ;
-    ;
-    ;  Lese Configuration
-    Procedure ReadConfig(*Config.INI_STRUCTURE) 
-        Protected Size.i
-        
-        
-        *Config\Version.s    = "1.02 Beta Fast Fertig"
-        *Config\WindowTitle.s= "Drop7z v"+ *Config\Version +" By Marty Shepard"
-        
-        *Config\ConfigPath.s = GetPathPart( ProgramFilename() ) + "Drop7z.ini"
-        *Config\ProfilePath.s= GetPathPart( ProgramFilename() ) + "Drop7z_Profiles.ini"
-        *Config\HistoryPath.s= GetPathPart( ProgramFilename() ) + "Drop7z_History.ini"
-        
-            Debug ""
-            Debug "Drop 7z Home Directory"
-            Debug "Home: "+ ProgramFilename()
-            Debug "Conf: "+ *Config\ConfigPath
-            Debug "Prof: "+ *Config\ProfilePath
-            Debug "Hist: "+ *Config\HistoryPath
-        
-        Size.i = FileSize(*Config\ConfigPath)
-        Select Size.i
-            Case 0,-1
-                Make_Config(*Config.INI_STRUCTURE)
-        EndSelect        
-        
-        Size.i = FileSize(*Config\HistoryPath)
-        Select Size.i
-            Case 0,-1
-                MakeHistory(*Config\HistoryPath)
-        EndSelect       
-        
-        ;
-        ;Ini Values mit String
-        Select (UCase( INIValue::Get_s("SETTINGS", "usFormat" ,*Config\ConfigPath) ) )
-            Case "7Z"   : *Config\usFormat = 0
-            Case "ZIP"  : *Config\usFormat = 1
-            Case "CHD"  : *Config\usFormat = 2
-            Default 
-                *Config\usFormat = 0
-        EndSelect 
-               
-        *Config\CRCLastPath = INIValue::Get_S("SETTINGS","Directory0"       ,*Config\ConfigPath)
-        *Config\CHDszPath	= INIValue::Get_S("SETTINGS","CHDManTool"       ,*Config\ConfigPath) 
-        *Config\szPinCurrent= INIValue::Get_S("SETTINGS","PinCurrentVZ"     ,*Config\ConfigPath)
-        ;
-        ; Ini Values mit Integer
-        *Config\DesktopX    = INIValue::Get_I("SETTINGS","Desktop.X"        ,*Config\ConfigPath)
-        *Config\DesktopY    = INIValue::Get_I("SETTINGS","Desktop.Y"        ,*Config\ConfigPath)
-        *Config\ZipMethodID = INIValue::Get_I("SETTINGS","ZipMethodID"      ,*Config\ConfigPath)  
-        
-        ;
-        ; Ini Values mit true/false
-        *Config\Autostart   = INIValue::Get_Value("SETTINGS","Autostart"    ,*Config\ConfigPath)
-        *Config\MiniMized   = INIValue::Get_Value("SETTINGS","MiniMized"    ,*Config\ConfigPath)
-        *Config\Sticky      = INIValue::Get_Value("SETTINGS","Sticky"       ,*Config\ConfigPath)
-        *Config\DeleteFiles = INIValue::Get_Value("SETTINGS","DeleteFiles"  ,*Config\ConfigPath)          
-        *Config\Instanz     = INIValue::Get_Value("SETTINGS","SingleInstanz",*Config\ConfigPath)
-        *Config\AutoClearLt = INIValue::Get_Value("SETTINGS","AutoClearLt"  ,*Config\ConfigPath) 
-        *Config\DontAskMe   = INIValue::Get_Value("SETTINGS","DontAskMe"    ,*Config\ConfigPath)
-        *Config\CreateSHA1  = INIValue::Get_Value("SETTINGS","CreateSHA1"   ,*Config\ConfigPath)
-        *Config\CHDbClipBoard=INIValue::Get_Value("SETTINGS","ClipBoard"    ,*Config\ConfigPath)
-        *Config\CHDbSticky  = INIValue::Get_Value("SETTINGS","CHDSticky"    ,*Config\ConfigPath) 
-        *Config\PinDirectory= INIValue::Get_Value("SETTINGS","PinDirectory" ,*Config\ConfigPath)
-        
-        
-                
-        *Config\HandleExeAsRAR = INIValue::Get_Value("SETTINGS","ForceEXEAsRAR"  ,*Config\ConfigPath)
-        *Config\HandleExeAsZIP = INIValue::Get_Value("SETTINGS","ForceEXEAsZIP"  ,*Config\ConfigPath)
-        *Config\HandleExeAsS7Z = INIValue::Get_Value("SETTINGS","ForceEXEAsS7Z"  ,*Config\ConfigPath)
-        
-        
-        If (*Config\HandleExeAsRAR = #False ) And (*Config\HandleExeAsZIP = #False) And (*Config\HandleExeAsS7Z = #False) 
-        	*Config\HandleExeAsRAR = #True
-        EndIf
-        
-        *Config\ConvertDelTemp = INIValue::Get_Value("SETTINGS","DeleteTempDir"  ,*Config\ConfigPath)
-        *Config\MoveZIProblems = INIValue::Get_Value("SETTINGS","MoveArchive"    ,*Config\ConfigPath)
-        *Config\UnPackOnly	 = INIValue::Get_Value("SETTINGS","UnpackOnly"     ,*Config\ConfigPath)
-        
-        *Config\UnpackInSubDirectory = INIValue::Get_Value("SETTINGS","UnpackInSubDirectory" ,*Config\ConfigPath)
-         
-    EndProcedure
-    
-    ;
-    ;
-    ;  Schreibe Configuration
-    Procedure WriteConfig(*Config.INI_STRUCTURE)   
-        ;
-        ; Setze Ini Values mit String oder Integer
-        Select *Config\usFormat
-            Case 0: INIValue::Set("SETTINGS","usFormat","7Z"    ,*Config\ConfigPath)
-            Case 1: INIValue::Set("SETTINGS","usFormat","ZIP"   ,*Config\ConfigPath)
-            Case 2: INIValue::Set("SETTINGS","usFormat","CHD"   ,*Config\ConfigPath)                
-        EndSelect
-
-        INIValue::Set("SETTINGS","ZipMethodID"  ,Str(   *Config\ZipMethodID)    ,*Config\ConfigPath)
-        INIValue::Set("SETTINGS","Desktop.X"    ,Str(   *Config\DesktopX )      ,*Config\ConfigPath)
-        INIValue::Set("SETTINGS","Desktop.Y"    ,Str(   *Config\DesktopY )      ,*Config\ConfigPath)
-        
-        ;
-        ; Setze Ini Values mit True/False        
-        INIValue::Set_Value("SETTINGS","Autostart"      ,*Config\Autostart      ,*Config\ConfigPath)
-        INIValue::Set_Value("SETTINGS","MiniMized"      ,*Config\MiniMized      ,*Config\ConfigPath)
-        INIValue::Set_Value("SETTINGS","Sticky"         ,*Config\Sticky         ,*Config\ConfigPath)
-        INIValue::Set_Value("SETTINGS","SingleInstanz"  ,*Config\Instanz        ,*Config\ConfigPath) 
-        INIValue::Set_Value("SETTINGS","DeleteFiles"    ,*Config\DeleteFiles    ,*Config\ConfigPath)
-        INIValue::Set_Value("SETTINGS","AutoClearLt"    ,*Config\AutoClearLt    ,*Config\ConfigPath)
-        INIValue::Set_Value("SETTINGS","DontAskMe"      ,*Config\DontAskMe      ,*Config\ConfigPath)
-        INIValue::Set_Value("SETTINGS","ClipBoard"      ,*Config\CHDbClipBoard  ,*Config\ConfigPath)
-        INIValue::Set_Value("SETTINGS","CHDSticky"      ,*Config\CHDbSticky     ,*Config\ConfigPath)        
-        INIValue::Set_Value("SETTINGS","CreateSHA1"     ,*Config\CreateSHA1     ,*Config\ConfigPath)    
-        INIValue::Set_Value("SETTINGS","PinDirectory"   ,*Config\PinDirectory   ,*Config\ConfigPath)  
-        
-        INIValue::Set_Value("SETTINGS","ForceEXEAsRAR"  ,*Config\HandleExeAsRAR ,*Config\ConfigPath)
-        INIValue::Set_Value("SETTINGS","ForceEXEAsZIP"  ,*Config\HandleExeAsZIP ,*Config\ConfigPath)
-        INIValue::Set_Value("SETTINGS","ForceEXEAsS7Z"  ,*Config\HandleExeAsS7Z ,*Config\ConfigPath)  
-        INIValue::Set_Value("SETTINGS","DeleteTempDir"  ,*Config\ConvertDelTemp ,*Config\ConfigPath)  
-        INIValue::Set_Value("SETTINGS","MoveArchive"    ,*Config\MoveZIProblems ,*Config\ConfigPath)          
-        INIValue::Set_Value("SETTINGS","UnpackOnly"     ,*Config\UnPackOnly	  ,*Config\ConfigPath)  
-        
-        INIValue::Set_Value("SETTINGS","UnpackInSubDirectory" , *Config\UnpackInSubDirectory , *Config\ConfigPath)
-        ;
-        ; Button Info
-       If ( CFG::*Config\UnPackOnly = #True )
-        	ButtonEX::Settext(DC::#Button_002,0,"Unpack")
-        Else
-        	ButtonEX::Settext(DC::#Button_002,0,"Convert")
-        EndIf
-        
-    EndProcedure
+	;
+	;
+	;  Lese Configuration
+	Procedure ReadConfig(*Config.INI_STRUCTURE) 
+		Protected.i Size
+		Protected.s suSubData
+		
+		Update_OldConfigLocation()
+		
+		suSubData  = "DropData\"
+			
+		*Config\Version.s    = "1.02.02 Beta FastFertig"
+		*Config\WindowTitle.s= "Drop7z v"+ *Config\Version +" By Marty Shepard"
+		
+		*Config\ConfigPath.s = GetPathPart( ProgramFilename() ) + suSubData + "Drop7z.ini"
+		*Config\ProfilePath.s= GetPathPart( ProgramFilename() ) + suSubData + "Profiles.ini"
+		*Config\HistoryPath.s= GetPathPart( ProgramFilename() ) + suSubData + "History.ini"
+		
+		Debug ""
+		Debug "Drop 7z Home Directory"
+		Debug "Home: "+ ProgramFilename()
+		Debug "Conf: "+ *Config\ConfigPath
+		Debug "Prof: "+ *Config\ProfilePath
+		Debug "Hist: "+ *Config\HistoryPath
+		
+		Size.i = FileSize(*Config\ConfigPath)
+		Select Size.i
+			Case 0,-1
+				Make_Config(*Config.INI_STRUCTURE)
+		EndSelect        
+		
+		Size.i = FileSize(*Config\HistoryPath)
+		Select Size.i
+			Case 0,-1
+				MakeHistory(*Config\HistoryPath)
+		EndSelect       
+		
+		;
+		;Ini Values mit String
+		Select (UCase( INIValue::Get_s("SETTINGS", "usFormat" ,*Config\ConfigPath) ) )
+			Case "7Z"   : *Config\usFormat = 0
+			Case "ZIP"  : *Config\usFormat = 1
+			Case "CHD"  : *Config\usFormat = 2
+			Default 
+				*Config\usFormat = 0
+		EndSelect 
+		
+		*Config\CRCLastPath = INIValue::Get_S("SETTINGS","Directory0"       ,*Config\ConfigPath)
+		*Config\CHDszPath	= INIValue::Get_S("SETTINGS","CHDManTool"       ,*Config\ConfigPath) 
+		*Config\szPinCurrent= INIValue::Get_S("SETTINGS","PinCurrentVZ"     ,*Config\ConfigPath)
+		;
+		; Ini Values mit Integer
+		*Config\DesktopX    = INIValue::Get_I("SETTINGS","Desktop.X"        ,*Config\ConfigPath)
+		*Config\DesktopY    = INIValue::Get_I("SETTINGS","Desktop.Y"        ,*Config\ConfigPath)
+		*Config\ZipMethodID = INIValue::Get_I("SETTINGS","ZipMethodID"      ,*Config\ConfigPath)  
+		
+		;
+		; Ini Values mit true/false
+		*Config\Autostart   = INIValue::Get_Value("SETTINGS","Autostart"    ,*Config\ConfigPath)
+		*Config\MiniMized   = INIValue::Get_Value("SETTINGS","MiniMized"    ,*Config\ConfigPath)
+		*Config\Sticky      = INIValue::Get_Value("SETTINGS","Sticky"       ,*Config\ConfigPath)
+		*Config\DeleteFiles = INIValue::Get_Value("SETTINGS","DeleteFiles"  ,*Config\ConfigPath)          
+		*Config\Instanz     = INIValue::Get_Value("SETTINGS","SingleInstanz",*Config\ConfigPath)
+		*Config\AutoClearLt = INIValue::Get_Value("SETTINGS","AutoClearLt"  ,*Config\ConfigPath) 
+		*Config\DontAskMe   = INIValue::Get_Value("SETTINGS","DontAskMe"    ,*Config\ConfigPath)
+		*Config\CreateSHA1  = INIValue::Get_Value("SETTINGS","CreateSHA1"   ,*Config\ConfigPath)
+		*Config\CHDbClipBoard=INIValue::Get_Value("SETTINGS","ClipBoard"    ,*Config\ConfigPath)
+		*Config\CHDbSticky  = INIValue::Get_Value("SETTINGS","CHDSticky"    ,*Config\ConfigPath) 
+		*Config\PinDirectory= INIValue::Get_Value("SETTINGS","PinDirectory" ,*Config\ConfigPath)
+		
+		
+		
+		*Config\HandleExeAsRAR = INIValue::Get_Value("SETTINGS","ForceEXEAsRAR"  ,*Config\ConfigPath)
+		*Config\HandleExeAsZIP = INIValue::Get_Value("SETTINGS","ForceEXEAsZIP"  ,*Config\ConfigPath)
+		*Config\HandleExeAsS7Z = INIValue::Get_Value("SETTINGS","ForceEXEAsS7Z"  ,*Config\ConfigPath)
+		
+		
+		If (*Config\HandleExeAsRAR = #False ) And (*Config\HandleExeAsZIP = #False) And (*Config\HandleExeAsS7Z = #False) 
+			*Config\HandleExeAsRAR = #True
+		EndIf
+		
+		*Config\ConvertDelTemp = INIValue::Get_Value("SETTINGS","DeleteTempDir"  ,*Config\ConfigPath)
+		*Config\MoveZIProblems = INIValue::Get_Value("SETTINGS","MoveArchive"    ,*Config\ConfigPath)
+		*Config\UnPackOnly	 = INIValue::Get_Value("SETTINGS","UnpackOnly"     ,*Config\ConfigPath)
+		
+		*Config\UnpackInSubDirectory = INIValue::Get_Value("SETTINGS","UnpackInSubDirectory" ,*Config\ConfigPath)
+		
+	EndProcedure
+	
+	;
+	;
+	;  Schreibe Configuration
+	Procedure WriteConfig(*Config.INI_STRUCTURE)   
+		;
+		; Setze Ini Values mit String oder Integer
+		Select *Config\usFormat
+			Case 0: INIValue::Set("SETTINGS","usFormat","7Z"    ,*Config\ConfigPath)
+			Case 1: INIValue::Set("SETTINGS","usFormat","ZIP"   ,*Config\ConfigPath)
+			Case 2: INIValue::Set("SETTINGS","usFormat","CHD"   ,*Config\ConfigPath)                
+		EndSelect
+		
+		INIValue::Set("SETTINGS","ZipMethodID"  ,Str(   *Config\ZipMethodID)    ,*Config\ConfigPath)
+		INIValue::Set("SETTINGS","Desktop.X"    ,Str(   *Config\DesktopX )      ,*Config\ConfigPath)
+		INIValue::Set("SETTINGS","Desktop.Y"    ,Str(   *Config\DesktopY )      ,*Config\ConfigPath)
+		
+		;
+		; Setze Ini Values mit True/False        
+		INIValue::Set_Value("SETTINGS","Autostart"      ,*Config\Autostart      ,*Config\ConfigPath)
+		INIValue::Set_Value("SETTINGS","MiniMized"      ,*Config\MiniMized      ,*Config\ConfigPath)
+		INIValue::Set_Value("SETTINGS","Sticky"         ,*Config\Sticky         ,*Config\ConfigPath)
+		INIValue::Set_Value("SETTINGS","SingleInstanz"  ,*Config\Instanz        ,*Config\ConfigPath) 
+		INIValue::Set_Value("SETTINGS","DeleteFiles"    ,*Config\DeleteFiles    ,*Config\ConfigPath)
+		INIValue::Set_Value("SETTINGS","AutoClearLt"    ,*Config\AutoClearLt    ,*Config\ConfigPath)
+		INIValue::Set_Value("SETTINGS","DontAskMe"      ,*Config\DontAskMe      ,*Config\ConfigPath)
+		INIValue::Set_Value("SETTINGS","ClipBoard"      ,*Config\CHDbClipBoard  ,*Config\ConfigPath)
+		INIValue::Set_Value("SETTINGS","CHDSticky"      ,*Config\CHDbSticky     ,*Config\ConfigPath)        
+		INIValue::Set_Value("SETTINGS","CreateSHA1"     ,*Config\CreateSHA1     ,*Config\ConfigPath)    
+		INIValue::Set_Value("SETTINGS","PinDirectory"   ,*Config\PinDirectory   ,*Config\ConfigPath)  
+		
+		INIValue::Set_Value("SETTINGS","ForceEXEAsRAR"  ,*Config\HandleExeAsRAR ,*Config\ConfigPath)
+		INIValue::Set_Value("SETTINGS","ForceEXEAsZIP"  ,*Config\HandleExeAsZIP ,*Config\ConfigPath)
+		INIValue::Set_Value("SETTINGS","ForceEXEAsS7Z"  ,*Config\HandleExeAsS7Z ,*Config\ConfigPath)  
+		INIValue::Set_Value("SETTINGS","DeleteTempDir"  ,*Config\ConvertDelTemp ,*Config\ConfigPath)  
+		INIValue::Set_Value("SETTINGS","MoveArchive"    ,*Config\MoveZIProblems ,*Config\ConfigPath)          
+		INIValue::Set_Value("SETTINGS","UnpackOnly"     ,*Config\UnPackOnly	  ,*Config\ConfigPath)  
+		
+		INIValue::Set_Value("SETTINGS","UnpackInSubDirectory" , *Config\UnpackInSubDirectory , *Config\ConfigPath)
+		;
+		; Button Info
+		If ( CFG::*Config\UnPackOnly = #True )
+			ButtonEX::Settext(DC::#Button_002,0,"Unpack")
+		Else
+			ButtonEX::Settext(DC::#Button_002,0,"Convert")
+		EndIf
+		
+	EndProcedure
 EndModule
 ; IDE Options = PureBasic 5.73 LTS (Windows - x64)
-; CursorPosition = 139
-; FirstLine = 120
+; CursorPosition = 185
+; FirstLine = 152
 ; Folding = --
 ; EnableAsm
 ; EnableXP

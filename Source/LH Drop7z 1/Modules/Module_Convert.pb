@@ -2093,8 +2093,15 @@ Module DropVert
 
 						CompilerIf #PB_Compiler_Processor = #PB_Processor_x64	
 							szUnRarDLL = GetPathPart( ProgramFilename() ) + "UnRAR\unrar64.dll"
+							If FileSize( szUnRarDLL ) = -1
+							   szUnRarDLL = GetPathPart( ProgramFilename() ) + "DropData\" + "UnRAR\unrar64.dll"
+							EndIf							
 						CompilerElse
 							szUnRarDLL = GetPathPart( ProgramFilename() ) + "UnRAR\unrar.dll"								
+							If FileSize( szUnRarDLL ) = -1
+							   szUnRarDLL = GetPathPart( ProgramFilename() ) + "DropData\" + "UnRAR\unrar.dll"
+							EndIf							
+							
 						CompilerEndIf
 						
 						If FileSize( szUnRarDLL ) = -1
@@ -2141,8 +2148,15 @@ Module DropVert
 																
 								CompilerIf #PB_Compiler_Processor = #PB_Processor_x64	
 									szUnRarDLL = GetPathPart( ProgramFilename() ) + "UnRAR\unrar64.dll"
+									If FileSize( szUnRarDLL ) = -1
+										szUnRarDLL = GetPathPart( ProgramFilename() ) + "DropData\" + "UnRAR\unrar64.dll"
+									EndIf
+										
 								CompilerElse
-									szUnRarDLL = GetPathPart( ProgramFilename() ) + "UnRAR\unrar.dll"								
+									szUnRarDLL = GetPathPart( ProgramFilename() ) + "UnRAR\unrar.dll"
+									If FileSize( szUnRarDLL ) = -1
+										szUnRarDLL = GetPathPart( ProgramFilename() ) + "DropData\" + "UnRAR\unrar.dll"
+									EndIf									
 								CompilerEndIf
 								
 								If FileSize( szUnRarDLL ) = -1
@@ -2328,8 +2342,8 @@ Module DropVert
 	EndProcedure	
 EndModule
 ; IDE Options = PureBasic 5.73 LTS (Windows - x64)
-; CursorPosition = 136
-; FirstLine = 81
+; CursorPosition = 2103
+; FirstLine = 1698
 ; Folding = HAA94----
 ; EnableAsm
 ; EnableXP

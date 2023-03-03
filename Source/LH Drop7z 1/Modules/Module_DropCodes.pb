@@ -437,18 +437,42 @@ EndProcedure
     Procedure.s szMsgAboutText()
         Protected _AboutMsg.s = ""
         
-        _AboutMsg=      CFG::*Config\WindowTitle.s
+        _AboutMsg=""
         _AboutMsg+#LF$+ ""
-        _AboutMsg+#LF$+"Code: Marty Shepard"
-        _AboutMsg+#LF$+"Icon: Rob2Seven (RIP)"
+        _AboutMsg+#LF$+"Code : Marty Shepard"       
+        _AboutMsg+#LF$+"Icon : Rob2Seven (RIP)"
+        _AboutMsg+#LF$+"UnLZX: Help from Infratec"         
         _AboutMsg+#LF$+""
         _AboutMsg+#LF$+"Drop.7z is a Desktop Dragn'n'Drop Util "
-        _AboutMsg+#LF$+"  addon for 7z (Seven Zip) to quickly  "
+        _AboutMsg+#LF$+" Addon for 7z (Seven Zip) to quickly   "
         _AboutMsg+#LF$+"      Compress Files and Folders       "
+        _AboutMsg+#LF$+"  or Convert to 7z or simple Unpack    "
         _AboutMsg+#LF$+""              
         _AboutMsg+#LF$+"Changelog:                             "
         _AboutMsg+#LF$+"======================================="
-        _AboutMsg+#LF$+"Version 0.99.95 Beta                   "
+        _AboutMsg+#LF$+"Version 1.02.02 Beta                   "        
+        _AboutMsg+#LF$+""
+        _AboutMsg+#LF$+"Popup Menu Changes"
+        _AboutMsg+#LF$+"About Changes" 
+        _AboutMsg+#LF$+"Ini Location changed"
+        _AboutMsg+#LF$+"Unrar location changed"
+        _AboutMsg+#LF$+"Crash Fix... i hope this was the last"        
+        _AboutMsg+#LF$+"Bug fix Password in Mass Packin' "
+        _AboutMsg+#LF$+"Profile Routine Changes... not yet fin"  
+        _AboutMsg+#LF$+""          
+        _AboutMsg+#LF$+"---------------------------------------" 
+        _AboutMsg+#LF$+"Version 1.02.00 Beta                   "        
+        _AboutMsg+#LF$+""
+        _AboutMsg+#LF$+"Many BugFixes"
+        _AboutMsg+#LF$+"Many Design Fixes"
+        _AboutMsg+#LF$+"Added Convert/ Unpack"
+        _AboutMsg+#LF$+"Added LZX, ZIP, RAR etc.to Unpack/Conv."
+        _AboutMsg+#LF$+"Added Exe Identication for SelfExtract"
+        _AboutMsg+#LF$+"Design Changes"
+        _AboutMsg+#LF$+"etc .... "
+        _AboutMsg+#LF$+""        
+        _AboutMsg+#LF$+"---------------------------------------"  
+        _AboutMsg+#LF$+"Version 0.99.95 Beta			   "
         _AboutMsg+#LF$+"- Added ISO for CHD Compress           "
         _AboutMsg+#LF$+"- Fixed Memory Thread Error by Count   "        
         _AboutMsg+#LF$+"---------------------------------------"         
@@ -685,8 +709,8 @@ EndProcedure
 EndModule
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x64)
-; CursorPosition = 308
-; FirstLine = 256
+; CursorPosition = 461
+; FirstLine = 312
 ; Folding = -e+
 ; EnableAsm
 ; EnableXP

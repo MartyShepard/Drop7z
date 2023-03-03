@@ -1094,7 +1094,7 @@ Module Request
 			
 		Until rQuit = #True
 		
-		;SetWindowCallback(0, #REXW0)
+		
 		
 		
 		Debug #TAB$ + "========================================="
@@ -1108,6 +1108,8 @@ Module Request
 		
 		
 		ResultReturn = *MsgEx\ReturnCode
+		
+		SetWindowCallback(0, #REXW0)
 		
 		ProcedureReturn ResultReturn
 		
@@ -1315,7 +1317,8 @@ CompilerIf #PB_Compiler_IsMainFile
 	
 CompilerEndIf
 ; IDE Options = PureBasic 5.73 LTS (Windows - x64)
-; CursorPosition = 16
+; CursorPosition = 373
+; FirstLine = 1080
 ; Folding = ----
 ; EnableAsm
 ; EnableThread

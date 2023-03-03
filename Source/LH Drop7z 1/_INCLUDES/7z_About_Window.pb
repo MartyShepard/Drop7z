@@ -1,6 +1,6 @@
 ﻿Procedure.s Open_About() 
     
-    Protected nTxtMessageHeight.i = 2700
+    Protected nTxtMessageHeight.i = 3400
     
     OpenWindow002()
     
@@ -26,28 +26,31 @@
     
     Protected  nCurrentFontID.l = Fonts::#_DROIDSANS_10
     
-    ButtonEX::Add(DC::#Button_009, 44, 273, 87, 27, 
-                  DC::#_BTN_GREY1_1N, 
-                  DC::#_BTN_GREY1_1H, 
-                  DC::#_BTN_GREY1_1P,
-                  DC::#_BTN_GREY1_1D, "Mail", "Send Mail", "Close!",GetSysColor_(#COLOR_3DFACE),0,nCurrentFontID)
+    ButtonEX::Add(DC::#Button_009, 44, 275,83, 20,  
+   	              DC::#_BTN_GREY4_0N, 
+    	              DC::#_BTN_GREY4_0H, 
+    	              DC::#_BTN_GREY4_0P,
+    	              DC::#_BTN_GREY4_0D, "Send Mail", "Send Mail", "Close!",GetSysColor_(#COLOR_3DFACE),0,nCurrentFontID)
     
-    ButtonEX::Add(DC::#Button_008,164, 273, 87, 27,
-                  DC::#_BTN_GREY1_1N,
-                  DC::#_BTN_GREY1_1H,
-                  DC::#_BTN_GREY1_1P,
-                  DC::#_BTN_GREY1_1D, "aha!", "so so..!" , "Close!",GetSysColor_(#COLOR_3DFACE),0,nCurrentFontID)
+    ButtonEX::Add(DC::#Button_008,164, 275, 83, 20, 
+   	              DC::#_BTN_GREY4_0N, 
+    	              DC::#_BTN_GREY4_0H, 
+    	              DC::#_BTN_GREY4_0P,
+    	              DC::#_BTN_GREY4_0D, "Dann..", "Dann.." , "Close!",GetSysColor_(#COLOR_3DFACE),0,nCurrentFontID)
     
-    ButtonEX::Add(DC::#Button_010,280, 273, 87, 27,
-                  DC::#_BTN_GREY1_1N,
-                  DC::#_BTN_GREY1_1H,
-                  DC::#_BTN_GREY1_1P,
-                  DC::#_BTN_GREY1_1D, "Homepage", "Go To HP", "Close!",GetSysColor_(#COLOR_3DFACE),0,nCurrentFontID)
+    ButtonEX::Add(DC::#Button_010,280, 275,83, 20, 
+   	              DC::#_BTN_GREY4_0N, 
+    	              DC::#_BTN_GREY4_0H, 
+    	              DC::#_BTN_GREY4_0P,
+    	              DC::#_BTN_GREY4_0D, "Homepage", "Is Closed", "Close!",GetSysColor_(#COLOR_3DFACE),0,nCurrentFontID)
     
     
-    EnableWindow_(WindowID(#Window002), #True): SetActiveWindow(#Window002)    
+    EnableWindow_(WindowID(#Window002), #True)
+    SetActiveWindow(#Window002)    
     
-    HideWindow(#Window002,0): StickyWindow(#Window002,1)
+    HideWindow(#Window002,0)
+    StickyWindow(#Window002,1)
+    
     _AboutQuit = #False 
     
     Repeat    
@@ -114,9 +117,8 @@
     StickyWindow(#Window002,0): EnableWindow_(WindowID(DC::#_Window_001), #True) :SetActiveWindow(DC::#_Window_001): CloseWindow(#Window002) 
     
 EndProcedure  
-; IDE Options = PureBasic 5.62 (Windows - x64)
-; CursorPosition = 81
-; FirstLine = 50
+; IDE Options = PureBasic 5.73 LTS (Windows - x64)
+; CursorPosition = 2
 ; Folding = -
 ; EnableAsm
 ; EnableXP

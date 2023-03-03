@@ -40,9 +40,9 @@
 		Protected iDrop7z_Config$, MaxMenuItems.i,  CurrentItem.i, TrayItems.i, TrayID.i, Markiert.i ,CheckMarked.i, State$
 		
 		CreatePopupMenu(DC::#PopUpMenu_002)
-		MenuItem(7, "Packen: Standard Archiv")
-		MenuItem(8, "Packen: Alle Seperat")       
-		MenuItem(9, "Packen: Gewählte Dateien")
+		MenuItem(7, "Packen: Standard Archiv Erstellen")
+		MenuItem(8, "Packen: Alle Seperat Packen")       
+		MenuItem(9, "Packen: Markierte Dateien Packen")
 		MenuBar()
 		MenuItem(36, "Format: 7ZP")
 		MenuItem(37, "Format: ZIP")  
@@ -59,9 +59,12 @@
 		MenuItem(51, "Fenster im Vordergrund")
 		MenuItem(52, "Option: Zwischenablage")
 		CloseSubMenu()                            
-		MenuBar()
-		MenuItem(75, "Konvertieren <-> Entpacken")             
-		OpenSubMenu("Konvert.: Optionen")      
+		MenuBar()   
+		MenuItem(60, "Ziel Verzeichnis Pinnen") 
+		MenuBar()   		
+		MenuItem(75, "Konvertieren <-> Entpacken")    		
+		MenuBar()         
+		OpenSubMenu("Konvert./ Entpack: Optionen")      
 		MenuItem(72, "Behandle *.exe als Sfx7z")              
 		MenuItem(70, "Behandle *.exe als SfxRAR")
 		MenuItem(71, "Behandle *.exe als SfxZIP")            
@@ -81,9 +84,7 @@
 		;MenuBar()            
 		MenuItem(19, "Drag'n'Drop: Auto. Entfernen")
 		MenuBar()   
-		MenuItem(28, "Säubere History")
-		MenuBar()   
-		MenuItem(60, "Ziel Verzeichnis Pinnen")                
+		MenuItem(28, "Säubere Zielverzeichnis History")               
 		;MenuBar()                 
 		;MenuItem(20, "Delete Files: After Compress") 
 		;MenuItem(27, "Delete Files: Don't Ask Me")            
@@ -260,21 +261,13 @@
 				Select iMenuID
 					Case 17,20
 						Select GetMenuItemState(TrayMenu,iMenuID)
-							Case 0
-								sLANGUAGE = Windows::Get_Language() 
-								
+							Case 0							
 								Request0$ = "Now Look What You've Done" 
-								Request1$ = "Attention!"                
-								Select sLANGUAGE
-									Case 407              
-										Request2$ = "Benutze die Option 'Delete Files' auf eigenes Risiko."+#CR$+
-										            "Alle gelöschten Dateien befinden sich im Papierkorb." +#CR$+#CR$+
-										            "Ordner und Dateien nach dem Komprimieren Löschen ?"   
-									Default
-										Request2$ = "Use the Option 'Delete Files' on your own Risk."+#CR$+#CR$+
-										            "Info: All Deleted Files got to the Recycle Bin" +#CR$+
-										            "Enable 'Delete Files' after Compressing 7z Archive/s ?"
-								EndSelect
+								Request1$ = "Attention!"                              
+								Request2$ = "Benutze die Option 'Dateien Löschen' auf eigene's Risiko." + #CR$ +
+										            "Alle gelöschten Dateien befinden sich im Papierkorb."  + #CR$ +#CR$+
+										            "Ordner und Dateien nach dem Packen/Komprimieren Löschen ?" 
+										
 								iResult = Request::MSG(Request0$, Request1$  ,Request2$,12,0,ProgramFilename(),0,0,DC::#_Window_001)
 								Select iResult
 									Case 0
@@ -359,15 +352,9 @@
 				sLANGUAGE = Windows::Get_Language() 
 				
 				Request0$ = "Now Look What You've Done" 
-				Request1$ = "Cear Autocomplete History"               
-				Select sLANGUAGE
-					Case 407              
-						Request2$ =  "Damit werdne alle Einträge in der Zielverzeichnis-History gelöscht."+#CR$+#CR$+
-						             "Einträge Löschen?"   
-					Default
-						Request2$ =  "Clear complet the Autocomplete Destination History ?" +#CR$+#CR$+
-						             "Delete Entrys"
-				EndSelect
+				Request1$ = "Clear Autocomplete History"                       
+				Request2$ = "Damit werden alle Einträge in der History gelöscht." +#CR$ + #CR$ + "Einträge Löschen?"
+				
 				iResult = Request::MSG(Request0$, Request1$  ,Request2$,12,1,ProgramFilename(),0,0,DC::#_Window_001)
 				Select iResult
 					Case 0
@@ -421,8 +408,8 @@
 				;
 				; Verzeichnis Festsetzen     
 				Select CFG::*Config\PinDirectory
-					Case 0: CFG::*Config\PinDirectory = 1                   
-					Case 1: CFG::*Config\PinDirectory = 0                    
+					Case 0: CFG::*Config\PinDirectory = 1                 
+					Case 1: CFG::*Config\PinDirectory = 0
 				EndSelect            
 				DropCode::Consolidate_Directory(CFG::*Config\PinDirectory)      
 			Case 70
@@ -470,8 +457,8 @@
 		CFG::WriteConfig(CFG::*Config): CFG::ReadConfig(CFG::*Config): DropSYSF::Process_FreeRam()
 	EndProcedure
 ; IDE Options = PureBasic 5.73 LTS (Windows - x64)
-; CursorPosition = 81
-; FirstLine = 51
+; CursorPosition = 66
+; FirstLine = 31
 ; Folding = -
 ; EnableAsm
 ; EnableXP
