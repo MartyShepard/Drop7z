@@ -123,9 +123,15 @@ Module UnRAR
 	
 	CompilerIf #PB_Compiler_Processor = #PB_Processor_x64
 		DLL = OpenLibrary(#PB_Any, GetPathPart( ProgramFilename() ) +"UnRAR\unrar64.dll")
+		If DLL = 0
+			DLL = OpenLibrary(#PB_Any, GetPathPart( ProgramFilename() ) +"DropData\UnRAR\unrar64.dll")
+		EndIf
 		
 	CompilerElse
 		DLL = OpenLibrary(#PB_Any, GetPathPart( ProgramFilename() ) +"UnRAR\unrar.dll")
+		If DLL = 0
+			DLL = OpenLibrary(#PB_Any, GetPathPart( ProgramFilename() ) +"DropData\UnRAR\unrar.dll")
+		EndIf		
 	CompilerEndIf
 	
 	If DLL
@@ -352,8 +358,8 @@ CompilerIf #PB_Compiler_IsMainFile
 CompilerEndIf	
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x64)
-; CursorPosition = 187
-; FirstLine = 142
+; CursorPosition = 132
+; FirstLine = 101
 ; Folding = f-
 ; EnableAsm
 ; EnableXP
