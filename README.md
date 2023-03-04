@@ -23,6 +23,7 @@ Icon : Rob2Seven (RIP)
 UnLZX: Help from Infratec (Changes, Adjusting, C to PB help)
 
 Done in Purebasic 5.73 LTS .. credits go to Fred
+
 Enviorment: Windows 7/ RTX 2060/ FX 8350/ 32GB
 
 Errors in the program or what I haven't gotten to yet......
