@@ -68,10 +68,11 @@ Module DropPack
 			                             #MB_USERICON  |
 			                             #MB_DEFBUTTON2|
 			                             #MB_TASKMODAL		,
-			                             #IDI_INFORMATION		,
+			                             145				, ; #ID from Shell32 Dll
 			                             DropLang::GetUIText(34)	,
 			                             DropLang::GetUIText(35) 	,
-			                             DropLang::GetUIText(36)  )
+			                             DropLang::GetUIText(36)  ,
+			                             "shell32.dll"		)
 			Select Result
 				Case 7
 					 ProcedureReturn 0    
@@ -898,8 +899,8 @@ Module DropPack
 	
 EndModule
 ; IDE Options = PureBasic 5.73 LTS (Windows - x64)
-; CursorPosition = 79
-; FirstLine = 51
+; CursorPosition = 74
+; FirstLine = 38
 ; Folding = -----
 ; EnableAsm
 ; EnableXP

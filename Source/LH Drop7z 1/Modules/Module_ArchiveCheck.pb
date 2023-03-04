@@ -127,6 +127,20 @@ Module ArchiveCheck
 					ProcedureReturn "LHASFX"
 				EndIf	
 			EndIf
+			
+			If ( *ARCHEAD\Size >= 44 )			
+				If (*ARCHEAD\header[36] = 'L') And
+				   (*ARCHEAD\header[37] = 'H') And
+				   (*ARCHEAD\header[38] = 'A') And
+				   (*ARCHEAD\header[40] = 's') And
+				   (*ARCHEAD\header[42] = 'S') And
+				   (*ARCHEAD\header[43] = 'F') And
+				   (*ARCHEAD\header[44] = 'X')   
+					Debug "LHA Self Extract found"
+					ProcedureReturn "LHASFX"
+				EndIf	
+			EndIf			
+			
 			If ( *ARCHEAD\Size >= 55 )
 				If (*ARCHEAD\header[50] = 'P') And 
 				   (*ARCHEAD\header[51] = 'K') And
@@ -249,8 +263,8 @@ Module ArchiveCheck
 	EndProcedure	
 EndModule
 ; IDE Options = PureBasic 5.73 LTS (Windows - x64)
-; CursorPosition = 210
-; FirstLine = 184
+; CursorPosition = 130
+; FirstLine = 94
 ; Folding = --
 ; EnableAsm
 ; EnableXP

@@ -1,6 +1,40 @@
 DeclareModule MessageBoxExt
 	
-	Declare.b	Show(hwnd, szCaption.s, szText.s,  dwStyle.i, dwStyleEx.i, lpszIcon.i, szbutton1.s = "", szbutton2.s ="", szbutton3.s ="")
+	Declare.b	Show(hwnd		,	  ; The WindowHandle (without WindowID())
+	         	     szCaption.s	,	  ; The Window Title Text
+	         	     szText.s	,	  ; The Message Text
+	         	     dwStyle	,	  ; Style: 	MB_ABORTRETRYIGNORE
+							  ;		MB_CANCELTRYCONTINUE
+							  ;		MB_HELP
+							  ;		MB_OK
+							  ;	      MB_OKCANCEL
+							  ;		MB_RETRYCANCEL
+							  ;		MB_YESNO
+							  ;		MB_YESNOCANCEL
+			     dwStyleEx	,	  ; Optional dwStyle
+							  ;	      MB_DEFBUTTON1
+							  ;		MB_DEFBUTTON2
+							  ;		MB_DEFBUTTON3
+							  ;		MB_DEFBUTTON4		
+							  ;		MB_APPLMODAL
+							  ;		MB_SYSTEMMODAL	-  the message box has the WS_EX_TOPMOST style
+							  ;		MB_TASKMODAL	-  the message box has the WS_EX_TOPMOST style
+			     lpszIcon.i	,	  ; The Icon. This can be: (or use the combination with "DynamicLibrary" and icon id nr from dll)
+							  ;		IDI_APPLICATION 
+							  ;		IDI_ASTERISK 
+							  ;		IDI_ERROR 
+							  ;		IDI_EXCLAMATION 
+							  ;		IDI_HAND 
+							  ;		IDI_INFORMATION 
+							  ;		IDI_QUESTION 
+							  ;		IDI_WARNING 
+							  ;		IDI_WINLOGO 
+			     szbutton1.s     = "",; Custom Button Text
+			     szbutton2.s     = "",; Custom Button Text
+			     szbutton3.s     = "",; Custom Button Text
+			     DynamicLibrary.s= "",; Use Custom Icon from dll eq: DynamicLibrary = "shell32.dll"
+			     pbFontID.l	   = 0 ); 
+
 	
 	#IDOK 	= 1
 	#IDCANCEL 	= 2
@@ -13,11 +47,13 @@ DeclareModule MessageBoxExt
 	#IDCONTINUE = 11
 	#IDPROMPT 	= $FFFF
 	
+	#MB_USERICON = $80 
 EndDeclareModule
 
 Module MessageBoxExt
 		
 	Global.i lhHook, ldwStyle
+	Global.l hFont
 	Global.s szDlgButton1, szDlgButton2, szDlgButton3
 	;
 	;
@@ -29,6 +65,10 @@ Module MessageBoxExt
 			Case #HCBT_ACTIVATE
 				
 				#MB_CANCELTRYCONTINUE = 6
+				
+				*tagDRAWITEMSTRUCT.DRAWITEMSTRUCT 
+				
+				*tagDRAWITEMSTRUCT = lParam
 				
 				;SetWindowText_ (wParam, szDlgTitle)
 				;SetDlgItemText_ (wParam, #IDPROMPT, szDlgMessage)
@@ -97,28 +137,40 @@ Module MessageBoxExt
 							SetDlgItemText_ ( wParam, #IDCONTINUE  , szDlgButton3 )
 						EndIf										
 				EndSelect	
+				
+				
+				
 				UnhookWindowsHookEx_ (lhHook)
 			Default
-				Debug "Messagebox Extended: Hook Procedure Message " + Str(uMsg)
+				CompilerIf #PB_Compiler_IsMainFile
+					Debug "Messagebox Extended: Hook Procedure Message " + Str(uMsg)
+				CompilerEndIf	
 		EndSelect
 		ProcedureReturn #False
 	EndProcedure
 	;
 	;
 	;
-	Procedure.b Show(hwnd, szCaption.s, szText.s,  dwStyle.i, dwStyleEx.i, lpszIcon.i, szbutton1.s = "", szbutton2.s ="", szbutton3.s ="")
+	Procedure.b Show(hwnd, szCaption.s, szText.s,  dwStyle, dwStyleEx, lpszIcon.i, szbutton1.s = "", szbutton2.s ="", szbutton3.s ="",DynamicLibrary.s ="", pbFontID.l = 0)
 		
 		Protected Messagebox.MSGBOXPARAMS
 		
-		#MB_USERICON = $80 
+		
 
 		If ( hwnd <> 0 )
 			hwnd = WindowID(hwnd)
 		EndIf
-		
+					
 		Messagebox\cbSize		= SizeOf(MSGBOXPARAMS) 
 		Messagebox\hwndOwner	= hwnd ; change to windowID(#your window) if needed
-		Messagebox\hInstance	= 0
+		
+		If ( Len( DynamicLibrary ) > 0 )			
+			
+			Messagebox\hInstance	= LoadLibrary_(DynamicLibrary)
+		Else	
+			Messagebox\hInstance	= 0
+		EndIf
+		
 		Messagebox\lpszText	= @szText
 		Messagebox\lpszCaption	= @szCaption 
 		
@@ -171,7 +223,66 @@ Module MessageBoxExt
 		ldwStyle = 0
 		ldwStyle = dwStyle
 		
+		If ( pbFontID > 0 )
+			pbFontID = FontID( pbFontID )	
+		EndIf	
+		
+			
+       		
+		
+		CompilerIf #PB_Compiler_IsMainFile
+			
+		*LogFont.LogFont = AllocateMemory( SizeOf( LogFont ) )					
+		GetObject_(pbFontID, SizeOf(LOGFONT), *LogFont); 
+        	
+			szFontFamilie.s = ""				
+			For i = 0 To 1023
+				If *LogFont\lfFaceName[i] = 0
+					Break
+				EndIf	
+				
+				szFontFamilie + Chr( *LOGFONT\lfFaceName[i])					
+			Next	
+			Debug "Front    			: " + szFontFamilie		
+			Debug "Font Width 		: " + Str( *LogFont\lfWidth )	
+			Debug "Font Height		: " + Str( *LogFont\lfHeight)			
+			
+		            Select *LogFont\lfWeight
+		                Case #FW_DONTCARE   : Debug "Font Weight 		: " + Str( *LogFont\lfWeight ) + " = #FW_DONTCARE"
+		                Case #FW_THIN       : Debug "Font Weight 		: " + Str( *LogFont\lfWeight ) + " = #FW_THIN"
+		                Case #FW_EXTRALIGHT : Debug "Font Weight 		: " + Str( *LogFont\lfWeight ) + " = #FW_EXTRALIGHT"
+		                Case #FW_ULTRALIGHT : Debug "Font Weight 		: " + Str( *LogFont\lfWeight ) + " = #FW_ULTRALIGHT"                 
+		                Case #FW_LIGHT      : Debug "Font Weight 		: " + Str( *LogFont\lfWeight ) + " = #FW_LIGHT"                
+		                Case #FW_NORMAL     : Debug "Font Weight 		: " + Str( *LogFont\lfWeight ) + " = #FW_NORMAL"  
+		                Case #FW_REGULAR    : Debug "Font Weight 		: " + Str( *LogFont\lfWeight ) + " = #FW_REGULAR"          
+		                Case #FW_MEDIUM     : Debug "Font Weight 		: " + Str( *LogFont\lfWeight ) + " = #FW_MEDIUM"      
+		                Case #FW_SEMIBOLD   : Debug "Font Weight 		: " + Str( *LogFont\lfWeight ) + " = #FW_SEMIBOLD"       
+		                Case #FW_DEMIBOLD   : Debug "Font Weight 		: " + Str( *LogFont\lfWeight ) + " = #FW_DEMIBOLD"          
+		                Case #FW_BOLD       : Debug "Font Weight 		: " + Str( *LogFont\lfWeight ) + " = #FW_BOLD"
+		                Case #FW_EXTRABOLD  : Debug "Font Weight 		: " + Str( *LogFont\lfWeight ) + " = #FW_EXTRABOLD"          
+		                Case #FW_ULTRABOLD  : Debug "Font Weight 		: " + Str( *LogFont\lfWeight ) + " = #FW_ULTRABOLD"            
+		                Case #FW_HEAVY      : Debug "Font Weight 		: " + Str( *LogFont\lfWeight ) + " = #FW_HEAVY"       
+		                Case #FW_BLACK      : Debug "Font Weight 		: " + Str( *LogFont\lfWeight ) + " = #FW_BLACK"       
+		          EndSelect
+		          			
+			Debug "Font Italic 		: " + Str( *LogFont\lfItalic )				
+			Debug "Font Charset 		: " + Str( *LogFont\lfCharSet )	
+			Debug "Font Out Precision 	: " + Str( *LogFont\lfOutPrecision )	
+			Debug "Font Clip Precision 	: " + Str( *LogFont\lfClipPrecision )
+			Debug "Font Quality		: " + Str( *LogFont\lfQuality )
+			Debug "Font PitchAndFamily	: " + Str( *LogFont\lfPitchAndFamily )
+			
+			
+		hFont = CreateFontIndirect_(@LogFont)
+		SendMessage_(hwnd, #WM_SETFONT, hFont, 1)
+		
+
+		CompilerEndIf
+		
+		
 		lhHook   = SetWindowsHookEx_ (#WH_CBT, @MsgBoxHookProc (), hInstance, hThreadId)
+		
+
 		
 		ProcedureReturn MessageBoxIndirect_(@Messagebox)
 		
@@ -180,7 +291,11 @@ Module MessageBoxExt
 EndModule
 
 CompilerIf #PB_Compiler_IsMainFile
-Result.b = MessageboxExt::Show(0, "Search for program...", "Please select the drive to search...", #MB_ABORTRETRYIGNORE, #MB_USERICON | #MB_DEFBUTTON2|#MB_TASKMODAL, #IDI_INFORMATION,"Search C:\", "Search D:\", "Cancel")
+	
+	pbFont.l = LoadFont (#PB_Any, "CRAMPS", 15)
+
+	
+Result.b = MessageboxExt::Show(0, "Search for program...", "Please select the drive to search...", #MB_ABORTRETRYIGNORE, #MB_USERICON | #MB_DEFBUTTON2|#MB_TASKMODAL, 10,"Search C:\", "Search D:\", "Cancel", "shell32.dll", pbFont)
 Debug Result
 
 
@@ -192,8 +307,8 @@ EndIf
 End
 CompilerEndIf
 ; IDE Options = PureBasic 5.73 LTS (Windows - x64)
-; CursorPosition = 120
-; FirstLine = 128
+; CursorPosition = 274
+; FirstLine = 207
 ; Folding = --
 ; EnableAsm
 ; EnableXP

@@ -50,6 +50,7 @@ Module DropVert
 		exitCodeLo.i
 		ResultMax.i
 		ContinueOnError.i
+		ProgressCountFiles.i
 		rect.RECT
 		List Collection.s()
 		List ConvertResult.CONVERT_RESULT()
@@ -1584,7 +1585,8 @@ Module DropVert
 		NewList   *P\Mis()
 		
 		
-		SetGadgetAttribute(DC::#Progress_001, #PB_ProgressBar_Maximum, Items_Count() ):                       
+		SetGadgetAttribute(DC::#Progress_001, #PB_ProgressBar_Maximum, *P\ProgressCountFiles )	
+		;SetGadgetAttribute(DC::#Progress_001, #PB_ProgressBar_Maximum, Items_Count() ):                       
 		
 		;
 		; Verstecke den Column "Verzeichnis" nur wenn in der Liste alle Dateinamen vorhanden sind
@@ -1600,7 +1602,8 @@ Module DropVert
 				
 				Auto_Select( *P\Collection() )                
 				
-				Cnt.i               + 1
+				Cnt + 1; Progress Counter
+				SetGadgetState(DC::#Progress_001, Cnt)  
 				
 				*P\sz7zArchiv       = ""
 				*P\Command          = ""
@@ -1618,6 +1621,10 @@ Module DropVert
 				SetGadgetText(DC::#Frame_006, UCase(GetExtensionPart( *P\Collection() ) ) )
 				
 				UnCompressCheck( *P )	
+				
+				;                               
+				;
+				
 				
 				;Delay( 5 )
 				
@@ -1646,9 +1653,7 @@ Module DropVert
 				
 				SetGadgetText(DC::#String_005, "Compress: " + Chr(34) + GetFilePart( *P\sz7zArchiv )  + ".7z" + Chr(34) )
 				
-				;                               
-				;
-				SetGadgetState(DC::#Progress_001, Cnt)  
+
 				
 				
 				
@@ -1748,6 +1753,7 @@ Module DropVert
 				EndIf	
 				
 				;Delay( 25 ) 
+				
 			Next
 			
 			; Normalisiere den Drop7z Satus
@@ -1779,16 +1785,20 @@ Module DropVert
 				Case 0: SetGadgetText(DC::#Frame_006,"7Z")
 				Case 1: SetGadgetText(DC::#Frame_006,"ZIP")           
 				Case 2: SetGadgetText(DC::#Frame_006,"CHD")          
-			EndSelect 			
+			EndSelect 
+			
+			SetGadgetAttribute(DC::#Progress_001, #PB_ProgressBar_Minimum, 0)
+			SetGadgetAttribute(DC::#Progress_001, #PB_ProgressBar_Maximum, 0)			
 		EndIf	
 
 	EndProcedure    
 	;
 	;
 	;
-	Procedure.i ConvertArchive_Thread(*P)
+	Procedure.i ConvertArchive_Thread(*P.PROGRAM_BOOT)
 		
-		
+
+			
 		
 		; Ab hier den Durchlauf starten
 		
@@ -1807,7 +1817,8 @@ Module DropVert
 		;
 		;
 		; _SendMailArchive(*P\sz7zArchiv), in Single Variante ... nö
-			
+		
+		
 		QuitTask(*P)                              
 		
 	EndProcedure    
@@ -1832,7 +1843,7 @@ Module DropVert
 				Result = Request::MSG(DropLang::GetUIText(20), "RAR. DLL Not Found", "Rar benötigt die "+ Chr(34) + GetFilePart( szString ) + Chr(34) + " im DropZ Verzeichnis " + GetPathPart( szString ),10,0,"",0,0,DC::#_Window_001 )
 				
 			Case 5
-				Result = Request::MSG(DropLang::GetUIText(20), "Identifiziert als: "+ szString +" ", "Kann Das Archiv [."+GetExtensionPart( *P\Collection() )+"] nicht in 7z umwandeln" + #CRLF$ +  *P\Collection(),10,2,"",0,0,DC::#_Window_001 )				
+				Result = Request::MSG(DropLang::GetUIText(20), "Identifiziert als: "+ szString +" ", "Kann Das Archiv [."+GetExtensionPart( *P\Collection() )+"] nicht öffnen" + #CRLF$ +  *P\Collection(),10,2,"",0,0,DC::#_Window_001 )				
 				
 			Case 6
 				Result = Request::MSG(DropLang::GetUIText(20), "Can Not Compress", "Kann das Archiv [."+GetExtensionPart( *P\Collection() )+"] nicht IN 7z umwandeln" + #CRLF$ +  *P\Collection(),10,2,"",0,0,DC::#_Window_001 )
@@ -1929,6 +1940,8 @@ Module DropVert
 		*P\szTempFile      = ""
 		*P\PrgFlag         = 0
 		
+		*P\ProgressCountFiles = 0
+		
 		*P\rect\left  = 0
 		*P\rect\right = GadgetWidth(DC::#String_001)
 		*P\rect\top   = 0
@@ -2015,7 +2028,7 @@ Module DropVert
 						If ( UCase( GetExtensionPart( *P\Collection() ) ) = "EXE" )
 							
 
-							
+							CheckArchiveLongName = ""
 							CheckArchive = ArchiveCheck::Test_Archive( *P\Collection() )
 							
 							If ( CheckArchive = "-2" )
@@ -2070,16 +2083,15 @@ Module DropVert
 									CheckArchive = ""										
 								Default
 									CheckArchiveLongName = ""
-							EndSelect	
-							
-; 							If (Len( CheckArchive) > 0)																									
-; 								MessageRequester_Show(*P, 2, CheckArchiveLongName)								
-; 								MessageRequester_Result
-; 							EndIf									
+							EndSelect															
 							
 						EndIf
 						
-						If ( FileSize( *P\DstPath + GetFilePart( *P\Collection() , #PB_FileSystem_NoExtension) + ".7z" ) >= 0 ) And ( CFG::*Config\UnPackOnly = #False)
+ 						If (Len( CheckArchiveLongName) > 0)																									
+ 								MessageRequester_Show(*P, 2, CheckArchiveLongName)								
+ 								MessageRequester_Result
+													
+						ElseIf ( FileSize( *P\DstPath + GetFilePart( *P\Collection() , #PB_FileSystem_NoExtension) + ".7z" ) >= 0 ) And ( CFG::*Config\UnPackOnly = #False)
 							
 							Result = MessageRequester_Show(*P, 3)	
 							If Result = 1
@@ -2205,13 +2217,17 @@ Module DropVert
 							QuitTask(*P)
 							ProcedureReturn 0
 						EndIf							
-				EndSelect					
+				EndSelect
+				
+				*P\ProgressCountFiles + 1
 			Next
 		Else
            		MessageRequester_Show(*P, 7)
            		QuitTask(*P)
            		ProcedureReturn 12		
 		EndIf				
+		
+
 		
 		;Set_GadgetStatus(1)
 		
@@ -2342,8 +2358,8 @@ Module DropVert
 	EndProcedure	
 EndModule
 ; IDE Options = PureBasic 5.73 LTS (Windows - x64)
-; CursorPosition = 2103
-; FirstLine = 1698
+; CursorPosition = 1587
+; FirstLine = 1178
 ; Folding = HAA94----
 ; EnableAsm
 ; EnableXP

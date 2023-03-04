@@ -41,13 +41,15 @@ DeclareModule CFG
 	
 	*Config.INI_STRUCTURE       = AllocateMemory(SizeOf(INI_STRUCTURE))
 	
-	Declare ReadConfig(*Config.INI_STRUCTURE)
-	Declare WriteConfig(*Config.INI_STRUCTURE)
-	Declare Make_Config(*Config.INI_STRUCTURE)
+	Declare 	ReadConfig(*Config.INI_STRUCTURE)
+	Declare 	WriteConfig(*Config.INI_STRUCTURE)
+	Declare 	Make_Config(*Config.INI_STRUCTURE)
 	
+	Declare.s   AboutMessage()			
+	Declare.s 	MakeHistory(szFileHistory.s,Force=0)
 	
+	Declare.l	Get_AboutMessage_TextHeight(TextGadgetID)
 	
-	Declare.s MakeHistory(szFileHistory.s,Force=0)
 EndDeclareModule 
 
 DeclareModule DropPack   
@@ -183,12 +185,12 @@ Module CFG
 		
 		suSubData  = "DropData\"
 			
-		*Config\Version.s    = "1.02.02 Beta FastFertig"
-		*Config\WindowTitle.s= "Drop7z v"+ *Config\Version +" By Marty Shepard"
+		*Config\Version    	= "1.02.04 Beta FastFertig"
+		*Config\WindowTitle	= "Drop7z v"+ *Config\Version +" By Marty Shepard"
 		
-		*Config\ConfigPath.s = GetPathPart( ProgramFilename() ) + suSubData + "Drop7z.ini"
-		*Config\ProfilePath.s= GetPathPart( ProgramFilename() ) + suSubData + "Profiles.ini"
-		*Config\HistoryPath.s= GetPathPart( ProgramFilename() ) + suSubData + "History.ini"
+		*Config\ConfigPath 	= GetPathPart( ProgramFilename() ) + suSubData + "Drop7z.ini"
+		*Config\ProfilePath	= GetPathPart( ProgramFilename() ) + suSubData + "Profiles.ini"
+		*Config\HistoryPath	= GetPathPart( ProgramFilename() ) + suSubData + "History.ini"
 		
 		Debug ""
 		Debug "Drop 7z Home Directory"
@@ -301,18 +303,342 @@ Module CFG
 		INIValue::Set_Value("SETTINGS","UnpackInSubDirectory" , *Config\UnpackInSubDirectory , *Config\ConfigPath)
 		;
 		; Button Info
-		If ( CFG::*Config\UnPackOnly = #True )
+		If ( *Config\UnPackOnly = #True )
 			ButtonEX::Settext(DC::#Button_002,0,"Unpack")
 		Else
 			ButtonEX::Settext(DC::#Button_002,0,"Convert")
 		EndIf
 		
-	EndProcedure
+	EndProcedure	
+	
+	;
+	;
+	;
+	Procedure.l Get_AboutMessage_TextHeight(TextGadgetID)
+		Protected.s szText
+		Protected.i cLF, FontHeight
+		
+		hDC = GetDC_(GadgetID(TextGadgetID)) 
+		
+		hFont = SendMessage_(GadgetID(TextGadgetID),#WM_GETFONT,0,0)
+		
+		If hFont And hDC 
+			SelectObject_(hDC,hFont) 
+		EndIf 
+		
+		GetTextExtentPoint32_(hDC, GetGadgetText(TextGadgetID), Len(GetGadgetText(TextGadgetID)) , lpSize.SIZE)
+		
+		FontHeight = lpSize\cy
+		
+		szText = GetGadgetText(TextGadgetID)
+		cLF    = CountString(szText,#LF$) + 2
+		;
+		;
+		; Font Höhe * Zeilenvorschub
+		result = FontHeight * cLF
+		
+		ProcedureReturn result
+	EndProcedure	
+	;
+	;
+	;
+	;
+	; Drop7z Message Text
+	;
+	Procedure.s AboutMessage()
+		Protected.s szString
+		szString=""
+		szString + "$" + CFG::*Config\Version
+		szString + #LF$ +  ""		
+		szString + #LF$ + "Code : Marty Shepard"       
+		szString + #LF$ + "Icon : Rob2Seven (RIP)"
+		szString + #LF$ + "UnLZX: Help from Infratec"         
+		szString + #LF$ + ""
+		szString + #LF$ + "Drop.7z is a Desktop Dragn'n'Drop Util "
+		szString + #LF$ + " Addon for 7z (Seven Zip) to quickly   "
+		szString + #LF$ + "      Compress Files and Folders       "
+		szString + #LF$ + "  or Convert to 7z or simple Unpack    "
+		szString + #LF$ + ""              
+		szString + #LF$ + "Changelog:                             "
+		szString + #LF$ + "======================================="
+		szString + #LF$ + "Version 1.02.04 Beta                   "        
+		szString + #LF$ + ""
+		szString + #LF$ + "- Add Missing Convertet Amiga Fonts"
+		szString + #LF$ + "  : Fixplain7"
+		szString + #LF$ + "  : Pl_Apple"
+		szString + #LF$ + "  : XbookBook"		
+		szString + #LF$ + "  and additional Font Memory Resource"
+		szString + #LF$ + "- Message Box Extend Hook Fix"
+		szString + #LF$ + "- Minor Fixes"
+		szString + #LF$ + ""   		
+		szString + #LF$ + "---------------------------------------" 
+		szString + #LF$ + "Version 1.02.03 Beta                   "        
+		szString + #LF$ + ""
+		szString + #LF$ + "About Design Changes & Code"
+		szString + #LF$ + "Show working RAR Volume Number"
+		szString + #LF$ + "Progress Count Files in Convert/Unpack"
+		szString + #LF$ + ""   		
+		szString + #LF$ + "---------------------------------------" 
+		szString + #LF$ + "Version 1.02.02 Beta                   "        
+		szString + #LF$ + ""
+		szString + #LF$ + "Popup Menu Changes"
+		szString + #LF$ + "About Changes" 
+		szString + #LF$ + "Ini Location changed"
+		szString + #LF$ + "Unrar location changed"
+		szString + #LF$ + "Crash Fix... i hope this was the last"        
+		szString + #LF$ + "Bug fix Password in Mass Packin' "
+		szString + #LF$ + "Profile Routine Changes... not yet fin"  
+		szString + #LF$ + ""          
+		szString + #LF$ + "---------------------------------------" 
+		szString + #LF$ + "Version 1.02.00 Beta                   "        
+		szString + #LF$ + ""
+		szString + #LF$ + "Many BugFixes"
+		szString + #LF$ + "Many Design Fixes"
+		szString + #LF$ + "Added Convert/ Unpack"
+		szString + #LF$ + "Added LZX, ZIP, RAR etc.to Unpack/Conv."
+		szString + #LF$ + "Added Exe Identication for SelfExtract"
+		szString + #LF$ + "Design Changes"
+		szString + #LF$ + "etc .... "
+		szString + #LF$ + ""        
+		szString + #LF$ + "---------------------------------------"  
+		szString + #LF$ + "Version 0.99.95 Beta			   "
+		szString + #LF$ + "- Added ISO for CHD Compress           "
+		szString + #LF$ + "- Fixed Memory Thread Error by Count   "        
+		szString + #LF$ + "---------------------------------------"         
+		szString + #LF$ + "Version 0.99.94 Beta                   "
+		szString + #LF$ + "- Rewritten Compress Mode (Full)       "
+		szString + #LF$ + "- Rewritten Compress Mode (Single)     "        
+		szString + #LF$ + "- Optic Changes                        "
+		szString + #LF$ + "- Fixed Auto Complete History          "        
+		szString + #LF$ + "- Fixed and Optimzed old Codes         "
+		szString + #LF$ + "---------------------------------------" 
+		szString + #LF$ + ""                
+		szString + #LF$ + "Version 0.99.93 Beta                   "
+		szString + #LF$ + "- Various Code Changes                 "
+		szString + #LF$ + "- About Optics Changed                 "
+		szString + #LF$ + "- Fixed Auto Complete History          "
+		szString + #LF$ + "- Add Support for M.A.M.E CHDMan       "        
+		szString + #LF$ + "---------------------------------------" 
+		szString + #LF$ + ""        
+		szString + #LF$ + "Version 0.99.92 Beta                   "
+		szString + #LF$ + "- Fixed Clearing AutoComplete History  "
+		szString + #LF$ + "- Replace DialogRequester              "
+		szString + #LF$ + "- Removed Grammatical Erros            "
+		szString + #LF$ + "- Fixed old Registry Code              "
+		szString + #LF$ + "- Change Button Font                   "
+		szString + #LF$ + "- Add Zip Support (Look PopupMenu)     "
+		szString + #LF$ + "- Add Zip Options by 7-Zip             "        
+		szString + #LF$ + "---------------------------------------"
+		szString + #LF$ + ""
+		szString + #LF$ + "Version 0.99.8 Quick Fix Beta          "
+		szString + #LF$ + "- Broken Autostart with Loading Drop7z "
+		szString + #LF$ + " and Profile ini loading Fixed         "
+		szString + #LF$ + "---------------------------------------"
+		szString + #LF$ + ""
+		szString + #LF$ + "Version 0.99.8 Beta                    " 
+		szString + #LF$ + "- Small Design and Gui Handle Changes  "
+		szString + #LF$ + "  on Combox (Main -and Profile Window) "
+		szString + #LF$ + "- Fixed a small bug in Password that   "
+		szString + #LF$ + "  does'nt show in the Profile Window   " 
+		szString + #LF$ + "  if there Exists but not check marked "
+		szString + #LF$ + "  in the Main Window                   "                 
+		szString + #LF$ + "- Changed Handle for Profile Ini and   "
+		szString + #LF$ + "  Config ini                           "                
+		szString + #LF$ + "---------------------------------------"
+		szString + #LF$ + ""
+		szString + #LF$ + "Version 0.99.7 Beta                    "                 
+		szString + #LF$ + "- PB Version Update 5.21 => 5.30       "
+		szString + #LF$ + "  DropSevenZip Compiled with 5.30      "
+		szString + #LF$ + "- Fixed a small bug in Autostart       "
+		szString + #LF$ + "- Added an Excpetion Requester Path =1 " 
+		szString + #LF$ + "- Exchanged Destination String with    "
+		szString + #LF$ + "  with Combox and AutoComplete History "                  
+		szString + #LF$ + "---------------------------------------"
+		szString + #LF$ + ""
+		szString + #LF$ + "Version 0.99.6 Beta                    "                 
+		szString + #LF$ + "- Added 7zSFX Support (SelfExtract)    "              
+		szString + #LF$ + "---------------------------------------"
+		szString + #LF$ + ""
+		szString + #LF$ + "Version 0.99.5 Beta                    "                 
+		szString + #LF$ + "- Fixed Destination Path in Single Mode"           
+		szString + #LF$ + "---------------------------------------"
+		szString + #LF$ + ""
+		szString + #LF$ + "Version 0.99.4 Beta                    "                 
+		szString + #LF$ + "- Fixed 'Stay On Top' if Open from     "
+		szString + #LF$ + "  Tray IconMenu                        "               
+		szString + #LF$ + "- Added SendMail                       "
+		szString + #LF$ + "- Added new Style Requester (Testing)  " 
+		szString + #LF$ + "- Few Small bug fixed                  "
+		szString + #LF$ + "- Fixed SingleMode Full Compress       "
+		szString + #LF$ + "- Added Send Mail and Hompage Button   "              
+		szString + #LF$ + "---------------------------------------"
+		szString + #LF$ + ""
+		szString + #LF$ + "Version 0.99.3 Beta                    "                 
+		szString + #LF$ + "- Fixed Delete Directorys in Single    "               
+		szString + #LF$ + "  Mode                                 "
+		szString + #LF$ + "- Extended Requester Message if an     " 
+		szString + #LF$ + "  Error occured due Delete Files       "
+		szString + #LF$ + "- Fixed: a Marked State in the FileList"
+		szString + #LF$ + "- Fixed: Catched Abort ExitCode by 7z  "
+		szString + #LF$ + "- Optimze DropSevenZip Memory          "  
+		szString + #LF$ + "---------------------------------------"
+		szString + #LF$ + ""
+		szString + #LF$ + "Version 0.99.2 Beta                    " 
+		szString + #LF$ + "- Small Bug's Fixed in the  Profile    "               
+		szString + #LF$ + "  Editor                               "
+		szString + #LF$ + "- Added 'Single Instance' Option       " 
+		szString + #LF$ + "- Added 'Don't AskMe' Option for       "
+		szString + #LF$ + "  Delete Files                         "
+		szString + #LF$ + "- State Fix in the Password Checkbox   "                  
+		szString + #LF$ + "---------------------------------------"                
+		szString + #LF$ + ""
+		szString + #LF$ + "Version 0.99.1 Beta                    " 
+		szString + #LF$ + "- Fixed Bug in Delete Files            "
+		szString + #LF$ + "  (Allcoate Memory was to small.)      "
+		szString + #LF$ + "- State Fix for Size/Items not Disable "
+		szString + #LF$ + "- Clear File List doesnt Reset the     "
+		szString + #LF$ + "  Password.                            "
+		szString + #LF$ + "---------------------------------------"                
+		szString + #LF$ + ""
+		szString + #LF$ + "Version 0.99.0 Beta                    " 
+		szString + #LF$ + "- Many Design Changes                  "
+		szString + #LF$ + "- FileList Changes                     "
+		szString + #LF$ + "- Add Rename to the Profile Editor     "
+		szString + #LF$ + "---------------------------------------"
+		szString + #LF$ + ""
+		szString + #LF$ + "Version 0.98.8 Alpha                   "
+		szString + #LF$ + "- Extended File Lister, Added Size     "
+		szString + #LF$ + "- Changed Calculate Function           "
+		szString + #LF$ + "- Changed Delete Files in Combination  "
+		szString + #LF$ + "  with Compress all Single Files. 7z   "
+		szString + #LF$ + "  Interleaved Archive does'nt Delete   "
+		szString + #LF$ + "  Use on your own Risk. It's Beta      "
+		szString + #LF$ + "- Added 'Auto Clear File List' in the  "
+		szString + #LF$ + "  Tray icon and File Lister Popupmenu. "
+		szString + #LF$ + "  If not enabled You can Drag'n'drop   "
+		szString + #LF$ + "  from Various HD Locations."                
+		szString + #LF$ + "---------------------------------------"                 
+		szString + #LF$ + ""
+		szString + #LF$ + "Version 0.98.7 Alpha                   "
+		szString + #LF$ + "- Change: Option Splittet, Start With  "
+		szString + #LF$ + "  Windows and Minimized                "
+		szString + #LF$ + "- Request: Added Window Stay On Top on "
+		szString + #LF$ + "  The Tray Icon Menu                   "
+		szString + #LF$ + "- Added: Delete Files after Compressing"
+		szString + #LF$ + "  Use on your own Risk. It's Beta      "
+		szString + #LF$ + "---------------------------------------" 
+		szString + #LF$ + ""
+		szString + #LF$ + "Version 0.98.6 Alpha                   "
+		szString + #LF$ + "- Fixed: Filehandling Issue in         "
+		szString + #LF$ + "  Combination with Directory's /Suffix " 
+		szString + #LF$ + "- Fixed: Start with Windows State Fix  " 
+		szString + #LF$ + "---------------------------------------"                 
+		szString + #LF$ + ""
+		szString + #LF$ + "Version 0.98.4 Alpha                   "
+		szString + #LF$ + "- Added: Reload/Refresh Button on the  "
+		szString + #LF$ + "  Profiles Window                      " 
+		szString + #LF$ + "- Fixed: Missing Refresh State on      " 
+		szString + #LF$ + "  Program Start" 
+		szString + #LF$ + "---------------------------------------"                
+		szString + #LF$ + ""
+		szString + #LF$ + "Version 0.98.3 Alpha                   "
+		szString + #LF$ + "- Fixed: NoSPlit/SplitMode on Profile  "
+		szString + #LF$ + "  Window. Corrected Filename.          " 
+		szString + #LF$ + "- Fixed: Element 'Open File' and 'Size "
+		szString + #LF$ + "  View'. Corrected State Disable/Enable" 
+		szString + #LF$ + "- Few Font Changes!                    "
+		szString + #LF$ + "- Fixed: Small Bug on Password State   "                 
+		szString + #LF$ + "---------------------------------------" 
+		szString + #LF$ + ""
+		szString + #LF$ + "Version 0.98.2 Alpha                   "
+		szString + #LF$ + "- Change: Small Layout Changes         " 
+		szString + #LF$ + "- Added : Checkbox for -ssw            " 
+		szString + #LF$ + "- Change: On The Profile Window        "                   
+		szString + #LF$ + "---------------------------------------" 
+		szString + #LF$ + ""
+		szString + #LF$ + "Version 0.98.1 Alpha                   "
+		szString + #LF$ + "- Change: Detail/Design in the Profile " 
+		szString + #LF$ + "  Window" 
+		szString + #LF$ + "- Added : 7z -ssw Command-Line Switsh  " 
+		szString + #LF$ + "- Added : 7z Default Compression-Types " 
+		szString + #LF$ + "- Fixed : Profile Window, Stay On Top  " 
+		szString + #LF$ + "  Handle" 
+		szString + #LF$ + "---------------------------------------"                 
+		szString + #LF$ + ""
+		szString + #LF$ + "Version 0.97.1 Alpha                   "
+		szString + #LF$ + "- Added : User Option for SplitSize for" 
+		szString + #LF$ + "  Multi-Volumes Archives               " 
+		szString + #LF$ + "- Fixed : Window Handle if Running 7z  " 
+		szString + #LF$ + "- Added : Profile Settings. Save/Store " 
+		szString + #LF$ + "  your Individual Settings" 
+		szString + #LF$ + "---------------------------------------"
+		szString + #LF$ + ""
+		szString + #LF$ + "Version 0.97 Useless                   "
+		szString + #LF$ + "- Change: Design and Layout            " 
+		szString + #LF$ + "- Added : PopupMenu to Filelist Window "  
+		szString + #LF$ + "- Request: Option, 150MB Split Archiv  " 
+		szString + #LF$ + "- Added : Progress Indicator for       " 
+		szString + #LF$ + "  Compress Single Files                " 
+		szString + #LF$ + "- Handle Change if Running 7z          " 
+		szString + #LF$ + "---------------------------------------" 
+		szString + #LF$ + ""
+		szString + #LF$ + "Version 0.96 Useless                   "
+		szString + #LF$ + "- Design and Layout Changes            " 
+		szString + #LF$ + "- Added Option to Split Archives       " 
+		szString + #LF$ + "- Add Missing ToolTip for Destination. " 
+		szString + #LF$ + "- Add Calculate the Size for Dir/Files " 
+		szString + #LF$ + "---------------------------------------"                
+		szString + #LF$ + ""
+		szString + #LF$ + "Version 0.95 Useless                   "
+		szString + #LF$ + "- *First Public Beta Release           " 
+		szString + #LF$ + "***************************************" 
+		szString + #LF$ + ""
+		szString + #LF$ + ""
+		szString + #LF$ + "This software is provided as-is,without"
+		szString + #LF$ + "any express OR implied warranty. In no "
+		szString + #LF$ + "event  will the authors be held liable "
+		szString + #LF$ + "For any  damages  arising from the use "
+		szString + #LF$ + "ofthis software."
+		szString + #LF$ + ""
+		szString + #LF$ + "Permission is granted to anyone to use "
+		szString + #LF$ + "this software for any purpose,including"
+		szString + #LF$ + "commercial applications, and to alter  "
+		szString + #LF$ + "it and redistribute it freely subject to"
+		szString + #LF$ + "the following restrictions:            "
+		szString + #LF$ + ""
+		szString + #LF$ + "1. The origin of this software must not"
+		szString + #LF$ + "be misrepresented; you must not claim  "
+		szString + #LF$ + "original Software.If you use this      "
+		szString + #LF$ + "software  IN  a product,anacknowledgment"
+		szString + #LF$ + "IN the product documentation would be  "
+		szString + #LF$ + "appreciated but is Not required.       "
+		szString + #LF$ + ""
+		szString + #LF$ + "2. Altered source versions must be     "
+		szString + #LF$ + "plainly marked as such,and must not be "
+		szString + #LF$ + "misrepresented as being the original   "
+		szString + #LF$ + "software."
+		szString + #LF$ + ""
+		szString + #LF$ + "3. This notice may Not be removed Or   "   
+		szString + #LF$ + "altered from any source distribution.  "
+		szString + #LF$ + ""
+		szString + #LF$ + "4. This software uses Not part of source"
+		szString + #LF$ + "code of 7z.7zip is subject To the rules"
+		szString + #LF$ + "of the GNU LGPL + unRAR restriction.   "
+		szString + #LF$ + "The copyright is owned by Igor Pavlov  "
+		szString + #LF$ + "And Alexander Roshal (unRAR)."
+		szString + #LF$ + ""
+		szString + #LF$ + "This software is intended only As Drag "
+		szString + #LF$ + "and Drop frontend for 7z. Do You have  " 
+		szString + #LF$ + "Problems With this software? Mail me   "
+		szString + #LF$ + ""
+		szString + #LF$ + "FF? ... Fast Fertig ..................."        
+		ProcedureReturn szString
+	EndProcedure	
 EndModule
 ; IDE Options = PureBasic 5.73 LTS (Windows - x64)
-; CursorPosition = 185
-; FirstLine = 152
-; Folding = --
+; CursorPosition = 369
+; FirstLine = 292
+; Folding = f0
 ; EnableAsm
 ; EnableXP
 ; UseMainFile = ..\Drop7z.pb

@@ -71,7 +71,7 @@ Module GUI00
 		
 		;
 		; Dateiname Im Hintegrund wenn Drop7z am Packen ist
-		TextGadget(DC::#String_005,94, 28, 394, 16, "")
+		TextGadget(DC::#String_005,94, 28, 394, 17, "")
 		SetGadgetColor(DC::#String_005, #PB_Gadget_FrontColor,RGB(0, 175, 255))
 		SetGadgetColor(DC::#String_005, #PB_Gadget_BackColor,RGB(82,82,82))
 		SetGadgetFont(DC::#String_005, FontID(Fonts::#_SEGOEUI10N))     	
@@ -80,7 +80,7 @@ Module GUI00
 		
 		;
 		; String für die Dateinamen
-		StringGadget(DC::#String_001, 90, 28, 398, 16, "", #PB_String_BorderLess)
+		StringGadget(DC::#String_001, 90, 28, 398, 17, "", #PB_String_BorderLess)
 		SetGadgetColor(DC::#String_001, #PB_Gadget_BackColor,RGB(82,82,82))
 		SetGadgetColor(DC::#String_001, #PB_Gadget_FrontColor,RGB(225,225,226))
 		SetGadgetFont(DC::#String_001, FontID(Fonts::#_SEGOEUI10N))   
@@ -303,8 +303,8 @@ Module GUI04
 EndModule
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x64)
-; CursorPosition = 58
-; FirstLine = 24
+; CursorPosition = 82
+; FirstLine = 33
 ; Folding = --
 ; EnableAsm
 ; EnableXP

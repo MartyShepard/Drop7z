@@ -150,7 +150,34 @@ Module UnRAR
 		RARGetDllVersion      = GetFunction(DLL, "RARGetDllVersion")
 	EndIf
 		
-	
+	Procedure Volume_Progress(ArcName.s)
+		Protected.s szExtension, szPart
+		
+		CompilerIf #PB_Compiler_IsMainFile
+
+			
+		CompilerElse
+		
+		If IsGadget( DC::#Frame_006 )
+			
+			szExtension = GetExtensionPart( ArcName )
+			
+			If ( FindString( ArcName, ".part" ) > 0 )
+				szPart = GetFilePart	 ( ArcName, #PB_FileSystem_NoExtension)
+				szPart = GetExtensionPart( szPart )			
+				szPart = ReplaceString( szPart, "part", "")
+				szPart = RSet( szPart, 3, "0")
+				szExtension = szPart															
+			EndIf
+			
+			SetGadgetText( DC::#Frame_006, szExtension )
+		EndIf	
+		
+		CompilerEndIf
+	EndProcedure
+	;
+	;
+	;
 	Procedure Callback(msg, UserData, P1, P2)
 		Protected Result.i
 
@@ -187,6 +214,10 @@ Module UnRAR
 					Case 1
 						;
 						; OK Found
+						Volume_Progress( PeekS(P1, -1, #PB_Ascii) )
+						CompilerIf #PB_Compiler_IsMainFile
+							Debug "A: " + Chr(34) + PeekS(P1, -1, #PB_Ascii) + Chr(34)
+						CompilerEndIf
 				EndSelect
 			Case #UCM_CHANGEVOLUMEW
 				Select P2
@@ -197,7 +228,11 @@ Module UnRAR
 						EndIf						
 					Case 1
 						;
-						; OK Found	
+						; OK Found
+						Volume_Progress( PeekS(P1, -1, #PB_Ascii) )
+						CompilerIf #PB_Compiler_IsMainFile
+							Debug "B: " + Chr(34) + PeekS(P1, -1, #PB_Ascii) + Chr(34)
+						CompilerEndIf
 				EndSelect
 				
 		
@@ -331,9 +366,11 @@ Module UnRAR
 					szFilename + PeekS( @rarheader\FileNameW[i], 1)					
 				Next			
 				
-				If Len( szFilename ) > 0
-					Debug "UnRAR Module - Extract File " + szFilename
-				EndIf	
+				CompilerIf #PB_Compiler_IsMainFile				
+					If Len( szFilename ) > 0					
+						Debug "UnRAR Module - Extract File " + szFilename
+					EndIf	
+				CompilerEndIf
 				
 				If ( IsGadget( szGadgetID ) And Len( szFilename ) > 0 )
 					UnCompressSetInfo(szFilename, szGadgetID, szGadgetID_With)					
@@ -353,13 +390,13 @@ EndModule
 
 CompilerIf #PB_Compiler_IsMainFile
 	
-	Debug UnRar::RARUnpackArchiv("B:\Sortet\AVSRUTH.001", "B:\TestPack\" )
+	Debug UnRar::RARUnpackArchiv("D:\System Down\Mods\Succubus Demons of the Past-CODEX\Succubus.Demons.of.the.Past-CODEX.part1.rar", "B:\TestPack\" )
 	
 CompilerEndIf	
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x64)
-; CursorPosition = 132
-; FirstLine = 101
-; Folding = f-
+; CursorPosition = 174
+; FirstLine = 129
+; Folding = -4-
 ; EnableAsm
 ; EnableXP

@@ -62,15 +62,15 @@
 		MenuBar()   
 		MenuItem(60, "Ziel Verzeichnis Pinnen") 
 		MenuBar()   		
-		MenuItem(75, "Konvertieren <-> Entpacken")    		
+		MenuItem(75, "Konvertieren <-> Entpacken")
+		MenuItem(74, "Unterverzeichnis Entpacken")  		
 		MenuBar()         
 		OpenSubMenu("Konvert./ Entpack: Optionen")      
 		MenuItem(72, "Behandle *.exe als Sfx7z")              
 		MenuItem(70, "Behandle *.exe als SfxRAR")
 		MenuItem(71, "Behandle *.exe als SfxZIP")            
 		MenuBar()            
-		MenuItem(73, "Temp Verzeichnis Löschen")
-		MenuItem(74, "Unterverzeichnis Entpacken")            
+		MenuItem(73, "Temp Verzeichnis Löschen")          
 		;MenuItem(74, "Move ZIP Problems")                  
 		CloseSubMenu()                          
 		MenuBar()            
@@ -457,8 +457,8 @@
 		CFG::WriteConfig(CFG::*Config): CFG::ReadConfig(CFG::*Config): DropSYSF::Process_FreeRam()
 	EndProcedure
 ; IDE Options = PureBasic 5.73 LTS (Windows - x64)
-; CursorPosition = 66
-; FirstLine = 31
+; CursorPosition = 65
+; FirstLine = 42
 ; Folding = -
 ; EnableAsm
 ; EnableXP

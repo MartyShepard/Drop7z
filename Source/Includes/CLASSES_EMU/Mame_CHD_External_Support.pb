@@ -308,7 +308,7 @@ Module CHD
         Protected H.i = 276
         Protected W.i = 480
         Protected F.l = FontID(Fonts::#_FIXPLAIN7_12)
-        Protected t.l = FontID(Fonts::#_DROIDSANS_11)
+        Protected t.l = FontID(Fonts::#_FIXPLAIN7_12)
         MonitorInfo\cbSize = SizeOf(MonitorInfo)
         
 		GetMonitorInfo_(DesktopEX::MonitorInfo_Display_GetPrimary(DC::#_Window_001), @MonitorInfo)
@@ -2036,8 +2036,8 @@ Module CHD
 EndModule
     
 ; IDE Options = PureBasic 5.73 LTS (Windows - x64)
-; CursorPosition = 1853
-; FirstLine = 1541
+; CursorPosition = 310
+; FirstLine = 282
 ; Folding = zv--BgGM8-
 ; EnableAsm
 ; EnableXP

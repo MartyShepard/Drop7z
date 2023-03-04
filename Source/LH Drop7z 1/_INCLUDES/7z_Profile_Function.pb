@@ -589,11 +589,15 @@ EndProcedure
 
 
 Procedure OpenWindow_500(x = 0, y = 0, width = 346, height = 358)
-	OpenWindow(DC::#_Window_002, x, y, width, height, "", #PB_Window_SystemMenu | #PB_Window_Invisible | #PB_Window_Tool | #PB_Window_ScreenCentered)
+	OpenWindow(DC::#_Window_002, x, y, width, height, "", #PB_Window_SystemMenu | #PB_Window_Invisible | #PB_Window_Tool | #PB_Window_ScreenCentered, WindowID(DC::#_Window_001))
 EndProcedure
 ;/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ;/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 Procedure.s Open_Profile() 
+	
+	Protected.l FontID
+	
+	FontID.l   = Fonts::#_FIXPLAIN7_12
 	
 	Profile_Current.s = GetGadgetText(DC::#Text_003)
 	OpenWindow_500():
@@ -604,10 +608,10 @@ Procedure.s Open_Profile()
 	ImageGadget(DC::#ImageGadget_003,0, 0, 346, 356,ImageID(#_BCK_T01))
 	DisableGadget(DC::#ImageGadget_003, #True)
 	
-	TextGadget(DC::#Text_001, 23, 21, 140, 16, "  Custom Profiles Settings")
+	TextGadget(DC::#Text_001, 23, 21, 200, 16, "  Custom Profiles Settings")
 	SetGadgetColor(DC::#Text_001, #PB_Gadget_FrontColor,RGB(0, 175, 255))
 	SetGadgetColor(DC::#Text_001, #PB_Gadget_BackColor,RGB(82,82,82))
-	SetGadgetFont (DC::#Text_001, FontID(Fonts::#_SEGOEUI09N))
+	SetGadgetFont (DC::#Text_001, FontID(FontID) )
 	
 	FrameGadget(DC::#Frame_003, 6, 6, 334, 346, "", #PB_Frame_Flat)
 	FrameGadget(DC::#Frame_004, 20, 80, 192, 180, "", #PB_Frame_Flat)
@@ -782,8 +786,8 @@ Procedure.s Open_Profile()
 	CloseWindow(DC::#_Window_002) 
 EndProcedure 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x64)
-; CursorPosition = 409
-; FirstLine = 372
+; CursorPosition = 610
+; FirstLine = 579
 ; Folding = ---
 ; EnableAsm
 ; EnableXP
