@@ -22,4 +22,7 @@ F3atureS
 
 Code : Marty Shepard      
 Icon : Rob2Seven (RIP)
+
 UnLZX: Help from Infratec (Changes, Adjusting, help)
+
+Done in Purebasic 5.73 LTS .. credits go to Fred
