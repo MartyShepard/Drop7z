@@ -1,22 +1,23 @@
 ﻿
 
-Procedure Event_GadgetEx_Events()
+Procedure.i Event_GadgetEx_Events()
 	Select EventGadget()
 			
 			
 			;**********************************************************************************************************************    
 		Case DC::#Button_001    
 			Select BUTTONEX::ButtonExEvent(DC::#Button_001)  
-				Case BUTTONEX::#ButtonGadgetEx_Entered:  
-					
+				Case BUTTONEX::#ButtonGadgetEx_Entered  					
 				Case BUTTONEX::#ButtonGadgetEx_Released
-				Case BUTTONEX::#ButtonGadgetEx_Pressed:       _Exit_Win():End
+				Case BUTTONEX::#ButtonGadgetEx_Pressed
+					_Exit_Win()
+					ProcedureReturn -1
 			EndSelect  
 			
 			;**********************************************************************************************************************    
 		Case DC::#Button_002    
 			Select BUTTONEX::ButtonExEvent(DC::#Button_002)  
-				Case BUTTONEX::#ButtonGadgetEx_Entered:
+				Case BUTTONEX::#ButtonGadgetEx_Entered
 					
 				Case BUTTONEX::#ButtonGadgetEx_Released
 				Case BUTTONEX::#ButtonGadgetEx_Pressed      ; BUTTONEX::SetState(DC::#Button_002,0):_Clear_FileList()
@@ -199,8 +200,7 @@ EndProcedure
 
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x64)
-; CursorPosition = 41
-; FirstLine = 9
+; CursorPosition = 2
 ; Folding = -
 ; EnableAsm
 ; EnableXP

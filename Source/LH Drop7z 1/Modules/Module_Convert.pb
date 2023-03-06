@@ -29,6 +29,7 @@ Module DropVert
 		PrgFlag.l
 		ExError.i  
 		StError.s
+		ResultMax.i		
 		Archivname.s
 		sz7zArchiv.s    ; The 7zArchiv
 		szTempFile.s    ; File to hold the List
@@ -48,7 +49,6 @@ Module DropVert
 		bForceBreak.i
 		exitCodeHi.i
 		exitCodeLo.i
-		ResultMax.i
 		ContinueOnError.i
 		ProgressCountFiles.i
 		rect.RECT
@@ -144,36 +144,68 @@ Module DropVert
 	;
 	;
 	; 
-	Procedure.i FileExists(*P.PROGRAM_BOOT)
-		
+	Procedure.i FileExists(szPackedFile.s)
 		; Check For File Exists		    
-		Protected szMsgNote$
+		Protected.s szMsgNote, szArchivFile
+		Protected.b Result
 		
-		If FileSize( *P\DstPath + *P\sz7zArchiv  ) >= 0
-			
-			szMsgNote$  = GetFilePart( *P\DstPath + *P\sz7zArchiv ) + #CR$ + DropLang::GetUIText(33) 
-			
-			Request::*MsgEx\User_BtnTextL = DropLang::GetUIText(34) 
-			Request::*MsgEx\User_BtnTextM = DropLang::GetUIText(35) 
-			Request::*MsgEx\User_BtnTextR = DropLang::GetUIText(36)  
-			
-			Select Request::MSG( DropLang::GetUIText(20), DropLang::GetUIText(32) , szMsgNote$, 16, 1, ProgramFilename(), 0, 0, DC::#_Window_001)
-					;
-					; Akualsieren
-				Case 2: ProcedureReturn 0    
-					;
-					; Abbruch
-				Case 1: ProcedureReturn 1
-					;
-					; Überschreiben
-				Case 0:
-					If ( FileSize(   *P\DstPath + *P\sz7zArchiv  ) >= 0 )
-						DeleteFile(  *P\DstPath + *P\sz7zArchiv  )
-						Delay(1000)
+		szArchivFile = szPackedFile
+		
+		If FileSize(szArchivFile ) >= 0
+
+			szMsgNote  = DropLang::GetUIText(32) + ": " + GetFilePart( szArchivFile ) + #CRLF$ + "...?"
+
+			Result = MessageBoxExt::Show(DC::#_Window_001		, 
+			                             DropLang::GetUIText(20)  ,
+			                             szMsgNote			,
+			                             #MB_YESNO			,
+			                             #MB_USERICON  |
+			                             #MB_DEFBUTTON1|
+			                             #MB_TASKMODAL		,
+			                             145				, ; #ID from Shell32 Dll
+			                             "Ersetzen"	,
+			                             " Weiter "	,
+			                             ""				,
+			                             "shell32.dll"		,
+			                             Fonts::#_DEJAVU_08	)
+			Select Result
+				Case 7
+					 ProcedureReturn 0    
+				Case 6
+					If ( FileSize(  szArchivFile  ) >= 0 )
+						DeleteFile(  szArchivFile , #PB_FileSystem_Force)
 					EndIf
-					ProcedureReturn 0
-			EndSelect 		
-		EndIf
+					ProcedureReturn 0	
+				Default
+					ProcedureReturn 1
+			EndSelect
+					
+		; 		If FileSize( *P\DstPath + *P\sz7zArchiv  ) >= 0
+		; 			
+		; 			szMsgNote$  = GetFilePart( *P\DstPath + *P\sz7zArchiv ) + #CR$ + DropLang::GetUIText(33) 
+		; 			
+		; 			Request::*MsgEx\User_BtnTextL = DropLang::GetUIText(34) 
+		; 			Request::*MsgEx\User_BtnTextM = DropLang::GetUIText(35) 
+		; 			Request::*MsgEx\User_BtnTextR = DropLang::GetUIText(36)  
+		; 			
+		; 			Select Request::MSG( DropLang::GetUIText(20), DropLang::GetUIText(32) , szMsgNote$, 16, 1, ProgramFilename(), 0, 0, DC::#_Window_001)
+		; 					;
+		; 					; Akualsieren
+		; 				Case 2: ProcedureReturn 0    
+		; 					;
+		; 					; Abbruch
+		; 				Case 1: ProcedureReturn 1
+		; 					;
+		; 					; Überschreiben
+		; 				Case 0:
+		; 					If ( FileSize(   *P\DstPath + *P\sz7zArchiv  ) >= 0 )
+		; 						DeleteFile(  *P\DstPath + *P\sz7zArchiv  )
+		; 						Delay(1000)
+		; 					EndIf
+		; 					ProcedureReturn 0
+		; 			EndSelect 	
+		EndIf		
+		
 		
 	EndProcedure
 	;
@@ -1149,32 +1181,90 @@ Module DropVert
 	;
 	;
 	;
-	;
-	;
-	;
-	Procedure 	UnCompressZIP(*P.PROGRAM_BOOT, pbPackerPlugin.i)
-		Protected.i PackData, Result, SizeLocal, SizePacked, PackType, SizeUnPacked, u, FileAttribute.i
-		Protected.s szFilePack, szDirectory, szPackedFile, szUnPackedFile, szUnicode, Infotext, szNumbering
+	Procedure.b UnCompressZIP_ErrorMessage(*P.PROGRAM_BOOT, szUnPackedFile.s, szPackedFile.s, SizeUnPacked.i, Result.i)
+		Protected.s szMsgNote
+		Protected.b MsgResult
+		szMsgNote = "" 
+		
+		szMsgNote + "Archiv Datei:"
+		szMsgNote +  #CRLF$ + #CRLF$								               											               
+		szMsgNote +  GetFilePart( *P\ConvertResult()\File , #PB_FileSystem_NoExtension) + ":" + szPackedFile										               
+		szMsgNote +  #CRLF$ + #CRLF$						
+		
+		If FileSize( szUnPackedFile ) > 4096								
+			szMsgNote + "Datenfehler: Geschrieben" + Str( FileSize( szUnPackedFile ) ) + " von " + Str( SizeUnPacked )						               
 			
-		AddElement( *P\ConvertResult() ) 
-
-		*P\ConvertResult()\File 		= *P\Collection() 
-		*P\ConvertResult()\FileCount 	= 0
+		Else			
+			szMsgNote + "Kann nicht Entpackt werden (Result " + Str(Result) + ")"
+			
+		EndIf
+			
+		szMsgNote + #CRLF$ + #CRLF$           
+		szMsgNote + "Den Entpack Prozess für diese Datei stoppen?"			
+		
+		MsgResult = MessageBoxExt::Show(DC::#_Window_001		, 
+		                                 DropLang::GetUIText(20)  ,
+		                                 szMsgNote			,
+		                                 #MB_YESNO			,
+		                                 #MB_USERICON  |
+		                                 #MB_DEFBUTTON1|
+		                                 #MB_TASKMODAL		,
+		                                 54				, ; #ID from Shell32 Dll
+		                                 "Weiter"	,
+		                                 "Stoppen"	,
+		                                 ""				,
+		                                 "shell32.dll"		,
+		                                 Fonts::#_FIXPLAIN7_12	)		
+		
+		ProcedureReturn MsgResult
+	EndProcedure
+	;
+	;
+	;
+	Procedure UncompressAttribute(szUnPackedFile.s)
+		Protected.i FileAttribute
+		
+		FileAttribute = GetFileAttributes(szUnPackedFile)
+		Select FileAttribute
+			Case #PB_FileSystem_Hidden     : Debug "Attribute: Datei ist versteckt"
+			Case #PB_FileSystem_Archive    : Debug "Attribute: Datei wurde geändert und nicht archiviert seit dem letzten Mal"
+			Case #PB_FileSystem_Compressed : Debug "Attribute: Datei ist komprimiert"
+			Case #PB_FileSystem_Normal     : Debug "Attribute: Normale Attribute"
+			Case #PB_FileSystem_ReadOnly   : Debug "Attribute: Datei ist im ReadOnly Modus (schreibgeschützt)"
+			Case #PB_FileSystem_System     : Debug "Attribute: Datei ist eine Systemdatei"
+		EndSelect		
+		ProcedureReturn FileAttribute		
+		
+	EndProcedure
+	;	
+	;
+	;
+	Procedure.i UncompressPrepare(*P.PROGRAM_BOOT)	
+		
+		*P\ConvertResult()\File 	  = *P\Collection() 
+		*P\ConvertResult()\FileCount 	  = 0
 		*P\ConvertResult()\MismtachSize = 0
 		*P\ConvertResult()\MisMatchFile = 0
 		*P\ConvertResult()\MisMatchZero = 0	
-		*P\ContinueOnError		  = 0
-		*P\Archivname  			= GetGadgetText(DC::#String_002)  + GetFilePart( *P\ConvertResult()\File , #PB_FileSystem_NoExtension)
+		*P\ContinueOnError		  = 0		
+		
+	EndProcedure		
+	;	
+	;
+	;
+	Procedure.s UncompressSet_DestDirectory(*P.PROGRAM_BOOT)
+		
+		Protected.s  szNumbering, szDirectory 
 		
 		szDirectory    			= GetPathPart( *P\ConvertResult()\File  )
-				
+		
 		If ( CFG::*Config\UnPackOnly = #False)
 			szDirectory	+ "_[TEMP" + Str( Random(999999,000001) ) + "]\"
 		Else			
 			
 			If ( CFG::*Config\UnpackInSubDirectory = #True )
 				szDirectory + GetFilePart( *P\ConvertResult()\File , #PB_FileSystem_NoExtension)
-								
+				
 				If ( FileSize( szDirectory ) = -2 )				
 					For u = 0 To 999
 						szNumbering = ""
@@ -1187,15 +1277,48 @@ Module DropVert
 					Next
 				EndIf
 			EndIf
-		EndIf
-			
+		EndIf		
+		ProcedureReturn szDirectory
+	EndProcedure	
+	;	
+	;
+	;
+	Procedure.s UncompressSet_ArchivName(*P.PROGRAM_BOOT)		
+		ProcedureReturn GetGadgetText(DC::#String_002)  + GetFilePart( *P\ConvertResult()\File , #PB_FileSystem_NoExtension)
+	EndProcedure
+	;	
+	;
+	;
+	Procedure.i UnCompressZIP_DebugInfo(szPackedFile.s, SizeUnPacked.i, PackType.i)
 		
-		*P\DstPath = szDirectory ; Lösche das _xxxx Temp Verzeichnis
+		Debug "Pack Name: " + Chr(34) + szPackedFile + Chr(34) +#CRLF$ + " [ Size UnCompress: " + RSet( Str( SizeUnPacked ), 12, " ") +  #TAB$ + " ] [ Pack Type = " + Str( PackType ) + " ]"+#CRLF$	
+		
+	EndProcedure		
+	;	
+	;
+	;	
+	Procedure 	UnCompressZIP(*P.PROGRAM_BOOT, pbPackerPlugin.i)
+		Protected.i PackData, Result, SizeLocal, SizePacked, PackType, SizeUnPacked, u, FileAttribute.i;, ProgressBarOldValue.i, ProgressBarOldMaxim.i
+		Protected.s szFilePack, szDirectory, szPackedFile, szUnPackedFile, szUnicode, Infotext, szNumbering
+			
+		AddElement( *P\ConvertResult() ) 
+
+		UncompressPrepare(*P)
+		
+		*P\Archivname  = UncompressSet_ArchivName(*P)		
+		szDirectory    = UncompressSet_DestDirectory(*P)				
+					
+		*P\DstPath     = szDirectory 	; Lösche später das _xxxx Temp Verzeichnis
 		
 		If ( Right( szDirectory, 1) <> "\" )
 			szDirectory + "\"
 		EndIf	
-		
+		;
+		;
+		; Todo Progress Bar
+		; ProgressBarOldValue = GetGadgetState(DC::#Progress_001)
+		; ProgressBarOldMaxim = GetGadgetAttribute(DC::#Progress_001, #PB_ProgressBar_Maximum )
+				
 		PackData = OpenPack(#PB_Any, *P\ConvertResult()\File  , pbPackerPlugin )
 		If ( PackData > 0 )
 			
@@ -1206,6 +1329,7 @@ Module DropVert
 			EndSelect 
 			
 			If ExaminePack(PackData)
+
 				While NextPackEntry(PackData)			
 					
 					SizeUnPacked  = -1
@@ -1225,20 +1349,12 @@ Module DropVert
 						Continue
 					EndIf	
 					
-	
-						
-					Debug "Pack Name: " + Chr(34) +szPackedFile + Chr(34) +#CRLF$ +
-					      " [ Size UnCompress: " + RSet( Str( SizeUnPacked ), 12, " ") +  #TAB$ +
-					     ; " | Size Compressed: " + RSet( Str( SizePacked   ), 12, " ") + #TAB$ +
-					      " ] [ Pack Type = " + Str( PackType ) + " ]"+#CRLF$			
-										
+					UnCompressZIP_DebugInfo(szPackedFile, SizeUnPacked, PackType)
 					;
 					; Problem mit Unicode behandlung
 					
 					szPackedFile 	= Char_Check(szPackedFile,*P)
-																										
 					szUnPackedFile 	= szDirectory + szPackedFile	
-					
 					szUnPackedFile 	= UnCompressZIP_GenerateDirs(szUnPackedFile)
 														
 					;
@@ -1252,36 +1368,33 @@ Module DropVert
 							EndSelect 
 							
 							Continue
-						Default
-							
-						
+						Default													
 					EndSelect					
 					
 					UnCompressSetInfo(*P,szPackedFile)
-					
-					
-					FileAttribute = GetFileAttributes(szUnPackedFile)
-					Select FileAttribute
-						Case #PB_FileSystem_Hidden     : Debug "Attribute: Datei ist versteckt"
-						Case #PB_FileSystem_Archive    : Debug "Attribute: Datei wurde geändert und nicht archiviert seit dem letzten Mal"
-						Case #PB_FileSystem_Compressed : Debug "Attribute: Datei ist komprimiert"
-						Case #PB_FileSystem_Normal     : Debug "Attribute: Normale Attribute"
-						Case #PB_FileSystem_ReadOnly   : Debug "Attribute: Datei ist im ReadOnly Modus (schreibgeschützt)"
-						Case #PB_FileSystem_System     : Debug "Attribute: Datei ist eine Systemdatei"
-					EndSelect
 
+					If ( FileExists( szUnPackedFile ) = 1 )
+						Continue
+					EndIf
+					
+					UncompressAttribute(szUnPackedFile)
+					
+					;
+					;
+					;
+					; Progress Bar ... mal sehen
+					; SetGadgetAttribute(DC::#Progress_001, #PB_ProgressBar_Maximum,  SizeUnPacked)
+					; SetGadgetAttribute(DC::#Progress_001, #PB_ProgressBar_Minimum,  0)
+					; SendMessage_(GadgetID(DC::#Progress_001), #PBM_STEPIT, 0, 0)
+					
 					Result = UncompressPackFile( PackData , szUnPackedFile)
-					If ( Result >= 0)
-						
-						;Repeat 
-						;	Delay( 5 )
-						;Until ( FileSize(szUnPackedFile) > 0 )
+					If ( Result >= 0)						
 						;
 						; Do a CFile Check heck
 						SizeLocal = FileSize( szUnPackedFile )
+						
 						*P\ConvertResult()\FileCount + 1
-						
-						
+												
 						If ( SizeLocal <> SizeUnPacked )
 							*P\ConvertResult()\MismtachSize = 1
 							;
@@ -1302,74 +1415,44 @@ Module DropVert
 						EndIf						
 					Else
 						*P\ConvertResult()\MisMatchFile + 1
-						bMsgResult = MessageRequester( "ERROR", "Archiv Datei:  "  + #CRLF$ + #CRLF$ +
-						                           Chr(34) +  GetFilePart( *P\ConvertResult()\File , #PB_FileSystem_NoExtension) + ":" + szPackedFile + Chr(34) + #CRLF$ +
-						                           "Kann nicht verarbeitet werden" + #CRLF$ + #CRLF$ + "( Result = " + Str(Result) + ")" + #CRLF$ +
-						                           "Den Konvertierungs Prozess für diese Datei stoppen?",#PB_MessageRequester_Error|#PB_MessageRequester_YesNo )
-						;
-						; FEHLER In DER DATEI LÄNGE 
-						;Debug "ENTPACK FEHLER ON FILE " + *P\ConvertResult()\File 
 						
-						If ( #PB_MessageRequester_Yes = bMsgResult )
+						If ( UnCompressZIP_ErrorMessage( *P, szUnPackedFile, szPackedFile, SizeUnPacked, Result) = 7)
 							*P\ContinueOnError = 1
 							Break;
 						EndIf	
 					EndIf
-					;Delay( 10 )
-					;DropSYSF::Process_FreeRam()
 				Wend
 			Else
 				*P\ConvertResult()\MisMatchZero = 1
 			EndIf
 			ClosePack(PackData)
-			
-
 		Else
 			; ERRROR
 		EndIf
 		
+		;
+		;
+		;
+		; Progress Bar ... mal sehen
+		; SetGadgetAttribute(DC::#Progress_001, #PB_ProgressBar_Maximum,  ProgressBarOldMaxim)
+		; SetGadgetAttribute(DC::#Progress_001, #PB_ProgressBar_Minimum,  0)
+		; SetGadgetState(DC::#Progress_001, ProgressBarOldValue)
 		
 	EndProcedure
 	;
 	;
 	;
 	Procedure 	UnCompressRAR(*P.PROGRAM_BOOT)
-		Protected.s szDirectory, szNumbering
+		Protected.s szDirectory
 		Protected.i Result
 
 		
 		AddElement( *P\ConvertResult() ) 
 
-		*P\ConvertResult()\File 		= *P\Collection() 
-		*P\ConvertResult()\FileCount 	= 1
-		*P\ConvertResult()\MismtachSize = 0
-		*P\ConvertResult()\MisMatchFile = 0
-		*P\ConvertResult()\MisMatchZero = 0	
+		UncompressPrepare(*P)
 		
-		*P\Archivname  			= GetGadgetText(DC::#String_002)  + GetFilePart( *P\ConvertResult()\File , #PB_FileSystem_NoExtension)
-		szDirectory    			= GetPathPart( *P\ConvertResult()\File  ) 
-
-		
-		If ( CFG::*Config\UnPackOnly = #False)
-			szDirectory	+ "_[TEMP" + Str( Random(999999,000001) ) + "]\"
-		Else			
-			
-			If ( CFG::*Config\UnpackInSubDirectory = #True )
-				szDirectory + GetFilePart( *P\ConvertResult()\File , #PB_FileSystem_NoExtension)
-								
-				If ( FileSize( szDirectory ) = -2 )				
-					For u = 0 To 999
-						szNumbering = ""
-						szNumbering = szDirectory + "_["+RSet( Str(u), 3, "0") +"]"
-						
-						If ( FileSize( szNumbering ) ! -2 )
-							szDirectory = szNumbering
-							Break;
-						EndIf
-					Next
-				EndIf
-			EndIf
-		EndIf
+		*P\Archivname  = UncompressSet_ArchivName(*P)		
+		szDirectory    = UncompressSet_DestDirectory(*P)
 		
 		If ( Right( szDirectory, 1) <> "\" )
 			szDirectory + "\"
@@ -1380,6 +1463,8 @@ Module DropVert
 		Debug "UnRAR Result: " + Str( Result )
 		If Result = 0
 			*P\ConvertResult()\MisMatchFile + 1
+		Else
+			*P\ConvertResult()\FileCount    + 1
 		EndIf	
 		
 		*P\DstPath = szDirectory ; Lösche das _xxxx Temp Verzeichnis
@@ -1393,40 +1478,14 @@ Module DropVert
 	Procedure 	UnCompressLZX(*P.PROGRAM_BOOT)
 		
 		Define *LzxMemory
-		Protected.s szDirectory, szNumbering
+		Protected.s szDirectory
 		Protected.i Result, ListCount
 		AddElement( *P\ConvertResult() ) 
 		
-		*P\ConvertResult()\File 		= *P\Collection() 
-		*P\ConvertResult()\FileCount 	= 0
-		*P\ConvertResult()\MismtachSize = 0
-		*P\ConvertResult()\MisMatchFile = 0
-		*P\ConvertResult()\MisMatchZero = 0	
+		UncompressPrepare(*P)
 		
-		*P\Archivname  			= GetGadgetText(DC::#String_002)  + GetFilePart( *P\ConvertResult()\File , #PB_FileSystem_NoExtension)						
-		szDirectory    			= GetPathPart( *P\ConvertResult()\File  )
-		
-		
-		If ( CFG::*Config\UnPackOnly = #False)
-			szDirectory	+ "_[TEMP" + Str( Random(999999,000001) ) + "]\"
-		Else			
-			
-			If ( CFG::*Config\UnpackInSubDirectory = #True )
-				szDirectory + GetFilePart( *P\ConvertResult()\File , #PB_FileSystem_NoExtension)
-								
-				If ( FileSize( szDirectory ) = -2 )				
-					For u = 0 To 999
-						szNumbering = ""
-						szNumbering = szDirectory + "_["+RSet( Str(u), 3, "0") +"]"
-						
-						If ( FileSize( szNumbering ) ! -2 )
-							szDirectory = szNumbering
-							Break;
-						EndIf
-					Next
-				EndIf
-			EndIf
-		EndIf
+		*P\Archivname  = UncompressSet_ArchivName(*P)		
+		szDirectory    = UncompressSet_DestDirectory(*P)
 		
 		If ( Right( szDirectory, 1) <> "\" )
 			szDirectory + "\"
@@ -1523,10 +1582,11 @@ Module DropVert
 	;	
 	Procedure   UncompressCheck(*P.PROGRAM_BOOT)	
 		Protected CheckArchive.s
-		
+						
 		Select UCase( GetExtensionPart( *P\Collection() ) )
 			Case "EXE"; Try this with ZIP, RAR or 7z									
 				
+
 				If ( CFG::*Config\HandleExeAsRAR )
 					UnCompressRAR(*P)	
 					
@@ -1558,7 +1618,7 @@ Module DropVert
 				Select CheckArchive
 					Case "RAR", "RARSFX"
 						UnCompressRAR(*P)	
-					Case "ZIP"															
+					Case "ZIP", "ZIPSFX"															
 						UnCompressZIP(*P, #PB_PackerPlugin_Zip)	
 					Case "S7ZSFX"
 						UnCompressZIP(*P, #PB_PackerPlugin_Lzma)
@@ -1615,8 +1675,8 @@ Module DropVert
 				*P\HiProcess        = 0
 				*P\ulMutex          = 0
 				*P\ulThread         = 0
-				
-				SetWindowTitle(DC::#_Window_001," Extrahiere Archiv ... Bitte warten ....")   
+						
+				SetWindowTitle(DC::#_Window_001," Extrahiere Archiv ... " + ArchiveCheck::szVersionsString)   
 				
 				SetGadgetText(DC::#Frame_006, UCase(GetExtensionPart( *P\Collection() ) ) )
 				
@@ -1662,10 +1722,10 @@ Module DropVert
 				; Aktualsiere Gegebenfalls das Text Gadget
 				FileSuffix(*P)                    
 				
-				; Überprüfe ob die Datei existiert  
-				If ( FileExists( *P ) = 1 )
-					ProcedureReturn 1
-				EndIf                    
+				; Überprüfe ob die Datei existiert  (Konvertierungs Modus)
+				;If ( FileExists( *P ) = 1 )
+				;	ProcedureReturn 1
+				;EndIf                    
 				
 				; Multivolume Archiv Check
 				If ( zArchiv_MultiVolume(*P) = 1 )
@@ -1826,13 +1886,14 @@ Module DropVert
 	;
 	;
 	Procedure.i	MessageRequester_Show(*P.PROGRAM_BOOT, Option.i = 0, szString.s = "")
+		Protected szUnknownString.s
 		
 		Select Option
 			Case 1				
 				Result = Request::MSG(DropLang::GetUIText(20), "ReCompress", "7z Archiv Neu Komprimieren und überschreiben?",11,-1,"",0,0,DC::#_Window_001 )
 				
 			Case 2				
-				Request::MSG(DropLang::GetUIText(20), "Archiv Identifikation", "Archiv "+ Chr(34) +GetFilePart( *P\Collection() ) + Chr(34) + " Identifziert als " + szString,2,-1,"",0,0,DC::#_Window_001 )	
+				Request::MSG(DropLang::GetUIText(20), "Archiv Ident: [ " + ArchiveCheck::szVersionsString + " ]", "Archiv "+ Chr(34) +GetFilePart( *P\Collection() ) + Chr(34) + " Identifziert als " + szString,2,1,"",0,0,DC::#_Window_001 )	
 				
 			Case 3
 				Result = Request::MSG(DropLang::GetUIText(20), "Archiv Existiert", "Archiv "+GetFilePart( *P\Collection() , #PB_FileSystem_NoExtension) + ".7z Überschreiben?",11,-1,"",0,0,DC::#_Window_001 )
@@ -1840,28 +1901,46 @@ Module DropVert
 			Case 4
 				Request::*MsgEx\User_BtnTextL = "Weiter"
 				Request::*MsgEx\User_BtnTextR = "Abbruch" 				
-				Result = Request::MSG(DropLang::GetUIText(20), "RAR. DLL Not Found", "Rar benötigt die "+ Chr(34) + GetFilePart( szString ) + Chr(34) + " im DropZ Verzeichnis " + GetPathPart( szString ),10,0,"",0,0,DC::#_Window_001 )
+				Result = Request::MSG(DropLang::GetUIText(20), "RAR. DLL Not Found", "Für RAR wird die "+ Chr(34) + GetFilePart( szString ) + Chr(34) + " im DropZ Verzeichnis " + GetPathPart( szString ),10,2," benötigt.",0,0,DC::#_Window_001 )
 				
 			Case 5
-				Result = Request::MSG(DropLang::GetUIText(20), "Identifiziert als: "+ szString +" ", "Kann Das Archiv [."+GetExtensionPart( *P\Collection() )+"] nicht öffnen" + #CRLF$ +  *P\Collection(),10,2,"",0,0,DC::#_Window_001 )				
+				If ( ArchiveCheck::szVersionsString = "" )
+					szUnknownString = "Unknown"
+				Else
+					szUnknownString = ArchiveCheck::szVersionsString
+				EndIf
+				
+				Result = Request::MSG(DropLang::GetUIText(20), "Ident: [ " + szUnknownString + " ]", "Kann das Archiv [."+GetExtensionPart( *P\Collection() )+"] nicht öffnen" + #CRLF$ +  *P\Collection(),10,2,"",0,0,DC::#_Window_001 )				
 				
 			Case 6
-				Result = Request::MSG(DropLang::GetUIText(20), "Can Not Compress", "Kann das Archiv [."+GetExtensionPart( *P\Collection() )+"] nicht IN 7z umwandeln" + #CRLF$ +  *P\Collection(),10,2,"",0,0,DC::#_Window_001 )
+				Result = Request::MSG(DropLang::GetUIText(20), "Error", "Kann [."+GetExtensionPart( *P\Collection() )+"] nicht Entpacken/Konvertieren" + #CRLF$ +  *P\Collection(),10,2,"",0,0,DC::#_Window_001 )
 				
 			Case 7
 				Request::MSG( DropLang::GetUIText(20) , "Keine Dateien !?!", "Keine Dateien zum Archivieren", 2, 0, "",0,0,DC::#_Window_001)
 			Case 8
+				If ( ArchiveCheck::szVersionsString = "" )
+					szUnknownString = "Unknown"
+				Else
+					szUnknownString = ArchiveCheck::szVersionsString
+				EndIf
+				
 				Request::*MsgEx\User_BtnTextL = "RAR"			
 				Request::*MsgEx\User_BtnTextM = "ZIP"
 				Request::*MsgEx\User_BtnTextR = "Abbruch"					
-				Result = Request::MSG(DropLang::GetUIText(20), "Archiv Identifikation", "Archiv "+ Chr(34) +GetFilePart( *P\Collection() ) + Chr(34) + " Identifziert als " + szString + #CRLF$ + "Trotzdem Versuchen zu Entpacken/ Konvertieren als RAR/ZIP oder Überspringen?",16,-1,"",0,0,DC::#_Window_001 )	
+				Result = Request::MSG(DropLang::GetUIText(20), "Archiv Identifikation: [ " + szUnknownString + " ]", "Archiv "+ Chr(34) +GetFilePart( *P\Collection() ) + Chr(34) + " Identifziert als " + szString + #CRLF$ + "Trotzdem Versuchen zu Entpacken/ Konvertieren als RAR/ZIP oder Überspringen?",16,1,"",0,0,DC::#_Window_001 )	
 				
 			Case 9
-				Request::MSG( DropLang::GetUIText(20) , "Kann nicht Öffnen", "Die Datei ist von einem anderen Programm geöffnent" + #CRLF$ + "( " + Chr(34) + GetFilePart(  *P\Collection() ) + Chr(34) + " ) ", 2, 0, "",0,0,DC::#_Window_001)				
+				Request::MSG( DropLang::GetUIText(20) , "Kann nicht Öffnen", "Die Datei ist von einem anderen Programm geöffnent" + #CRLF$ + "( " + Chr(34) + GetFilePart(  *P\Collection() ) + Chr(34) + " ) ", 2, 2, "",0,0,DC::#_Window_001)				
 				
 			Case 10
-				Result = Request::MSG(DropLang::GetUIText(20), "Unbekanntes Archiv", "Archiv ["+GetFilePart( *P\Collection() )+" ] kann nicht geöffnet werden.", 2, 0, "",0,0,DC::#_Window_001)			
-								
+				Result = Request::MSG(DropLang::GetUIText(20), "Unbekanntes Archiv", "Archiv ["+GetFilePart( *P\Collection() )+" ] kann nicht geöffnet werden.", 2, 2, "",0,0,DC::#_Window_001)			
+				
+			Case 11
+				Result = Request::MSG(DropLang::GetUIText(20), "Datei nicht gefunden", "["+GetFilePart( *P\Collection() )+" ] kann nicht geöffnet werden.", 2, 2, "",0,0,DC::#_Window_001)			
+				
+			Case 12
+				Result = Request::MSG(DropLang::GetUIText(20), "Verzeichnis ?!?", "Das Verzeichnis [ " + *P\Collection() + " ] kann nicht Konvertiert werden.", 2, 2, "",0,0,DC::#_Window_001)			
+				
 		EndSelect
 		
 		ProcedureReturn Result
@@ -2008,9 +2087,22 @@ Module DropVert
 		
 		If ( ListSize( *P\Collection() ) >= 1 )
 			
-			SetWindowTitle(DC::#_Window_001," Analysiare ... Bitte warten ....")  
+			SetWindowTitle(DC::#_Window_001," Analysiere ... Bitte warten ....")  
 			
 			ForEach *P\Collection()
+				
+				ArchiveCheck::szVersionsString = ""
+				If 	  ( FileSize( *P\Collection() ) = -1 )
+						MessageRequester_Show(*P, 11)					
+						MessageRequester_Result
+						Continue
+					
+				ElseIf  ( FileSize( *P\Collection() ) = -2 )		
+						MessageRequester_Show(*P, 12)					
+						MessageRequester_Result
+						Continue					
+				EndIf
+				
 				
 				Select UCase( GetExtensionPart( *P\Collection() ) )
 						; ---------------------------------------------------------------------------------------------------------------  						
@@ -2039,6 +2131,7 @@ Module DropVert
 							If ( CheckArchive = "UNKNOWN" )And ( CFG::*Config\UnPackOnly )
 								MessageRequester_Show(*P, 10)
 								MessageRequester_Result
+								Continue
 							EndIf	
 							
 							Select CheckArchive
@@ -2048,8 +2141,14 @@ Module DropVert
 								Case "LHASFX"
 									CheckArchiveLongName = "LHA (Selbstentpackende Datei)"
 									
+								Case "LHA"
+									CheckArchiveLongName = "LHA (Gepackte Datei)"
+									
+								Case "LHICE/ICE"
+									CheckArchiveLongName = "LHICE/ICE (Selbstentpackende Datei)"
+									
 								Case "UPX"
-									CheckArchiveLongName = "UPX (Ausfürhbare Datei)"
+									CheckArchiveLongName = "UPX (Ausführbare Datei)"
 									Result = MessageRequester_Show(*P, 8, CheckArchiveLongName)	
 									Select Result
 										Case 0: 
@@ -2091,13 +2190,16 @@ Module DropVert
  								MessageRequester_Show(*P, 2, CheckArchiveLongName)								
  								MessageRequester_Result
 													
-						ElseIf ( FileSize( *P\DstPath + GetFilePart( *P\Collection() , #PB_FileSystem_NoExtension) + ".7z" ) >= 0 ) And ( CFG::*Config\UnPackOnly = #False)
+ 						ElseIf  ( ListSize( *P\Collection())  > 0 )
+ 								
+ 							If ( FileSize( *P\DstPath + GetFilePart( *P\Collection() , #PB_FileSystem_NoExtension) + ".7z" ) >= 0 ) And ( CFG::*Config\UnPackOnly = #False)
 							
-							Result = MessageRequester_Show(*P, 3)	
-							If Result = 1
-								MessageRequester_Result
-							EndIf	
-						EndIf
+								Result = MessageRequester_Show(*P, 3)	
+								If Result = 1
+									MessageRequester_Result
+								EndIf	
+							EndIf
+						EndIf	
 						
 							
 						; ---------------------------------------------------------------------------------------------------------------       
@@ -2192,7 +2294,7 @@ Module DropVert
 								Continue
 								;
 								; ----------------------------------------------------------------------
-							ElseIf  ( CheckArchive = "ZIP" )
+							ElseIf  ( CheckArchive = "ZIP" Or CheckArchive = "ZIPSFX" )
 								
 								If ( FileSize( *P\DstPath + GetFilePart( *P\Collection() , #PB_FileSystem_NoExtension) + ".7z" ) >= 0 ) And ( CFG::*Config\UnPackOnly = #False)
 									
@@ -2271,7 +2373,7 @@ Module DropVert
 					ForEach ( *P\ConvertResult() )
 						
 						If ( *P\ConvertResult()\FileCount = 0 )					     						
-							szErrorList + GetFilePart( *P\ConvertResult()\File ) + ": 0 (Keine) Dateien Konvertiert" + #CRLF$
+							szErrorList + GetFilePart( *P\ConvertResult()\File ) + ": 0 (Keine) Dateien/ Problem beim öffnen" + #CRLF$
 						Else					     
 							If ( *P\ConvertResult()\MismtachSize = 1 ) 	
 								szErrorList + "[ 1 DATEI IM ARCHIV]: " + GetFilePart( *P\ConvertResult()\File ) + ": Grösse Stimmt nicht" + #CRLF$					
@@ -2295,11 +2397,7 @@ Module DropVert
 						EndIf
 						
 					Next
-					
-					If Len (szErrorList ) > 0
-						szErrorList = #CRLF$ + "Quell Archiv Fehler:" + #CRLF$ + szErrorList
-					EndIf
-					
+										
 					ResetList(*P\ConvertResult() )                 
 					
 					While NextElement( *P\ConvertResult() )
@@ -2312,15 +2410,19 @@ Module DropVert
 					;
 					;
 					; Entpacken/ Konvertieren Fehlerbericht					
-					If ( CFG::*Config\UnPackOnly )
-						Request::MSG( DropLang::GetUIText(20) , "Status" , "Alle Archiv(e) Entpackt", 2, 0, "",0,0,DC::#_Window_001)  
-					Else						
-						Request::MSG( DropLang::GetUIText(20) , "Status" , "Alle 7z Archiv(e) Komprimiert", 2, 0, "",0,0,DC::#_Window_001)   
-					EndIf	
-					
+					If ( CFG::*Config\UnPackOnly = #False)			
+						Request::MSG( DropLang::GetUIText(20) , "Status" , "Alle Archiv(e) Konvertiert", 2, 0, "",0,0,DC::#_Window_001)   
+					EndIf						
 					ProcedureReturn 0
 					
-				ElseIf  ( ListSize( *P\Collection() ) > *P\ResultMax )
+				ElseIf  ( Len( szErrorList ) = 0 )
+					
+					If ( CFG::*Config\UnPackOnly )
+						Request::MSG( DropLang::GetUIText(20) , "Status" , "Alle Archiv(e) Entpackt", 2, 0, "",0,0,DC::#_Window_001)  
+					EndIf
+					ProcedureReturn 0
+					
+				ElseIf  ( ListSize( *P\Collection() ) > *P\ResultMax ) Or ( Len( szErrorList ) > 0 )
 					
 					ResetList( *P\Mis() )
 					
@@ -2328,13 +2430,17 @@ Module DropVert
 						Lst + #CR$ + *P\Mis()
 					Next    
 					
+					If Len (szErrorList ) > 0
+						szErrorList = #CRLF$ + "Quell Archiv(e):" + #CRLF$ + szErrorList
+					EndIf
+					
 					;
 					; Entpacken/ Konvertieren Fehlerbericht
 					;
 					If ( CFG::*Config\UnPackOnly )
-						Request::MSG( DropLang::GetUIText(20) , "Status" , Str( ListSize( *P\Collection()) ) + " Archiv(e) Entpackt " + Lst + #CRLF$ + szErrorList, 2, 0,"",0,0,DC::#_Window_001) 
+						Request::MSG( DropLang::GetUIText(20) , "Status mit Fehler" , Str( ListSize( *P\Collection()) ) + " Fehler beim Verarbeiten " + Lst + #CRLF$ + szErrorList, 2, 2,"",0,0,DC::#_Window_001) 
 					Else						
-						Request::MSG( DropLang::GetUIText(20) , "Status" , "7z Archiv(e) Komprimiert " + Str(*P\ResultMax) + " von " + ListSize( *P\Collection() ) + Lst + #CRLF$ + szErrorList, 2, 0,"",0,0,DC::#_Window_001)  
+						Request::MSG( DropLang::GetUIText(20) , "Status mit Fehler" , "7z Archiv(e) Komprimiert " + Str(*P\ResultMax) + " von " + ListSize( *P\Collection() ) + Lst + #CRLF$ + szErrorList, 2, 1,"",0,0,DC::#_Window_001)  
 					EndIf
 					;
 					ProcedureReturn 1
@@ -2358,9 +2464,9 @@ Module DropVert
 	EndProcedure	
 EndModule
 ; IDE Options = PureBasic 5.73 LTS (Windows - x64)
-; CursorPosition = 1587
-; FirstLine = 1178
-; Folding = HAA94----
+; CursorPosition = 2093
+; FirstLine = 876
+; Folding = LAAAAA7x--
 ; EnableAsm
 ; EnableXP
 ; UseMainFile = ..\Drop7z.pb

@@ -48,34 +48,67 @@ Module DropSPak
     ; Überprpfe ob die Datei existiert und Optionl Lösche diese
 	
 	Procedure.i FileExists(*P.PROGRAM_BOOT)
-	    
-	    ; Check For File Exists		    
-	    Protected szMsgNote$
-	    
-	    If FileSize( *P\DstPath + *P\sz7zArchiv  ) >= 0
-	        
-	        szMsgNote$  = GetFilePart( *P\DstPath + *P\sz7zArchiv ) + #CR$ + DropLang::GetUIText(33) 
-	        
-            Request::*MsgEx\User_BtnTextL = DropLang::GetUIText(34) 
-            Request::*MsgEx\User_BtnTextM = DropLang::GetUIText(35) 
-            Request::*MsgEx\User_BtnTextR = DropLang::GetUIText(36)  
-            
-            Select Request::MSG( DropLang::GetUIText(20), DropLang::GetUIText(32) , szMsgNote$, 16, 1, ProgramFilename(), 0, 0, DC::#_Window_001)
-                    ;
-                    ; Akualsieren
-                Case 2: ProcedureReturn 0    
-	                ;
-	                ; Abbruch
-                Case 1: ProcedureReturn 1
-                    ;
-                    ; Überschreiben
-                Case 0:
-                        If ( FileSize(   *P\DstPath + *P\sz7zArchiv  ) >= 0 )
-                            DeleteFile(  *P\DstPath + *P\sz7zArchiv  )
-                            Delay(1000)
-                        EndIf
-                        ProcedureReturn 0
-            EndSelect 		
+		
+		
+		; Check For File Exists		    
+		Protected.s szMsgNote, szArchivFile
+		Protected.b Result
+		
+		szArchivFile = *P\sz7zArchiv 
+		
+		If FileSize(szArchivFile ) >= 0
+
+			szMsgNote  = DropLang::GetUIText(32) + ": " + GetFilePart( szArchivFile ) + "                    " + #CRLF$
+
+			Result = MessageBoxExt::Show(DC::#_Window_001		, 
+			                             DropLang::GetUIText(20)  ,
+			                             szMsgNote			,
+			                             #MB_YESNOCANCEL		,
+			                             #MB_USERICON  |
+			                             #MB_DEFBUTTON2|
+			                             #MB_TASKMODAL		,
+			                             145				, ; #ID from Shell32 Dll
+			                             "Ersetzen"	,
+			                             DropLang::GetUIText(35) 	,
+			                             DropLang::GetUIText(36)  ,
+			                             "shell32.dll"		,
+			                             Fonts::#_DEJAVU_08	)
+			Select Result
+				Case 7
+					 ProcedureReturn 0    
+				Case 6
+					If ( FileSize(  szArchivFile  ) >= 0 )
+						DeleteFile(  szArchivFile , #PB_FileSystem_Force)
+					EndIf
+					ProcedureReturn 0	
+				Default
+					ProcedureReturn 1
+			EndSelect
+				    
+			; 	    If FileSize( *P\DstPath + *P\sz7zArchiv  ) >= 0
+			; 	        
+			; 	        szMsgNote$  = GetFilePart( *P\DstPath + *P\sz7zArchiv ) + #CR$ + DropLang::GetUIText(33) 
+			; 	        
+			;             Request::*MsgEx\User_BtnTextL = DropLang::GetUIText(34) 
+			;             Request::*MsgEx\User_BtnTextM = DropLang::GetUIText(35) 
+			;             Request::*MsgEx\User_BtnTextR = DropLang::GetUIText(36)  
+			;             
+			;             Select Request::MSG( DropLang::GetUIText(20), DropLang::GetUIText(32) , szMsgNote$, 16, 1, ProgramFilename(), 0, 0, DC::#_Window_001)
+			;                     ;
+			;                     ; Akualsieren
+			;                 Case 2: ProcedureReturn 0    
+			; 	                ;
+			; 	                ; Abbruch
+			;                 Case 1: ProcedureReturn 1
+			;                     ;
+			;                     ; Überschreiben
+			;                 Case 0:
+			;                         If ( FileSize(   *P\DstPath + *P\sz7zArchiv  ) >= 0 )
+			;                             DeleteFile(  *P\DstPath + *P\sz7zArchiv  )
+			;                             Delay(1000)
+			;                         EndIf
+			;                         ProcedureReturn 0
+			;             EndSelect 		
         EndIf
         
     EndProcedure
@@ -1081,8 +1114,8 @@ Module DropSPak
     
 EndModule
 ; IDE Options = PureBasic 5.73 LTS (Windows - x64)
-; CursorPosition = 840
-; FirstLine = 706
+; CursorPosition = 60
+; FirstLine = 49
 ; Folding = 44-Lu-
 ; EnableAsm
 ; EnableXP

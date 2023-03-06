@@ -185,7 +185,7 @@ Module CFG
 		
 		suSubData  = "DropData\"
 			
-		*Config\Version    	= "1.02.04 Beta FastFertig"
+		*Config\Version    	= "1.02.05 Beta FastFertig"
 		*Config\WindowTitle	= "Drop7z v"+ *Config\Version +" By Marty Shepard"
 		
 		*Config\ConfigPath 	= GetPathPart( ProgramFilename() ) + suSubData + "Drop7z.ini"
@@ -361,6 +361,20 @@ Module CFG
 		szString + #LF$ + ""              
 		szString + #LF$ + "Changelog:                             "
 		szString + #LF$ + "======================================="
+		szString + #LF$ + "Version 1.02.05 Beta                   "        
+		szString + #LF$ + ""
+		szString + #LF$ + "- API MessageBox(Extend) use now own"
+		szString + #LF$ + "  Font."
+		szString + #LF$ + "  : Todo: Missing Color"
+		szString + #LF$ + "  : Todo: Missing Size"	
+		szString + #LF$ + ""
+		szString + #LF$ + "Additionale SFX Executable and Unknown"
+		szString + #LF$ + "File Checks:"   	
+		szString + #LF$ + "  : PKSFX, WINZIP, PKLITE, RAR Heders"   			
+		szString + #LF$ + "- Single File Exists Check"
+		szString + #LF$ + "- Crash Fix (Archiv Identifation)"
+		szString + #LF$ + ""		
+		szString + #LF$ + "---------------------------------------" 
 		szString + #LF$ + "Version 1.02.04 Beta                   "        
 		szString + #LF$ + ""
 		szString + #LF$ + "- Add Missing Convertet Amiga Fonts"
@@ -636,8 +650,8 @@ Module CFG
 	EndProcedure	
 EndModule
 ; IDE Options = PureBasic 5.73 LTS (Windows - x64)
-; CursorPosition = 369
-; FirstLine = 292
+; CursorPosition = 371
+; FirstLine = 277
 ; Folding = f0
 ; EnableAsm
 ; EnableXP

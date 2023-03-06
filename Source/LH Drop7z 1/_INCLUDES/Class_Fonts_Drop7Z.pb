@@ -78,24 +78,8 @@ EndModule
 
 
 	Global FontID_FIXPLAIN7_12 = Fonts::InternalFontLoad(1, Fonts::#_FIXPLAIN7_12,"fixplain7 12",12)
-	Global FontID_DEJAVU_08    = Fonts::InternalFontLoad(2, Fonts::#_DEJAVU_08   ,"PL_APPLE"    ,12) 
+	Global FontID_DEJAVU_08    = Fonts::InternalFontLoad(2, Fonts::#_DEJAVU_08   ,"PL_APPLE 13"    ,12) 
       Global FontID_XBOXBOOK_09  = Fonts::InternalFontLoad(3, Fonts::#_XBOXBOOK_09 ,"Xbox Book"   ,09)	
-	;
-	;
-	;hMemFont = Fonts::CatchFont(Fonts::?beg_Fixplain7, Fonts::?end_Fixplain7 - Fonts::?beg_Fixplain7) 
-	;Global FontID_FIXPLAIN7_12 = LoadFont(Fonts::#_FIXPLAIN7_12,"fixplain7 12",12,#PB_Font_HighQuality)
-
-
-	;
-	;
-	;hMemFont = Fonts::CatchFont(Fonts::?beg_PlApple, Fonts::?end_PlApple - Fonts::?beg_PlApple) 
-	;Global FontID_DEJAVU_08    = LoadFont(Fonts::#_DEJAVU_08,"PL_APPLE",13); ;Global FontID_DEJAVU_08   = LoadFont(Fonts::#_DEJAVU_08,"DejaVu Sans",08)
-	
-	;
-	;
-	;hMemFont = Fonts::CatchFont(Fonts::?beg_XboxBook, Fonts::?end_XboxBook - Fonts::?beg_XboxBook) 
-	;Global FontID_XBOXBOOK_09  = LoadFont(Fonts::#_XBOXBOOK_09,"Xbox Book",09,#PB_Font_HighQuality)
-	
 	;
 	;
 	; Windows Standard Fonts 
@@ -103,8 +87,8 @@ EndModule
 	Global FontID_SEGOEUI09N   = LoadFont(Fonts::#_SEGOEUI09N,"Segoe UI", 09)     
 	Global FontID_SEGOEUI10N   = LoadFont(Fonts::#_SEGOEUI10N,"Segoe UI", 10)	
 ; IDE Options = PureBasic 5.73 LTS (Windows - x64)
-; CursorPosition = 80
-; FirstLine = 38
+; CursorPosition = 81
+; FirstLine = 4
 ; Folding = -
 ; EnableXP
 ; EnableUnicode

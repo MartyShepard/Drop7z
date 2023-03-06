@@ -212,6 +212,7 @@ Module GUI00
 		GadgetToolTip(DC::#Button_002, "KPF, LZX (Amiga), PK3, PK4, RAR (VOL,SFX), TAR, TGZ, TSU, ZIP (SFX)")    	
 		GadgetToolTip(DC::#String_002, "Zielverzeichnis. Gilt nur für das Packen/Komprimieren (Standard/Single).")
 		GadgetToolTip(DC::#ListIcon_001, "Verzeichnis Datei Liste. Mehr Optionen gibt es über die Rechte Maustaste")
+		SSTTIP::TooltTip(WindowID(DC::#_Window_001), DC::#Button_004, "Zielverzeichnis wählen ...","", 1,275) 
 	EndProcedure
 EndModule        
 
@@ -303,8 +304,8 @@ Module GUI04
 EndModule
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x64)
-; CursorPosition = 82
-; FirstLine = 33
+; CursorPosition = 214
+; FirstLine = 168
 ; Folding = --
 ; EnableAsm
 ; EnableXP

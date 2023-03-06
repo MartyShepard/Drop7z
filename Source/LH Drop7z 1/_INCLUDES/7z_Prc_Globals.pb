@@ -228,7 +228,8 @@
 	Procedure _Exit_Win()
 		CFG::*Config\DesktopX = WindowX(DC::#_Window_001)
 		CFG::*Config\DesktopY = WindowY(DC::#_Window_001)
-		CFG::WriteConfig(CFG::*Config): CloseWindow(DC::#_Window_001)
+		CFG::WriteConfig(CFG::*Config)
+		CloseWindow(DC::#_Window_001)
 	EndProcedure 
 	;
 	;
@@ -1481,7 +1482,8 @@
 	
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x64)
-; CursorPosition = 23
+; CursorPosition = 227
+; FirstLine = 203
 ; Folding = ------
 ; EnableAsm
 ; EnableXP

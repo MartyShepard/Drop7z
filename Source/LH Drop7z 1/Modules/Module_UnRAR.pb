@@ -181,7 +181,7 @@ Module UnRAR
 	Procedure Callback(msg, UserData, P1, P2)
 		Protected Result.i
 
-		Protected PWD.s
+		Protected PWD.s, szMsgNote.s
 		
 		If UserData
 			PWD = PeekS(UserData)
@@ -206,9 +206,26 @@ Module UnRAR
 				EndIf
 			Case #UCM_CHANGEVOLUME	
 				Select P2
-					Case 0						
-						Result = MessageRequester("RAR Volume Benötigt ... ", "Benötige das nächste Volume: " + Chr(34) + PeekS(P1, -1, #PB_Ascii) + Chr(34), #PB_MessageRequester_Info | #MB_RETRYCANCEL )	
-						If Result = 2						
+					Case 0
+						
+						szMsgNote = "Benötige das nächste Volume:                       " + #CRLF$	+ Chr(34) + PeekS(P1, -1, #PB_Ascii)  + Chr(34) + #CRLF$	
+						
+						Result = MessageBoxExt::Show(DC::#_Window_001		, 
+						                                "RAR Volume Benötigt ... "  ,
+						                                szMsgNote			,
+						                                #MB_YESNO			,
+						                                #MB_USERICON  |
+						                                #MB_DEFBUTTON1|
+						                                #MB_TASKMODAL		,
+						                                6				, ; #ID from Shell32 Dll
+						                                "Ok"	,
+						                                "Abbruch"	,
+						                                ""				,
+						                                "shell32.dll"		,
+						                                Fonts::#_FIXPLAIN7_12	)
+						
+						;Result = MessageRequester("RAR Volume Benötigt ... ", , #PB_MessageRequester_Info | #MB_RETRYCANCEL )	
+						If Result = 7						
 							ProcedureReturn -1
 						EndIf
 					Case 1
@@ -222,9 +239,25 @@ Module UnRAR
 			Case #UCM_CHANGEVOLUMEW
 				Select P2
 					Case 0						
-						Result = MessageRequester("RAR Volume Benötigt ... ", "Benötige das nächste Volume: "  + Chr(34) + PeekS(P1) + Chr(34), #PB_MessageRequester_Info |#MB_RETRYCANCEL )
-						If Result = 2							
-							;ProcedureReturn -1
+						szMsgNote = "Benötige das nächste Volume:                       " + #CRLF$	+ Chr(34) + PeekS(P1, -1, #PB_Unicode) + Chr(34) + #CRLF$			
+						
+						Result = MessageBoxExt::Show(DC::#_Window_001		, 
+						                                "RAR Volume Benötigt ... "  ,
+						                                szMsgNote			,
+						                                #MB_YESNO			,
+						                                #MB_USERICON  |
+						                                #MB_DEFBUTTON1|
+						                                #MB_TASKMODAL		,
+						                                6				, ; #ID from Shell32 Dll
+						                                "Ok"	,
+						                                "Abbruch"	,
+						                                ""				,
+						                                "shell32.dll"		,
+						                                Fonts::#_FIXPLAIN7_12	)
+						
+						;Result = MessageRequester("RAR Volume Benötigt ... ", , #PB_MessageRequester_Info | #MB_RETRYCANCEL )	
+						If Result = 7						
+							ProcedureReturn -1
 						EndIf						
 					Case 1
 						;
@@ -395,8 +428,8 @@ CompilerIf #PB_Compiler_IsMainFile
 CompilerEndIf	
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x64)
-; CursorPosition = 174
-; FirstLine = 129
+; CursorPosition = 210
+; FirstLine = 202
 ; Folding = -4-
 ; EnableAsm
 ; EnableXP

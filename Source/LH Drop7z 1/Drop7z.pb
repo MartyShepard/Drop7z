@@ -1,152 +1,152 @@
 ﻿
-	;
-	; Der ganze Code, Routinen aufbau bis auf die sachne vom Letzten und vorletzten Jahr
-	; stammen noch aus der Anfangszeit. ><. Ja vieles ist Müll .....
-	;
-	
-	InitKeyboard()
-	UseSHA1Fingerprint()
-	UseZipPacker()
-	UseLZMAPacker()
-	UseTARPacker()
-	UseBriefLZPacker()
-	UsePNGImageDecoder()
-	
-	Structure FULLPATHLIST
-		xPath.s ; 
-		xFile.s ; 
-		xNumB.l
-	EndStructure
+;
+; Der ganze Code, Routinen aufbau bis auf die sachne vom Letzten und vorletzten Jahr
+; stammen noch aus der Anfangszeit. ><. Ja vieles ist Müll .....
+;
 
-	Define tb
-	
-	;	/ AutoComplete
-	;
-	;
-	
-	TB_Created.l = RegisterWindowMessage_("TaskbarCreated")
+InitKeyboard()
+UseSHA1Fingerprint()
+UseZipPacker()
+UseLZMAPacker()
+UseTARPacker()
+UseBriefLZPacker()
+UsePNGImageDecoder()
 
-	
-	Global _Action1.i           = 0
-	Global DirectoryOnly        = 0
-	Global Profile_Current.s        = ""
+Structure FULLPATHLIST
+	xPath.s ; 
+	xFile.s ; 
+	xNumB.l
+EndStructure
 
-	Global iResult_DeleteFiles  = #False
+Define tb
 
-	Declare Event_GadgetEx_Profile()
-	Declare ComboAutoText()
+;	/ AutoComplete
+;
+;
 
-	;
-	;
-	; AutoComplete
-	Structure comboboxinfo 
-		cbSize.l
-		rcItem.RECT
-		rcButton.RECT
-		stateButton.l
-		hwndCombo.l
-		hwndEdit.l
-		hwndList.l
-	EndStructure
-
-	;
-	;
-
-	Global cbinfo.comboboxinfo
-	Global oldcomboProc    
-
-	cbinfo\cbsize   = SizeOf(comboboxinfo)
+TB_Created.l = RegisterWindowMessage_("TaskbarCreated")
 
 
-	;
-	; 
-	; Include Modules
-	XIncludeFile "Drop7z_Modules\Constants.pb"
-	XIncludeFile ".\_INCLUDES\Class_Fonts_Drop7Z.pb" 
-	
-	;
-	; Include Modules, Global Code Modules
-	;   
-	XIncludeFile "..\INCLUDES\Class_Process.pb"          
+Global _Action1.i           = 0
+Global DirectoryOnly        = 0
+Global Profile_Current.s        = ""
 
-	XIncludeFile "..\INCLUDES\Class_Win_Form.pb"
-	XIncludeFile "..\INCLUDES\Class_Win_Style.pb"         
-	XIncludeFile "..\INCLUDES\Class_Win_Desk.pb"
-	
-	XIncludeFile "..\INCLUDES\Class_ListIcon_Sort.pb"          
-	XIncludeFile "..\INCLUDES\Class_Tooltip.pb"
-	
-	XIncludeFile "..\Includes\Class_MessageBoxEx.pb"
-	XIncludeFile "..\Includes\CLASSES_GUI\SplitterGadgetEx.pb"
-	XIncludeFile "..\INCLUDES\CLASSES_GUI\ButtonGadgetEX.pb"
-	XIncludeFile "..\INCLUDES\CLASSES_GUI\DialogRequestEX.pb" 
-	
-	XIncludeFile "..\INCLUDES\Class_Windows.pb"
-	
-	XIncludeFile "..\INCLUDES\Class_FastFilePeInfo.pb"
-	XIncludeFile "..\INCLUDES\Class_FastFileHandle.pb"       
-	XIncludeFile "..\INCLUDES\CLASSES_FFS\FastFileSearch.pb"
-	
-	XIncludeFile "..\INCLUDES\Class_IniCommand.pb"
-	
-	XIncludeFile "..\INCLUDES\Class_Tooltip.pb"
-	
-	XIncludeFile "..\INCLUDES\CLASSES_SUB\Math_Bytes.pb"
+Global iResult_DeleteFiles  = #False
+
+Declare Event_GadgetEx_Profile()
+Declare ComboAutoText()
+
+;
+;
+; AutoComplete
+Structure comboboxinfo 
+	cbSize.l
+	rcItem.RECT
+	rcButton.RECT
+	stateButton.l
+	hwndCombo.l
+	hwndEdit.l
+	hwndList.l
+EndStructure
+
+;
+;
+
+Global cbinfo.comboboxinfo
+Global oldcomboProc    
+
+cbinfo\cbsize   = SizeOf(comboboxinfo)
 
 
-	;
-	; Include Modules Drop7z   
-	;    
-	
-	XIncludeFile "Drop7z_Modules\Configuration.pb"
-	
-	IncludeFile "Modules\Module_DropLists.pb"
-	
-	DropLS::CreateStructs()
-	
-	IncludeFile "Modules\Module_DropLanguage.pb"
-	IncludeFile "Modules\Module_DropSysFunctions.pb"         
-	IncludeFile "Modules\Module_DropCodes.pb"   
-	
-	
-	
-	XIncludeFile "..\INCLUDES\CLASSES_EMU\Mame_CHD_External_Support.pb"
-	
-	XIncludeFile "Drop7z_Modules\GuiWindow_Main.pb"
-	XIncludeFile "Drop7z_Modules\Quersumme.pb"
-	
-	IncludeFile "_INCLUDES\7z_About_Window.pbf"         ; Mit PB Editor, veraltete Variante
-	
-	
-	IncludeFile "_INCLUDES\_Datas_Sections.pb"
-	IncludeFile "_INCLUDES\7z_Struct_Lists.pb"
-	
-	IncludeFile "_INCLUDES\_WinFunc_Delete.pb"                        
-	IncludeFile "_INCLUDES\7z_About_Window.pb"
-	
-	IncludeFile "_INCLUDES\7z_Prc_Globals.pb"
-	IncludeFile "_INCLUDES\_Tray_PopUpMenu.pb"
-	
-	XIncludeFile "Modules\Module_ArchiveCheck.pb"
-	XIncludeFile "Modules\Module_LZX.pb"
-	XIncludeFile "Modules\Module_UnRar.pb" 
-	
-	IncludeFile "Modules\Module_Compress_Full.pb"         ; Updated
-	IncludeFile "Modules\Module_Compress_Single.pb"		; Updated
-	IncludeFile "Modules\Module_Convert.pb"			; Updated
-	
-	IncludeFile "_INCLUDES\7z_Profile_Function.pb"
-	
-	IncludeFile "Modules\Module_DropThread.pb"        
-	IncludeFile "_INCLUDES\_GagdetEX_Events.pb"
+;
+; 
+; Include Modules
+XIncludeFile "Drop7z_Modules\Constants.pb"
+XIncludeFile ".\_INCLUDES\Class_Fonts_Drop7Z.pb" 
 
-	;
-	; Intialisiere Language System
-	
-	DropLang::GetLngSysUI()
-	Global LHGAME_LANGUAGE = DropLang::GetLngSysUI(-1)     
-	
-   	
+;
+; Include Modules, Global Code Modules
+;   
+XIncludeFile "..\INCLUDES\Class_Process.pb"          
+
+XIncludeFile "..\INCLUDES\Class_Win_Form.pb"
+XIncludeFile "..\INCLUDES\Class_Win_Style.pb"         
+XIncludeFile "..\INCLUDES\Class_Win_Desk.pb"
+
+XIncludeFile "..\INCLUDES\Class_ListIcon_Sort.pb"          
+XIncludeFile "..\INCLUDES\Class_Tooltip.pb"
+
+XIncludeFile "..\Includes\Class_MessageBoxEx.pb"
+XIncludeFile "..\Includes\CLASSES_GUI\SplitterGadgetEx.pb"
+XIncludeFile "..\INCLUDES\CLASSES_GUI\ButtonGadgetEX.pb"
+XIncludeFile "..\INCLUDES\CLASSES_GUI\DialogRequestEX.pb" 
+
+XIncludeFile "..\INCLUDES\Class_Windows.pb"
+
+XIncludeFile "..\INCLUDES\Class_FastFilePeInfo.pb"
+XIncludeFile "..\INCLUDES\Class_FastFileHandle.pb"       
+XIncludeFile "..\INCLUDES\CLASSES_FFS\FastFileSearch.pb"
+
+XIncludeFile "..\INCLUDES\Class_IniCommand.pb"
+
+XIncludeFile "..\INCLUDES\Class_Tooltip.pb"
+
+XIncludeFile "..\INCLUDES\CLASSES_SUB\Math_Bytes.pb"
+
+
+;
+; Include Modules Drop7z   
+;    
+
+XIncludeFile "Drop7z_Modules\Configuration.pb"
+
+IncludeFile "Modules\Module_DropLists.pb"
+
+DropLS::CreateStructs()
+
+IncludeFile "Modules\Module_DropLanguage.pb"
+IncludeFile "Modules\Module_DropSysFunctions.pb"         
+IncludeFile "Modules\Module_DropCodes.pb"   
+
+
+
+XIncludeFile "..\INCLUDES\CLASSES_EMU\Mame_CHD_External_Support.pb"
+
+XIncludeFile "Drop7z_Modules\GuiWindow_Main.pb"
+XIncludeFile "Drop7z_Modules\Quersumme.pb"
+
+IncludeFile "_INCLUDES\7z_About_Window.pbf"         ; Mit PB Editor, veraltete Variante
+
+
+IncludeFile "_INCLUDES\_Datas_Sections.pb"
+IncludeFile "_INCLUDES\7z_Struct_Lists.pb"
+
+IncludeFile "_INCLUDES\_WinFunc_Delete.pb"                        
+IncludeFile "_INCLUDES\7z_About_Window.pb"
+
+IncludeFile "_INCLUDES\7z_Prc_Globals.pb"
+IncludeFile "_INCLUDES\_Tray_PopUpMenu.pb"
+
+XIncludeFile "Modules\Module_ArchiveCheck.pb"
+XIncludeFile "Modules\Module_LZX.pb"
+XIncludeFile "Modules\Module_UnRar.pb" 
+
+IncludeFile "Modules\Module_Compress_Full.pb"         ; Updated
+IncludeFile "Modules\Module_Compress_Single.pb"		; Updated
+IncludeFile "Modules\Module_Convert.pb"			; Updated
+
+IncludeFile "_INCLUDES\7z_Profile_Function.pb"
+
+IncludeFile "Modules\Module_DropThread.pb"        
+IncludeFile "_INCLUDES\_GagdetEX_Events.pb"
+
+;
+; Intialisiere Language System
+
+DropLang::GetLngSysUI()
+Global LHGAME_LANGUAGE = DropLang::GetLngSysUI(-1)     
+
+
 ;/////////////////////////////////////////////////////////////////////////////////////// Pre
 
 CFG::ReadConfig(CFG::*Config) 
@@ -245,8 +245,8 @@ EndIf
 
 ;/////////////////////////////////////////////////////////////////////////////////////// Code: Window
 Repeat
- 
-    
+	
+	
 	MainEvent       = WaitWindowEvent()
 	MainEventWindow = EventWindow()
 	MainEventGadget = EventGadget() ;// GadgetID
@@ -295,6 +295,9 @@ Repeat
 			EndSelect
 			
 			GadgetEx_EventResult = Event_GadgetEx_Events() 
+			If GadgetEx_EventResult = -1
+				Break
+			endif
 			;//////////////////////////////////////////////////////////////////////////////// Code: PopUpMenü
 			Select MainEventType
 				Case #PB_EventType_RightClick
@@ -310,7 +313,9 @@ Repeat
 			
 			;//////////////////////////////////////////////////////////////////////////////// Code: Drag & Drop
 		Case #PB_Event_WindowDrop 
-			If EventDropType() = #PB_Drop_Files : _SetAction_Drop() : EndIf
+			If EventDropType() = #PB_Drop_Files
+				_SetAction_Drop()
+			EndIf
 			
 			;//////////////////////////////////////////////////////////////////////////////// Code: Tray icon
 		Case #PB_Event_SysTray
@@ -327,7 +332,9 @@ Repeat
 							CFG::*Config\DesktopX = WindowX(DC::#_Window_001)
 							CFG::*Config\DesktopY = WindowY(DC::#_Window_001)
 							ShowWindow_(WindowID(DC::#_Window_001),#SW_MINIMIZE)
-							CFG::WriteConfig(CFG::*Config): CFG::ReadConfig(CFG::*Config): DropSYSF::Process_FreeRam()
+							CFG::WriteConfig(CFG::*Config)
+							CFG::ReadConfig(CFG::*Config)
+							DropSYSF::Process_FreeRam()
 					EndSelect
 					StickyWindow(DC::#_Window_001,CFG::*Config\Sticky)                     
 			EndSelect   
@@ -341,7 +348,8 @@ Repeat
 				Case 2 : _SeePopUpMenu(2)                        
 				Case 3 : _SeePopUpMenu(3)  
 				Case 4 : _SeePopUpMenu(4)                    
-				Case 5 : _SeePopUpMenu(5):Break:End                          
+				Case 5 : _SeePopUpMenu(5)
+					Break                        
 				Case 6 : _SeePopUpMenu(6)
 					;//////////////////////////////////////////////////////////////////////////////////////////////////                       
 				Case 7 :                 
@@ -423,7 +431,7 @@ Repeat
 				Case 11 : _Clear_FileList_Single()                  
 				Case 12 : _SeePopUpMenu(12)
 				Case 13 : _SeePopUpMenu(4)                    
-				Case 14 : _SeePopUpMenu(14):Break:End
+				Case 14 : _SeePopUpMenu(14):Break
 				Case 15 : _SeePopUpMenu(15)
 				Case 16 : _SeePopUpMenu(16)
 				Case 17 : _SeePopUpMenu(17)
@@ -468,19 +476,27 @@ Repeat
 			
 			;//////////////////////////////////////////////////////////////////////////////// Code: End Session            
 		Case #PB_Event_CloseWindow
+			
 			CFG::*Config\DesktopX = WindowX(DC::#_Window_001)
 			CFG::*Config\DesktopY = WindowY(DC::#_Window_001)
+			
 			ShowWindow_(WindowID(DC::#_Window_001),#SW_MINIMIZE)
-			CFG::WriteConfig(CFG::*Config): CFG::ReadConfig(CFG::*Config): DropSYSF::Process_FreeRam()            
+			CFG::WriteConfig(CFG::*Config)
+			CFG::ReadConfig(CFG::*Config)
+			DropSYSF::Process_FreeRam()            
 	EndSelect
 	
 	
 	
 ForEver
 
+SSTTIP::ToolTipMode(2,DC::#Button_004)
+
+
+End
 ; IDE Options = PureBasic 5.73 LTS (Windows - x64)
-; CursorPosition = 78
-; FirstLine = 42
+; CursorPosition = 299
+; FirstLine = 275
 ; EnableThread
 ; EnableXP
 ; EnableOnError

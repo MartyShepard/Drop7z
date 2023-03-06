@@ -59,20 +59,21 @@ Module DropPack
 		
 		If FileSize(szArchivFile ) >= 0
 
-			szMsgNote  = DropLang::GetUIText(32) + ": " + GetFilePart( szArchivFile ) + #CR$ + DropLang::GetUIText(33) 
+			szMsgNote  = DropLang::GetUIText(32) + ": " + GetFilePart( szArchivFile ) + "                    " + #CRLF$
 
 			Result = MessageBoxExt::Show(DC::#_Window_001		, 
-			                             DropLang::GetUIText(20)	,
+			                             DropLang::GetUIText(20),
 			                             szMsgNote			,
 			                             #MB_YESNOCANCEL		,
 			                             #MB_USERICON  |
 			                             #MB_DEFBUTTON2|
 			                             #MB_TASKMODAL		,
 			                             145				, ; #ID from Shell32 Dll
-			                             DropLang::GetUIText(34)	,
+			                             "Ersetzen"	,
 			                             DropLang::GetUIText(35) 	,
 			                             DropLang::GetUIText(36)  ,
-			                             "shell32.dll"		)
+			                             "shell32.dll"		,
+			                             Fonts::#_DEJAVU_08	)
 			Select Result
 				Case 7
 					 ProcedureReturn 0    
@@ -899,8 +900,8 @@ Module DropPack
 	
 EndModule
 ; IDE Options = PureBasic 5.73 LTS (Windows - x64)
-; CursorPosition = 74
-; FirstLine = 38
+; CursorPosition = 61
+; FirstLine = 52
 ; Folding = -----
 ; EnableAsm
 ; EnableXP
