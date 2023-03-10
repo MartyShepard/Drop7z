@@ -297,7 +297,7 @@ Repeat
 			GadgetEx_EventResult = Event_GadgetEx_Events() 
 			If GadgetEx_EventResult = -1
 				Break
-			endif
+			EndIf
 			;//////////////////////////////////////////////////////////////////////////////// Code: PopUpMenü
 			Select MainEventType
 				Case #PB_EventType_RightClick
@@ -470,7 +470,8 @@ Repeat
 				Case 72 : _SeePopUpMenu(72)						
 				Case 73 : _SeePopUpMenu(73)					
 				Case 74 : _SeePopUpMenu(74)
-				Case 75 : _SeePopUpMenu(75)						
+				Case 75 : _SeePopUpMenu(75)
+				Case 76 : _SeePopUpMenu(76)					
 					
 			EndSelect
 			
@@ -495,8 +496,8 @@ SSTTIP::ToolTipMode(2,DC::#Button_004)
 
 End
 ; IDE Options = PureBasic 5.73 LTS (Windows - x64)
-; CursorPosition = 299
-; FirstLine = 275
+; CursorPosition = 473
+; FirstLine = 417
 ; EnableThread
 ; EnableXP
 ; EnableOnError

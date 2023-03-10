@@ -60,7 +60,17 @@
 		MenuItem(52, "Option: Zwischenablage")
 		CloseSubMenu()                            
 		MenuBar()   
-		MenuItem(60, "Ziel Verzeichnis Pinnen") 
+		MenuItem(60, "Ziel Verzeichnis Pinnen") 				
+		If Not ( DropSysF::Directory_OpenTest() )
+			DisableMenuItem(DC::#PopUpMenu_002,60,0 )
+		Else	
+			DisableMenuItem(DC::#PopUpMenu_002,60,1 )
+		EndIf			
+		
+		MenuItem(76, "")		
+		DisableMenuItem(DC::#PopUpMenu_002, 76, DropSysF::Directory_OpenTest() )
+		SetMenuItemText(DC::#PopUpMenu_002, 76, CFG::*Config\szComboStringInfo )
+		
 		MenuBar()   		
 		MenuItem(75, "Konvertieren <-> Entpacken")
 		MenuItem(74, "Unterverzeichnis Entpacken")  		
@@ -451,14 +461,15 @@
 					Case 0: CFG::*Config\UnpackOnly = 1                   
 					Case 1: CFG::*Config\UnpackOnly = 0                    
 				EndSelect         	
-				
+			Case 76
+				DropSysF::Directory_Open()
 		EndSelect
 		
 		CFG::WriteConfig(CFG::*Config): CFG::ReadConfig(CFG::*Config): DropSYSF::Process_FreeRam()
 	EndProcedure
 ; IDE Options = PureBasic 5.73 LTS (Windows - x64)
-; CursorPosition = 65
-; FirstLine = 42
+; CursorPosition = 63
+; FirstLine = 27
 ; Folding = -
 ; EnableAsm
 ; EnableXP

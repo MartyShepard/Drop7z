@@ -6,7 +6,7 @@
     Declare     SetUIElements7ZP(uiState.i = 0)
     Declare     SetUIElementsZIP(uiState.i = 0)
     Declare     SetUIElementsCHD(uiState.i = 0)
-    Declare		SetUIElements_Global(n)
+    Declare	    SetUIElements_Global(n)
     
     Declare     SetArchivFormat(Format$ = "7z", usFormat = 0)
     Declare.s   GetArchivFormat()
@@ -436,7 +436,8 @@ EndProcedure
 EndModule
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x64)
-; CursorPosition = 16
+; CursorPosition = 21
+; FirstLine = 3
 ; Folding = -e+
 ; EnableAsm
 ; EnableXP

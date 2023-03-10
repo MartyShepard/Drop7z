@@ -1,0 +1,8 @@
+Source: vogons.zetafleet.com/download.php?id=11181
+
+"Here is a utility program written in Turbo C++ for DOS to convert PDI to IMA format. 
+It will run in DOSBox, and is of course limited to 8.3 filenames. 
+Only PDI type 1 images are supported; let me know if you find a type 1 image that doesn't convert correctly. 
+DOS executable and source code are in the attached archive."
+
+Author: ripsaw8080

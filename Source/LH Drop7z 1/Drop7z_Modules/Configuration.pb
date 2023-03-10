@@ -36,6 +36,7 @@ DeclareModule CFG
 		CHDszPath.s{#MAX_PATH}      ; Mame's CHDMan Tool
 		CHDbClipBoard.i
 		CHDbSticky.i
+		szComboStringInfo.s
 		
 	EndStructure    
 	
@@ -185,7 +186,7 @@ Module CFG
 		
 		suSubData  = "DropData\"
 			
-		*Config\Version    	= "1.02.05 Beta FastFertig"
+		*Config\Version    	= "1.02.06 Beta FastFertig"
 		*Config\WindowTitle	= "Drop7z v"+ *Config\Version +" By Marty Shepard"
 		
 		*Config\ConfigPath 	= GetPathPart( ProgramFilename() ) + suSubData + "Drop7z.ini"
@@ -361,6 +362,14 @@ Module CFG
 		szString + #LF$ + ""              
 		szString + #LF$ + "Changelog:                             "
 		szString + #LF$ + "======================================="
+		szString + #LF$ + "Version 1.02.06 Beta                   "        
+		szString + #LF$ + ""
+		szString + #LF$ + "- Destination Diectory Check/Open Menu"
+		szString + #LF$ + "- Fixed Missing Directory TempName"
+		szString + #LF$ + "- WinRAR Header Check"
+		szString + #LF$ + "- Bedder Archive Check Code"			
+		szString + #LF$ + ""	
+		szString + #LF$ + "---------------------------------------" 
 		szString + #LF$ + "Version 1.02.05 Beta                   "        
 		szString + #LF$ + ""
 		szString + #LF$ + "- API MessageBox(Extend) use now own"
@@ -650,8 +659,8 @@ Module CFG
 	EndProcedure	
 EndModule
 ; IDE Options = PureBasic 5.73 LTS (Windows - x64)
-; CursorPosition = 371
-; FirstLine = 277
+; CursorPosition = 370
+; FirstLine = 283
 ; Folding = f0
 ; EnableAsm
 ; EnableXP

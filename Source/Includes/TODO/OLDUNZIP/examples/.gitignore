@@ -1,0 +1,14 @@
+*.out
+/ozdemo
+/ozdemo.exe
+/_ozdemocpp.cpp
+/_ozdemocpp
+/_ozdemocpp.exe
+/testexamplecode
+/testexamplecode.exe
+/ozft
+/ozft.exe
+/ozft-afl
+/ozft-afl.exe
+/testcase_dir
+/findings_dir

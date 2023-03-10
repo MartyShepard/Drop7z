@@ -84,15 +84,11 @@ Module GUI00
 		SetGadgetColor(DC::#String_001, #PB_Gadget_BackColor,RGB(82,82,82))
 		SetGadgetColor(DC::#String_001, #PB_Gadget_FrontColor,RGB(225,225,226))
 		SetGadgetFont(DC::#String_001, FontID(Fonts::#_SEGOEUI10N))   
-		
-		;////////////// Combox Box Neu ////////////////////////////////////////////////////////
+		;
+		; Modified String Gadget as Combox
 		ComboBoxGadget(DC::#String_002, 67, 100, 415, 24, #CBS_SORT|#PB_ComboBox_Editable)
 		SetGadgetFont(DC::#String_002, FontID(Fonts::#_SEGOEUI10N))  
-		
-		
-		
-		;////////////// Combox Box Neu ////////////////////////////////////////////////////////   
-		
+	
 		StringGadget(DC::#String_003, 18, 357, 166, 19, ""); Password
 		SetGadgetFont(DC::#String_003, FontID(Fonts::#_SEGOEUI09N))
 		
@@ -304,8 +300,8 @@ Module GUI04
 EndModule
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x64)
-; CursorPosition = 214
-; FirstLine = 168
+; CursorPosition = 88
+; FirstLine = 45
 ; Folding = --
 ; EnableAsm
 ; EnableXP

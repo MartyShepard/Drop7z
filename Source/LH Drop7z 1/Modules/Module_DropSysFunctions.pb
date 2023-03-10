@@ -1,15 +1,18 @@
 ﻿DeclareModule DropSysF
     
-    Declare     Autostart()
-    Declare     RegAutostart_Save()     ; Für den Menüeintrag (Tray Icon)
-    Declare     RegAutostart_Kill()     ; Für den Menüeintrag (Tray Icon)
+    Declare     	Autostart()			; Todo BUGGY
+    Declare     	RegAutostart_Save()     ; Für den Menüeintrag (Tray Icon)
+    Declare     	RegAutostart_Kill()     ; Für den Menüeintrag (Tray Icon)
     
-    Declare     MultipleInstances()
-    Declare     Process_FreeRam()
-    Declare.s   File_CreateRandom()
+    Declare     	MultipleInstances()
+    Declare     	Process_FreeRam()
+    Declare.s   	File_CreateRandom()
     
-    Declare     Window_SetPosition()
-    Declare     Window_SetMinimized()
+    Declare     	Window_SetPosition()
+    Declare     	Window_SetMinimized()
+    
+    Declare.i   	Directory_OpenTest()
+    Declare		Directory_Open()
     
     Declare.s   RegGetSzString( hKey.l, RegPath$, lpValueName$ ,ulOptions = 0, samDesired.l  = #KEY_ALL_ACCESS )    
 EndDeclareModule
@@ -232,12 +235,67 @@ Module DropSysF
         EndIf
     
     EndProcedure
+    ;
+    ;
+    ; Test Directory Exists
+    Procedure.i Directory_OpenTest()
+    	
+    	Protected.s szDirectory
+    	
+    	szDirectory = GetGadgetText( DC::#String_002 )
+    	;
+    	; Check 
+    	If ( Len ( szDirectory ) > 0)
+    		
+    		
+    		If Not ( Right( szDirectory , 1)  = "\" )
+    			szDirectory + "\"
+    		EndIf
+    		
+    		If Not ( FileSize( szDirectory ) = -2 ) 
+    			;
+			;			
+			; Is not a Directory
+    			CFG::*Config\szComboStringInfo = "Ziel Verzeichnis (Nicht Gefunden)"
+    			ProcedureReturn #True
+    		EndIf	
+    			    			
+    		
+    	Else
+    		;
+		; 
+		; String is Empty
+    		CFG::*Config\szComboStringInfo = "Kein Zielverzeichnis vorhanden"
+    		ProcedureReturn #True
+    	EndIf	
+    	
+    	CFG::*Config\szComboStringInfo = "Ziel Verzeichnis Öffnen"
+    	ProcedureReturn #False
+
+    EndProcedure	
+    ;
+    ;
+    ; Open Dest Directory    
+    Procedure.i Directory_Open()
+    	
+    	Protected.s szDirectory
+    	
+    	szDirectory = GetGadgetText( DC::#String_002 )
+    	
+    	If Not ( Directory_OpenTest() )
+    		FFH::ShellExec(szDirectory, "open")	
+    	EndIf	    	
+    	
+    	; Declare.i ShellExec(lpFilePath$ = "",Verb$ = "",Paramter$ = "", Mask = #Null, ExShow.i = #SW_SHOWNORMAL, shAdmin.i = #False, Simple = 1)
+    	
+    EndProcedure
+    
 EndModule
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x64)
-; CursorPosition = 13
-; FirstLine = 5
-; Folding = jZ-
+; CursorPosition = 267
+; FirstLine = 48
+; Folding = DA-
 ; EnableAsm
 ; EnableXP
 ; UseMainFile = ..\Drop7z.pb

@@ -901,9 +901,18 @@ Module DropVert
 		If length=-1
 			i=0
 			While PeekA(*Mem+i)<>0 ;changed from PeekA(*Mem+i-1)
-				result.s+Chr(PeekA(*Mem+i)) ;;changed from PeekA(*Mem+i-1)
+				If PeekA( *Mem+i ) > 127	
+					Debug (PeekA( *Mem+i >> $f)*2 )-1
+					Debug PeekA( *Mem+i >> $f)*2
+					Debug PeekA( *Mem+i >> $f)
+					
+					result.s + Chr( ( PeekA( *Mem+i >> $f)*2 )-1 )						
+				Else
+					result.s + Chr( PeekA( *Mem + i) ) ;changed from PeekA(*Mem+i-1)
+				EndIf
 				i+1
 			Wend
+			Debug result
 			ProcedureReturn result
 		ElseIf length>0
 			For i=1 To length
@@ -916,7 +925,17 @@ Module DropVert
 	;
 	;	
 	Procedure.s Char_Unicode(szLine.s,szOrig.s, *P.PROGRAM_BOOT)
+		Protected.s szTest
 		
+sOEM_in_unicode.s = szLine
+   iByteLength = Len(sOEM_in_unicode) + 2     
+   sOem_in_Ascii.s = Space(iByteLength)
+   PokeS(@sOem_in_Ascii, sOEM_in_unicode, -1, #PB_UTF8)
+   sunicode.s = Space(iByteLength)
+   ;CharToOem_(@sOem_in_Ascii, @sunicode)
+   OemToChar_(@sOem_in_Ascii, @sunicode)
+   Output$ + sunicode + Chr(13)
+   
 		*Mem = AllocateMemory(256)
 		
 		zPokeSascii( *Mem ,0 ,szLine)
@@ -944,6 +963,7 @@ Module DropVert
 			c = Asc( Mid( szLine, i,1) )			
 			If ( c > 255 )								
 				szLine = Char_Unicode(szLine,szLine,*P)
+				Break
 			EndIf	
 			
 		Next
@@ -1200,14 +1220,14 @@ Module DropVert
 		EndIf
 			
 		szMsgNote + #CRLF$ + #CRLF$           
-		szMsgNote + "Den Entpack Prozess für diese Datei stoppen?"			
+		szMsgNote + "Den Entpack Prozess für diese Datei Stoppen/Überspringen? "	+ #CRLF$ 		
 		
 		MsgResult = MessageBoxExt::Show(DC::#_Window_001		, 
 		                                 DropLang::GetUIText(20)  ,
 		                                 szMsgNote			,
 		                                 #MB_YESNO			,
 		                                 #MB_USERICON  |
-		                                 #MB_DEFBUTTON1|
+		                                 #MB_DEFBUTTON2|
 		                                 #MB_TASKMODAL		,
 		                                 54				, ; #ID from Shell32 Dll
 		                                 "Weiter"	,
@@ -1257,8 +1277,10 @@ Module DropVert
 		Protected.s  szNumbering, szDirectory 
 		
 		szDirectory    			= GetPathPart( *P\ConvertResult()\File  )
+
 		
 		If ( CFG::*Config\UnPackOnly = #False)
+			szDirectory	+ GetFilePart( *P\ConvertResult()\File , #PB_FileSystem_NoExtension)
 			szDirectory	+ "_[TEMP" + Str( Random(999999,000001) ) + "]\"
 		Else			
 			
@@ -1473,8 +1495,7 @@ Module DropVert
 	EndProcedure		
 	;
 	;
-	;
-	
+	;	
 	Procedure 	UnCompressLZX(*P.PROGRAM_BOOT)
 		
 		Define *LzxMemory
@@ -1630,7 +1651,6 @@ Module DropVert
 	;
 	;
 	;
-
 	Procedure.i Compress_Looping( *P.PROGRAM_BOOT )
 		
 		Protected Cnt.i         = 0             ; Zähler für das Progressbar Gadget
@@ -2156,11 +2176,13 @@ Module DropVert
 											CFG::*Config\HandleExeAsZIP = #False
 											CFG::*Config\HandleExeAsS7Z = #False
 											CheckArchive = ""
+											CheckArchiveLongName = ""
 										Case 2:											
 											CFG::*Config\HandleExeAsRAR = #False
 											CFG::*Config\HandleExeAsZIP = #True
 											CFG::*Config\HandleExeAsS7Z = #False
-											CheckArchive = ""											
+											CheckArchive = ""		
+											CheckArchiveLongName = ""
 										Default
 											MessageRequester_Result										
 									EndSelect		
@@ -2170,16 +2192,19 @@ Module DropVert
 									CFG::*Config\HandleExeAsZIP = #False
 									CFG::*Config\HandleExeAsS7Z = #False
 									CheckArchive = ""
+									CheckArchiveLongName = ""
 								Case "S7ZSFX"
 									CFG::*Config\HandleExeAsRAR = #False
 									CFG::*Config\HandleExeAsZIP = #False
 									CFG::*Config\HandleExeAsS7Z = #True
-									CheckArchive = ""	
+									CheckArchive = ""
+									CheckArchiveLongName = ""
 								Case "ZIPSFX"
 									CFG::*Config\HandleExeAsRAR = #False
 									CFG::*Config\HandleExeAsZIP = #True
 									CFG::*Config\HandleExeAsS7Z = #False
-									CheckArchive = ""										
+									CheckArchive = ""		
+									CheckArchiveLongName = ""
 								Default
 									CheckArchiveLongName = ""
 							EndSelect															
@@ -2464,9 +2489,9 @@ Module DropVert
 	EndProcedure	
 EndModule
 ; IDE Options = PureBasic 5.73 LTS (Windows - x64)
-; CursorPosition = 2093
-; FirstLine = 876
-; Folding = LAAAAA7x--
+; CursorPosition = 932
+; FirstLine = 247
+; Folding = LAAAAeli--
 ; EnableAsm
 ; EnableXP
 ; UseMainFile = ..\Drop7z.pb
