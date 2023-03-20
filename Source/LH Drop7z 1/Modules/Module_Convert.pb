@@ -926,16 +926,7 @@ Module DropVert
 	;	
 	Procedure.s Char_Unicode(szLine.s,szOrig.s, *P.PROGRAM_BOOT)
 		Protected.s szTest
-		
-sOEM_in_unicode.s = szLine
-   iByteLength = Len(sOEM_in_unicode) + 2     
-   sOem_in_Ascii.s = Space(iByteLength)
-   PokeS(@sOem_in_Ascii, sOEM_in_unicode, -1, #PB_UTF8)
-   sunicode.s = Space(iByteLength)
-   ;CharToOem_(@sOem_in_Ascii, @sunicode)
-   OemToChar_(@sOem_in_Ascii, @sunicode)
-   Output$ + sunicode + Chr(13)
-   
+		   
 		*Mem = AllocateMemory(256)
 		
 		zPokeSascii( *Mem ,0 ,szLine)
@@ -1630,7 +1621,7 @@ sOEM_in_unicode.s = szLine
 				UnCompressZIP(*P, #PB_PackerPlugin_Lzma)		
 			Case "TAR", "GZ", "TGZ"
 				UnCompressZIP(*P, #PB_PackerPlugin_Tar)
-			Case "LZ"
+			Case "LZ";,"Z"
 				UnCompressZIP(*P, #PB_PackerPlugin_BriefLZ)
 			Case "LZX"	
 				UnCompressLZX(*P)	
@@ -2112,6 +2103,8 @@ sOEM_in_unicode.s = szLine
 			ForEach *P\Collection()
 				
 				ArchiveCheck::szVersionsString = ""
+				CheckArchiveLongName 		 = ""
+				
 				If 	  ( FileSize( *P\Collection() ) = -1 )
 						MessageRequester_Show(*P, 11)					
 						MessageRequester_Result
@@ -2126,6 +2119,15 @@ sOEM_in_unicode.s = szLine
 				
 				Select UCase( GetExtensionPart( *P\Collection() ) )
 						; ---------------------------------------------------------------------------------------------------------------  						
+; 					Case "LZ","Z"	
+; 						If ( CFG::*Config\UnPackOnly = #False)
+; 							Result = MessageRequester_Show(*P, 1)
+; 							If ( Result = 1 )
+; 								MessageRequester_Result
+; 							EndIf	
+; 						EndIf	
+						
+						; ---------------------------------------------------------------------------------------------------------------  						
 					Case "7Z"	
 						If ( CFG::*Config\UnPackOnly = #False)
 							Result = MessageRequester_Show(*P, 1)
@@ -2137,10 +2139,9 @@ sOEM_in_unicode.s = szLine
 						; ---------------------------------------------------------------------------------------------------------------  						
 					Case "ZIP", "TAR", "PK3", "PK4","KPF", "TSU", "GZ", "TGZ", "LZX", "EXE"
 						
+						
 						If ( UCase( GetExtensionPart( *P\Collection() ) ) = "EXE" )
 							
-
-							CheckArchiveLongName = ""
 							CheckArchive = ArchiveCheck::Test_Archive( *P\Collection() )
 							
 							If ( CheckArchive = "-2" )
@@ -2383,41 +2384,44 @@ sOEM_in_unicode.s = szLine
 		
 			
 				
-			
+			Errors.i = 0
 			If ( ListSize( *P\Collection() ) > 0 )
 				szErrorList.s = ""
 				If ( ListSize( *P\ConvertResult() ) > 0 )	
 					
 					ResetList(  *P\ConvertResult() )
 					
-					FileCount.i
-					MismtachSize.i		; 1 Error, 0 OK
-					MisMatchFile.i		; 1 Error, 0 OK (File Writte)
-					MisMatchZero.i	
+					
 					
 					ForEach ( *P\ConvertResult() )
 						
 						If ( *P\ConvertResult()\FileCount = 0 )					     						
 							szErrorList + GetFilePart( *P\ConvertResult()\File ) + ": 0 (Keine) Dateien/ Problem beim öffnen" + #CRLF$
+							Errors	+ 1
 						Else					     
 							If ( *P\ConvertResult()\MismtachSize = 1 ) 	
 								szErrorList + "[ 1 DATEI IM ARCHIV]: " + GetFilePart( *P\ConvertResult()\File ) + ": Grösse Stimmt nicht" + #CRLF$					
+								Errors	+ 1
 							EndIf
 							
 							If ( *P\ConvertResult()\MismtachSize > 1 ) 	
 								szErrorList + "[ "+*P\ConvertResult()\MismtachSize +" DATEIEN IM ARCHIV]: " + GetFilePart( *P\ConvertResult()\File ) + ": Grösse Stimmt nicht" + #CRLF$				
+								Errors	+ 1
 							EndIf	
 							
 							If ( *P\ConvertResult()\MisMatchFile = 1 ) 
 								szErrorList + "[ 1 DATEI IM ARCHIV]: " +  GetFilePart( *P\ConvertResult()\File ) + ": Fehler im Archiv" + #CRLF$
+								Errors	+ 1
 							EndIf	
 							
 							If ( *P\ConvertResult()\MisMatchFile > 1 ) 						
 								szErrorList + "[ "+ *P\ConvertResult()\MisMatchFile +" DATEI IM ARCHIV]: " +  GetFilePart( *P\ConvertResult()\File ) + ": Fehler im Archiv" + #CRLF$						
+								Errors	+ 1
 							EndIf
 							
 							If  ( Len( *P\ConvertResult()\FuckUnicode) > 0 )
 								szErrorList + "[UNICODE PROBLEM]: " +  GetFilePart( *P\ConvertResult()\File ) + ":" + #CRLF$ + *P\ConvertResult()\FuckUnicode
+								Errors	+ 1
 							EndIf	
 						EndIf
 						
@@ -2431,7 +2435,7 @@ sOEM_in_unicode.s = szLine
 					
 				EndIf	
 				
-				If ( ListSize( *P\Collection() ) = *P\ResultMax ) And ( Len( szErrorList ) = 0 )
+				If ( ListSize( *P\Collection() ) = *P\ResultMax ) And ( Errors = 0 )
 					;
 					;
 					; Entpacken/ Konvertieren Fehlerbericht					
@@ -2440,14 +2444,14 @@ sOEM_in_unicode.s = szLine
 					EndIf						
 					ProcedureReturn 0
 					
-				ElseIf  ( Len( szErrorList ) = 0 )
+				ElseIf  ( Errors = 0 )
 					
 					If ( CFG::*Config\UnPackOnly )
 						Request::MSG( DropLang::GetUIText(20) , "Status" , "Alle Archiv(e) Entpackt", 2, 0, "",0,0,DC::#_Window_001)  
 					EndIf
 					ProcedureReturn 0
 					
-				ElseIf  ( ListSize( *P\Collection() ) > *P\ResultMax ) Or ( Len( szErrorList ) > 0 )
+				ElseIf  ( ListSize( *P\Collection() ) > *P\ResultMax ) Or ( Errors > 0 )
 					
 					ResetList( *P\Mis() )
 					
@@ -2463,7 +2467,7 @@ sOEM_in_unicode.s = szLine
 					; Entpacken/ Konvertieren Fehlerbericht
 					;
 					If ( CFG::*Config\UnPackOnly )
-						Request::MSG( DropLang::GetUIText(20) , "Status mit Fehler" , Str( ListSize( *P\Collection()) ) + " Fehler beim Verarbeiten " + Lst + #CRLF$ + szErrorList, 2, 2,"",0,0,DC::#_Window_001) 
+						Request::MSG( DropLang::GetUIText(20) , "Status mit Fehler" , Str( Errors ) + " Fehler beim Verarbeiten " + Lst + #CRLF$ + szErrorList, 2, 2,"",0,0,DC::#_Window_001) 
 					Else						
 						Request::MSG( DropLang::GetUIText(20) , "Status mit Fehler" , "7z Archiv(e) Komprimiert " + Str(*P\ResultMax) + " von " + ListSize( *P\Collection() ) + Lst + #CRLF$ + szErrorList, 2, 1,"",0,0,DC::#_Window_001)  
 					EndIf
@@ -2488,10 +2492,10 @@ sOEM_in_unicode.s = szLine
 
 	EndProcedure	
 EndModule
-; IDE Options = PureBasic 5.73 LTS (Windows - x64)
-; CursorPosition = 932
-; FirstLine = 247
-; Folding = LAAAAeli--
+; IDE Options = PureBasic 6.00 LTS (Windows - x64)
+; CursorPosition = 1623
+; FirstLine = 710
+; Folding = LAAAAely--
 ; EnableAsm
 ; EnableXP
 ; UseMainFile = ..\Drop7z.pb

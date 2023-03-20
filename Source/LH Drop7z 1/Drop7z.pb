@@ -506,3 +506,4 @@ End
 ; CurrentDirectory = Drop7z\
 ; Compiler = PureBasic 5.73 LTS (Windows - x64)
 ; EnableUnicode
+; Optimizer

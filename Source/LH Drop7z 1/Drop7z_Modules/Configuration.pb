@@ -186,7 +186,7 @@ Module CFG
 		
 		suSubData  = "DropData\"
 			
-		*Config\Version    	= "1.02.06 Beta FastFertig"
+		*Config\Version    	= "1.02.07 Beta FastFertig"
 		*Config\WindowTitle	= "Drop7z v"+ *Config\Version +" By Marty Shepard"
 		
 		*Config\ConfigPath 	= GetPathPart( ProgramFilename() ) + suSubData + "Drop7z.ini"
@@ -362,6 +362,12 @@ Module CFG
 		szString + #LF$ + ""              
 		szString + #LF$ + "Changelog:                             "
 		szString + #LF$ + "======================================="
+		szString + #LF$ + "Version 1.02.07 Beta                   "        
+		szString + #LF$ + ""
+		szString + #LF$ + "- Ups .. Bugfix Errors Calculation"
+		szString + #LF$ + "- Extended Bytes Header Archiv Check"		
+		szString + #LF$ + ""	
+		szString + #LF$ + "---------------------------------------" 		
 		szString + #LF$ + "Version 1.02.06 Beta                   "        
 		szString + #LF$ + ""
 		szString + #LF$ + "- Destination Diectory Check/Open Menu"
@@ -659,8 +665,8 @@ Module CFG
 	EndProcedure	
 EndModule
 ; IDE Options = PureBasic 5.73 LTS (Windows - x64)
-; CursorPosition = 370
-; FirstLine = 283
+; CursorPosition = 367
+; FirstLine = 277
 ; Folding = f0
 ; EnableAsm
 ; EnableXP
