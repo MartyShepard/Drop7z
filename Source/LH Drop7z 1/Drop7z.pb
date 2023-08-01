@@ -495,15 +495,15 @@ SSTTIP::ToolTipMode(2,DC::#Button_004)
 
 
 End
-; IDE Options = PureBasic 5.73 LTS (Windows - x64)
-; CursorPosition = 473
-; FirstLine = 417
+; IDE Options = PureBasic 5.73 LTS (Windows - x86)
+; CursorPosition = 135
+; FirstLine = 95
 ; EnableThread
 ; EnableXP
 ; EnableOnError
 ; UseIcon = _GUI_IMAGES\ICONS\drop7ztray.ico
 ; Executable = ..\LH Drop7z 1 (Beta Versions)\Drop7z x64.exe
 ; CurrentDirectory = Drop7z\
-; Compiler = PureBasic 5.73 LTS (Windows - x64)
+; Compiler = PureBasic 5.73 LTS (Windows - x86)
 ; EnableUnicode
 ; Optimizer

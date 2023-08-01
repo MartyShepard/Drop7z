@@ -52,11 +52,32 @@ Module DropVert
 		ContinueOnError.i
 		ProgressCountFiles.i
 		rect.RECT
+		*RecycleFile
 		List Collection.s()
 		List ConvertResult.CONVERT_RESULT()
 		List Mis.s()
 	EndStructure 
 	
+	#FOF_NOERRORUI=$400
+
+	Procedure RecycleFile(*P.PROGRAM_BOOT)
+		
+		SHFileOp.SHFILEOPSTRUCT
+		SHFileOp\pFrom = @*p\DstPath
+		SHFileOp\wFunc = #FO_DELETE
+		SHFileOp\fFlags = #FOF_ALLOWUNDO | #FOF_NOCONFIRMATION | #FOF_NOERRORUI | #FOF_SILENT
+			
+		ok=SHFileOperation_(SHFileOp)
+
+		Delay(500)
+		If ok=0
+			ok=1
+		Else
+			ok=0
+		EndIf
+		Debug "OK = " + Str(ok)
+		ProcedureReturn ok
+	EndProcedure
 	;
 	;
 	;    
@@ -173,7 +194,8 @@ Module DropVert
 					 ProcedureReturn 0    
 				Case 6
 					If ( FileSize(  szArchivFile  ) >= 0 )
-						DeleteFile(  szArchivFile , #PB_FileSystem_Force)
+						;	DeleteFile(  szArchivFile , #PB_FileSystem_Force)
+						;RecycleFile(szArchivFile)
 					EndIf
 					ProcedureReturn 0	
 				Default
@@ -1701,7 +1723,8 @@ Module DropVert
 				
 				If ( *P\ContinueOnError = 1 )
 					If ( FileSize( *P\DstPath ) = -2 )
-						DeleteDirectory( *P\DstPath, "",  #PB_FileSystem_Recursive|#PB_FileSystem_Force )
+						;DeleteDirectory( *P\DstPath, "",  #PB_FileSystem_Recursive|#PB_FileSystem_Force )
+						RecycleFile(*P)
 					EndIf						
 					Continue
 				EndIf	
@@ -1820,7 +1843,8 @@ Module DropVert
 				
 				
 				If ( FileSize( *P\DstPath ) = -2 And  CFG::*Config\ConvertDelTemp = #True )
-					DeleteDirectory( *P\DstPath, "",  #PB_FileSystem_Recursive|#PB_FileSystem_Force )
+					;DeleteDirectory( *P\DstPath, "",  #PB_FileSystem_Recursive|#PB_FileSystem_Force )
+					RecycleFile(*P)
 				EndIf	
 				
 				;Delay( 25 ) 
@@ -2493,9 +2517,9 @@ Module DropVert
 	EndProcedure	
 EndModule
 ; IDE Options = PureBasic 6.00 LTS (Windows - x64)
-; CursorPosition = 1623
-; FirstLine = 710
-; Folding = LAAAAely--
+; CursorPosition = 78
+; FirstLine = 42
+; Folding = XAAAA0Kl--
 ; EnableAsm
 ; EnableXP
 ; UseMainFile = ..\Drop7z.pb

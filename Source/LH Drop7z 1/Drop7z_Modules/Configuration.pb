@@ -186,7 +186,7 @@ Module CFG
 		
 		suSubData  = "DropData\"
 			
-		*Config\Version    	= "1.02.07 Beta FastFertig"
+		*Config\Version    	= "1.02.08 Beta FastFertig"
 		*Config\WindowTitle	= "Drop7z v"+ *Config\Version +" By Marty Shepard"
 		
 		*Config\ConfigPath 	= GetPathPart( ProgramFilename() ) + suSubData + "Drop7z.ini"
@@ -362,6 +362,11 @@ Module CFG
 		szString + #LF$ + ""              
 		szString + #LF$ + "Changelog:                             "
 		szString + #LF$ + "======================================="
+		szString + #LF$ + "Version 1.02.08 Beta                   "        
+		szString + #LF$ + ""
+		szString + #LF$ + "- Bug ... Ahhhhhhhhhhh"
+		szString + #LF$ + ""	
+		szString + #LF$ + "---------------------------------------" 		
 		szString + #LF$ + "Version 1.02.07 Beta                   "        
 		szString + #LF$ + ""
 		szString + #LF$ + "- Ups .. Bugfix Errors Calculation"
@@ -664,9 +669,8 @@ Module CFG
 		ProcedureReturn szString
 	EndProcedure	
 EndModule
-; IDE Options = PureBasic 5.73 LTS (Windows - x64)
-; CursorPosition = 367
-; FirstLine = 277
+; IDE Options = PureBasic 6.00 LTS (Windows - x64)
+; CursorPosition = 188
 ; Folding = f0
 ; EnableAsm
 ; EnableXP
